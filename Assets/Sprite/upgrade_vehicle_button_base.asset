@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!213 &21300000
+Sprite:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: upgrade_vehicle_button_base
+  m_Rect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 136
+    height: 135
+  m_Offset: {x: 0, y: 0}
+  m_Border: {x: 0, y: 0, z: 0, w: 0}
+  m_PixelsToUnits: 100
+  m_Extrude: 1
+  m_IsPolygon: 0
+  m_AtlasName:
+  m_PackingTag:
+  m_RD:
+    texture: {fileID: 2800000, guid: 35e21c7a090804b419975e344d78b92f, type: 3}
+    alphaTexture: {fileID: 0}
+    vertices:
+    - serializedVersion: 2
+      pos: {x: 0.68, y: 0.425, z: 0}
+    - serializedVersion: 2
+      pos: {x: 0.48, y: -0.675, z: 0}
+    - serializedVersion: 2
+      pos: {x: 0.68, y: -0.575, z: 0}
+    - serializedVersion: 2
+      pos: {x: 0.41, y: 0.675, z: 0}
+    - serializedVersion: 2
+      pos: {x: -0.35, y: 0.675, z: 0}
+    - serializedVersion: 2
+      pos: {x: -0.4, y: 0.655, z: 0}
+    - serializedVersion: 2
+      pos: {x: -0.57, y: -0.675, z: 0}
+    - serializedVersion: 2
+      pos: {x: -0.68, y: 0.495, z: 0}
+    - serializedVersion: 2
+      pos: {x: -0.68, y: -0.555, z: 0}
+    indices: 080007000600050006000700010006000500040001000500030001000400000001000300020001000000
+    textureRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 136
+      height: 135
+    textureRectOffset: {x: 0, y: 0}
+    settingsRaw: 67
+    uvTransform: {x: 100, y: 68, z: 100, w: 67.5}

@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!43 &4300000
+Mesh:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: EffectElectrocutionStreak
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 36
+    topology: 0
+    firstVertex: 0
+    vertexCount: 21
+    localAABB:
+      m_Center: {x: 0.021177359, y: 0.025925368, z: 0}
+      m_Extent: {x: 0.21866804, y: 0.19528885, z: 0}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes:
+  m_RootBoneNameHash: 0
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexBuffer: 000001000200000002000300040003000200020005000400020006000500070008000200010007000900080006000a000b000c000d000d000e000f00100011000b00120013001400
+  m_Skin: []
+  m_VertexData:
+    m_CurrentChannels: 11
+    m_VertexCount: 21
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 12
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 24
+      format: 0
+      dimension: 2
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 672
+    _typelessdata: 089a753ef731f6bd0000000000000000000000000000803f000000000000003ff286c13dd64faf3b0000000000000000000000000000803fff62a03e8231503f0000000044e51e3c0000000000000000000000000000803ffeffff3efa32193f8f404b3dbff382bd0000000000000000000000000000803f1a09cb3e78dbd33de17742bdb70b8fbd0000000000000000000000000000803fa1a0153ffe04ad3d10cc19be75d005be0000000000000000000000000000803f0000803f0000003f57ddbebdd3aa7f3b0000000000000000000000000000803fd8472b3f2fb8543f8f65203dcfe7b43d0000000000000000000000000000803fabeada3e79cc653f8f6520bdcfe7b43d0000000000000000000000000000803fab8a123f79cc653f0000000044e51e3c0000000000000000000000000000803ffeffff3efa32193f0000000044e51e3c0000000000000000000000000000803ffeffff3efa32193f8f65203dcfe7b43d0000000000000000000000000000803fabeada3e79cc653f00000000c54b543e0000000000000000000000000000803f0000003f78cc653f8f6520bdcfe7b43d0000000000000000000000000000803fab8a123f79cc653fff3a4abefb85623e0000000000000000000000000000803fd8472b3f2fb8543f57ddbebdd3aa7f3b0000000000000000000000000000803fd8472b3f2fb8543ff286c13dd64faf3b0000000000000000000000000000803fff62a03e8231503fd35c4d3e93a2a53d0000000000000000000000000000803fabeada3e79cc653fe17742bdb70b8fbd0000000000000000000000000000803fa1a0153ffe04ad3d05be1a3c9f6d2dbe0000000000000000000000000000803f1a09cb3e78dbd33d8f404b3dbff382bd0000000000000000000000000000803f1a09cb3e78dbd33d
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data:
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data:
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data:
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data:
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data:
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data:
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data:
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data:
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data:
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data:
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0.021177359, y: 0.025925368, z: 0}
+    m_Extent: {x: 0.21866804, y: 0.19528885, z: 0}
+  m_MeshUsageFlags: 1
+  m_BakedConvexCollisionMesh:
+  m_BakedTriangleCollisionMesh:
+  m_MeshOptimized: 1

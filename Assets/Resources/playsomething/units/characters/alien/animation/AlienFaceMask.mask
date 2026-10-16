@@ -1,0 +1,234 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1011 &101100000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: AlienFaceMask
+  m_Mask: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  m_Elements:
+  - m_Path: Body
+    m_Weight: 0
+  - m_Path: Hips
+    m_Weight: 0
+  - m_Path: Hips/HipsCollider
+    m_Weight: 0
+  - m_Path: Hips/HipsCollider/HipsAngle
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftAnkle
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftAnkle/LeftAnkleCollider
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftAnkle/LeftAnkleCollider/LeftAnkleAngle
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftAnkle/LeftAnkleCollider/Max 6
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftAnkle/LeftAnkleCollider/Min 6
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftAnkle/LeftToes
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftKneeCollider
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftKneeCollider/LeftKneeAngle
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftKneeCollider/Max 3
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftKnee/LeftKneeCollider/Min 3
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftLegCollider
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftLegCollider/LeftLegAngle
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftLegCollider/Max
+    m_Weight: 0
+  - m_Path: Hips/LeftLeg/LeftLegCollider/Min
+    m_Weight: 0
+  - m_Path: Hips/RightLeg
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightAnkle
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightAnkle/RightAnkleCollider
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightAnkle/RightAnkleCollider/Max 7
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightAnkle/RightAnkleCollider/Min 7
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightAnkle/RightAnkleCollider/RightAnkleAngle
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightAnkle/RightToes
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightKneeCollider
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightKneeCollider/Max 4
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightKneeCollider/Min 4
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightKnee/RightKneeCollider/RightKneeAngle
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightLegCollider
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightLegCollider/Max 1
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightLegCollider/Min 1
+    m_Weight: 0
+  - m_Path: Hips/RightLeg/RightLegCollider/RightLegAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine1Collider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine1Collider/Max 2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine1Collider/Min 2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine1Collider/Spine1Angle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftElbowCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftElbowCollider/LeftElbowAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftElbowCollider/Max 12
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftElbowCollider/Min 12
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftIndex1/LeftIndex2/LeftIndex3
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftLittle1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftLittle1/LeftLittle2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftLittle1/LeftLittle2/LeftLittle3
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftThumb1/LeftThumb2/LeftThumb3
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftWristCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftWristCollider/LeftWristAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftWristCollider/Max 14
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftElbow/LeftWrist/LeftWristCollider/Min 14
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftShoulderCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftShoulderCollider/LeftShoulderAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftShoulderCollider/Max 9
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/LeftScapula/LeftShoulder/LeftShoulderCollider/Min 9
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/EyeLids
+    m_Weight: 1
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/HeadCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/HeadCollider/HeadAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/HeadCollider/Max 10
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/HeadCollider/Min 10
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/LeftEye
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/LeftEye/EyeLeft
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/Mouth
+    m_Weight: 1
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/RightEye
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/Head/RightEye/EyeRight
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/NeckCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/NeckCollider/Max 8
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/NeckCollider/Min 8
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Neck/NeckCollider/NeckAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightElbowCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightElbowCollider/Max 13
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightElbowCollider/Min 13
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightElbowCollider/RightElbowAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightIndex1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightIndex1/RightIndex2/RightIndex3
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightLittle1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightLittle1/RightLittle2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightLittle1/RightLittle2/RightLittle3
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightThumb1
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightThumb1/RightThumb2/RightThumb3
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightWristCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightWristCollider/Max 15
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightWristCollider/Min 15
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightElbow/RightWrist/RightWristCollider/RightWristAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightShoulderCollider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightShoulderCollider/Max 11
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightShoulderCollider/Min 11
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/RightScapula/RightShoulder/RightShoulderCollider/RightShoulderAngle
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Spine2Collider
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Spine2Collider/Max 5
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Spine2Collider/Min 5
+    m_Weight: 0
+  - m_Path: Hips/Spine1/Spine2/Spine2Collider/Spine2Angle
+    m_Weight: 0

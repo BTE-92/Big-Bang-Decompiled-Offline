@@ -1,0 +1,1071 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1125408137006432
+GameObject:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_Component:
+  - 4: {fileID: 4167130131870145}
+  - 114: {fileID: 114545611201997115}
+  m_Layer: 0
+  m_Name: ResourcePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4167130131870145
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1125408137006432}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &114545611201997115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1125408137006432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9927a26bc6bcd184163ef2ff4d7307a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  groups:
+  - name: SHARED
+    items:
+    - name: AlienAnimatorController_AnimatorController
+      path: PlaySomething/Units/Characters/Alien/Animation/AlienAnimatorController
+      GUID: c8a702207ebaa465ba836496b434f303
+      suffix: AnimatorController
+    - name: HurmeBold_Font
+      path: Fonts/HurmeBold
+      GUID: d520261f26119407b81ffd63c5ed4333
+      suffix: Font
+    - name: HurmeRegular_Font
+      path: Fonts/HurmeRegular
+      GUID: 196aa4e4b458e452d9c030003b10d3d0
+      suffix: Font
+    - name: HurmeSemiBold_Font
+      path: Fonts/HurmeSemiBold
+      GUID: 9b0cc5a8fe4c1459fa9229fcf47d73a3
+      suffix: Font
+    - name: HurmeSemiBoldMN_Font
+      path: Fonts/HurmeSemiBoldMN
+      GUID: fc45f8fa6e697472081905833ea09757
+      suffix: Font
+    - name: KGLetHerGo_Font
+      path: Fonts/KGLetHerGo
+      GUID: a090e3c041fb64a6b9ed44f53e84169c
+      suffix: Font
+    - name: KGSecondChances_Font
+      path: Fonts/KGSecondChances
+      GUID: 34a0e5f6f0050418cbbb411d9e628560
+      suffix: Font
+    - name: ResourcesAnimations_GameObject
+      path: PlaySomething/FX/Prefabs/ResourcesAnimations
+      GUID: d873a80fee0554cdbb6ba9502a79924b
+      suffix: GameObject
+    - name: WinTrophyEffect_GameObject
+      path: PlaySomething/FX/SharedEffects/WinTrophyEffect
+      GUID: e69358221fcb14e4fa9c5c485d775128
+      suffix: GameObject
+    - name: MenuCharBuildPrefab_GameObject
+      path: PlaySomething/Menu/MenuCharacters/Builder/MenuCharBuildPrefab
+      GUID: b3d2d4f529444d14ebb54152360a58ed
+      suffix: GameObject
+    - name: MenuCharMechPrefab_GameObject
+      path: PlaySomething/Menu/MenuCharacters/Mechanic/MenuCharMechPrefab
+      GUID: 17c0fd2b6810363439b213e9ce4fe74e
+      suffix: GameObject
+    - name: MenuCharProfPrefab_GameObject
+      path: PlaySomething/Menu/MenuCharacters/Professor/MenuCharProfPrefab
+      GUID: cfa3fe20a108d594d9591bc31cb7590f
+      suffix: GameObject
+    - name: RentWindow_GameObject
+      path: PlaySomething/UI/UnityUI/RentWindow
+      GUID: 7d105e81af0e843958c6a465e076818b
+      suffix: GameObject
+    - name: UnityUICanvas_GameObject
+      path: PlaySomething/UI/UnityUI/UnityUICanvas
+      GUID: aa606cb0be1fd475c9849ee780017223
+      suffix: GameObject
+    - name: UpgradeWindow_GameObject
+      path: PlaySomething/UI/UnityUI/UpgradeWindow
+      GUID: c502a173ef36242edb022f768f8c10ed
+      suffix: GameObject
+    - name: AlienNewPrefab_GameObject
+      path: PlaySomething/Units/Characters/Alien/AlienNewPrefab
+      GUID: 697ed90a46fbfe6408a5a814ae766287
+      suffix: GameObject
+    - name: BarbarianHelmetPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/BarbarianHelmet/BarbarianHelmetPrefab
+      GUID: 93c97fbd260d55f40bd177a247423a9b
+      suffix: GameObject
+    - name: AlienBaseballHatPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/BaseballHat/AlienBaseballHatPrefab
+      GUID: 9d64166fd5df4498c9e408fd19185bc8
+      suffix: GameObject
+    - name: ChickenHatPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/ChickenHat/ChickenHatPrefab
+      GUID: 556c4b193993c0c47a9499a97180f6f3
+      suffix: GameObject
+    - name: CowboyHatPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/CowboyHat/CowboyHatPrefab
+      GUID: 80452782872cc3746bdcd32dfdfc12fd
+      suffix: GameObject
+    - name: DealWithItGlassesPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/DealWithItGlasses/DealWithItGlassesPrefab
+      GUID: df2fd2d81403f1843894db98ebc86799
+      suffix: GameObject
+    - name: DeathMaskPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/DeathMask/DeathMaskPrefab
+      GUID: 7738b8e411be2d34aa96db7b765a3a3d
+      suffix: GameObject
+    - name: FlightCapPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/FlightCap/FlightCapPrefab
+      GUID: dc33d9d67d2fbda4a86c48df588fc792
+      suffix: GameObject
+    - name: HorseHeadMaskPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/HorseHeadMask/HorseHeadMaskPrefab
+      GUID: 7153e4420d0cfff43a418965905f3ef9
+      suffix: GameObject
+    - name: KnightHelmPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/KnightHelm/KnightHelmPrefab
+      GUID: 0c7ad398c4786f1478df30ec0b8d9417
+      suffix: GameObject
+    - name: MushroomHatPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/MushroomHat/MushroomHatPrefab
+      GUID: f5d3b3f0298d69041aceefd7e56b7364
+      suffix: GameObject
+    - name: AlienHelmetPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/OffroadCarHelmet/AlienHelmetPrefab
+      GUID: 72925cf6d22014d81a5d619a0636686c
+      suffix: GameObject
+    - name: PaperBagHatPrefab_GameObject
+      path: PlaySomething/Units/Characters/AlienProps/PaperBagHat/PaperBagHatPrefab
+      GUID: 5e7d76f225c36674fae78842c7fc411e
+      suffix: GameObject
+    - name: AntennaPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/AntennaPrefab
+      GUID: 3a768064aedf84b1ba500e2b77c02219
+      suffix: GameObject
+    - name: MotorcyclePrefab_GameObject
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcyclePrefab
+      GUID: 6a75da9ecc1f94c6bbe7dd8f27ea94d7
+      suffix: GameObject
+    - name: OffroadCarPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarPrefab
+      GUID: b0c93ca4c710b49aea2c7b6461ae03c8
+      suffix: GameObject
+    - name: DebugMaterial_Material
+      path: PlaySomething/FX/SpecialMaterials/DebugMaterial
+      GUID: 25fbc58865888472fb7e6dd49f619119
+      suffix: Material
+    - name: LevelLoadingBackgroundMat_Material
+      path: PlaySomething/UI/LevelLoadingBackgroundMat
+      GUID: 393185a7080614c0caa44f39f7e4f6df
+      suffix: Material
+    - name: LoadingBallEmitMat_Material
+      path: PlaySomething/UI/LoadingBallEmitMat
+      GUID: 67fad73f8bc9e45a1995d96108319b7a
+      suffix: Material
+    - name: LoadingScreenFadeMat_Material
+      path: PlaySomething/UI/LoadingScreenFadeMat
+      GUID: dc11fff6502a04dd591cf7fa51e3bfb1
+      suffix: Material
+    - name: MenuMetalLightMat_Material
+      path: PlaySomething/UI/MenuMetalLightMat
+      GUID: a31696178f07e4451b997760c46ad44e
+      suffix: Material
+    - name: MenuMetalMat_Material
+      path: PlaySomething/UI/MenuMetalMat
+      GUID: a4f01afaa2ec6488b8161e6ff686d9ec
+      suffix: Material
+    - name: MenuPopupBackgroundMat_Material
+      path: PlaySomething/UI/MenuPopupBackgroundMat
+      GUID: 19c8a41c1cb8e4c27a32c6d89b0944d6
+      suffix: Material
+    - name: ProfileMat_Material
+      path: PlaySomething/UI/ProfileMat
+      GUID: 27fd9a91352c242eb9c2ad5b37c9ab44
+      suffix: Material
+    - name: ScreenshotMat_Material
+      path: PlaySomething/UI/ScreenshotMat
+      GUID: f972be590fb4d4257b7e0084e9ee1afd
+      suffix: Material
+    - name: ScreenshotTutorialMat_Material
+      path: PlaySomething/UI/ScreenshotTutorialMat
+      GUID: a4ee8432f3f5646f0a3bd09a23d90735
+      suffix: Material
+    - name: UiAtlasMat_Material
+      path: PlaySomething/UI/UiAtlas/UiAtlasMat
+      GUID: 7847c63bc84dd45169faffc69e3a862a
+      suffix: Material
+    - name: UIPlanetAtlasMat_Material
+      path: PlaySomething/UI/UiAtlas/UIPlanetAtlasMat
+      GUID: 96d0f2f7704b24a31a6d0aeae79c1cb0
+      suffix: Material
+    - name: RandomLevelNamesBase_TextAsset
+      path: PlaySomething/RandomLevelNamesBase
+      GUID: fc9af9556defb42049d2bab56c655353
+      suffix: TextAsset
+    - name: UiAtlas_TextAsset
+      path: PlaySomething/UI/UiAtlas/UiAtlas
+      GUID: 39675d377be3b4ba69b3269ea5620c8f
+      suffix: TextAsset
+    - name: AnonymousProfile_Texture2D
+      path: PlaySomething/UI/AnonymousProfile
+      GUID: 68efc6a1ee4084d479c3f09184a74725
+      suffix: Texture2D
+    - name: ScreenshotDefault_Texture2D
+      path: PlaySomething/UI/ScreenshotDefault
+      GUID: 8cc65fa4f6dd740969eab8d136d05e54
+      suffix: Texture2D
+    - name: MotorcycleDifT0_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifT0
+      GUID: 50639090cefbf4c0895290497058ee40
+      suffix: Texture2D
+    - name: MotorcycleDifT1_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifT1
+      GUID: 12ebb45ec13cc4e97a0bb09972a3df14
+      suffix: Texture2D
+    - name: MotorcycleDifT2_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifT2
+      GUID: 210afa4bb2c5d45ab9df07692f11db43
+      suffix: Texture2D
+    - name: MotorcycleDifT3_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifT3
+      GUID: 54a530d54a36a42509331aeb99b27e19
+      suffix: Texture2D
+    - name: MotorcycleDifT4_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifT4
+      GUID: 49366d9bec2fb4e7eb0a3601d7b0097a
+      suffix: Texture2D
+    - name: OffroadCarDifT0_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifT0
+      GUID: d66217309e437594b92470718585ac53
+      suffix: Texture2D
+    - name: OffroadCarDifT1_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifT1
+      GUID: 04fbb05d3e5905c4daa962604bdeb7ad
+      suffix: Texture2D
+    - name: OffroadCarDifT2_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifT2
+      GUID: b4a93a5af24c4af429b6eebf605e6220
+      suffix: Texture2D
+    - name: OffroadCarDifT3_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifT3
+      GUID: c27dcc2232057f64e836f119e21b138e
+      suffix: Texture2D
+    - name: OffroadCarDifT4_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifT4
+      GUID: 1bcc2860aed4e450aa5f350558a27f27
+      suffix: Texture2D
+  - name: MENU
+    items:
+    - name: ItemCardEffect_GameObject
+      path: PlaySomething/FX/MenuEffects/ItemCardEffect
+      GUID: cae95f49424f74b0689aee99a4c5d9df
+      suffix: GameObject
+    - name: FloatingDomeDeathEffect_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/FloatingDomeDeathEffect
+      GUID: 8fb3a31a5cb65401fb92ce6fa2843d6d
+      suffix: GameObject
+    - name: FloatingPlatformPrefab_GameObject
+      path: PlaySomething/Menu/Floaters/FloatingPlatform/FloatingPlatformPrefab
+      GUID: e1e80e729ccffe54082bc5f76dad6306
+      suffix: GameObject
+    - name: FloatingPlatformDailyDiamondsPrefab_GameObject
+      path: PlaySomething/Menu/Floaters/FloatingPlatformDailyDiamonds/FloatingPlatformDailyDiamondsPrefab
+      GUID: 4d09905e17f2c5f4b9be268c0c55db07
+      suffix: GameObject
+    - name: FloatingPlatformFreshAndFreePrefab_GameObject
+      path: PlaySomething/Menu/Floaters/FloatingPlatformFreshAndFree/FloatingPlatformFreshAndFreePrefab
+      GUID: 59039ec50f223a1418f6e7e784eb64f5
+      suffix: GameObject
+    - name: MenuCharBuildButtonPrefab_GameObject
+      path: PlaySomething/Menu/MenuCharacters/Builder/MenuCharBuildButtonPrefab
+      GUID: a128676665e2d1d4aafb03d438d1ac69
+      suffix: GameObject
+    - name: MenuCharMechButtonPrefab_GameObject
+      path: PlaySomething/Menu/MenuCharacters/Mechanic/MenuCharMechButtonPrefab
+      GUID: ec07b9b5dad7a3a4884d0257d18fab68
+      suffix: GameObject
+    - name: MenuCharProfButtonPrefab_GameObject
+      path: PlaySomething/Menu/MenuCharacters/Professor/MenuCharProfButtonPrefab
+      GUID: 10d914b4461cbce4a8e083a52851ef5a
+      suffix: GameObject
+    - name: CloudsA_GameObject
+      path: PlaySomething/Menu/Planets/CloudsA
+      GUID: 490129b52c38e324f9fb1aae0acf9733
+      suffix: GameObject
+    - name: CloudsB_GameObject
+      path: PlaySomething/Menu/Planets/CloudsB
+      GUID: 0173247dd5b1ba042af0e4d5791d2423
+      suffix: GameObject
+    - name: CloudsC_GameObject
+      path: PlaySomething/Menu/Planets/CloudsC
+      GUID: 04803864fa5255843bb98f70db858828
+      suffix: GameObject
+    - name: PlanetAtmosphere_GameObject
+      path: PlaySomething/Menu/Planets/PlanetAtmosphere
+      GUID: 6ad268e6c529ba7418c4e5a8c6470dd9
+      suffix: GameObject
+    - name: PlanetBackgroundCloudsPrefab_GameObject
+      path: PlaySomething/Menu/Planets/PlanetBackgroundCloudsPrefab
+      GUID: 58104487831fefb45a1c527456384d4f
+      suffix: GameObject
+    - name: PlanetBackroundPrefab_GameObject
+      path: PlaySomething/Menu/Planets/PlanetBackroundPrefab
+      GUID: 4f7f63430dad91c478878b169caa8191
+      suffix: GameObject
+    - name: PlanetSliceAPrefab_GameObject
+      path: PlaySomething/Menu/Planets/PlanetSliceAPrefab
+      GUID: ce4d1a3e19488af4ab2cbb827ca0538f
+      suffix: GameObject
+    - name: PlanetSliceDesertAPrefab_GameObject
+      path: PlaySomething/Menu/Planets/PlanetSliceDesertAPrefab
+      GUID: 60f7cc9c4ccfc424d9124040f77f9902
+      suffix: GameObject
+    - name: PlanetStarskyPrefab_GameObject
+      path: PlaySomething/Menu/Planets/PlanetStarskyPrefab
+      GUID: 4faa1ad72718a01489cdaf4a50c790af
+      suffix: GameObject
+    - name: CheckpointAntennaPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/CheckpointAntennaPrefab
+      GUID: c80b7dafd7cd2334db051bec8f9a01ca
+      suffix: GameObject
+    - name: CheckpointChestPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/CheckpointChestPrefab
+      GUID: fdb9cfc70aa32ee40a01fb76b6b14a06
+      suffix: GameObject
+    - name: CheckpointCranePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/CheckpointCranePrefab
+      GUID: e6a7c89958f7b634e8fcc7335cf532cc
+      suffix: GameObject
+    - name: CheckpointGaragePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/CheckpointGaragePrefab
+      GUID: f7a897283cd2c6e4e8270d521b3ebe15
+      suffix: GameObject
+    - name: FloatingPlatformTournamentPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/FloatingPlatformTournamentPrefab
+      GUID: d8b4d906d45570845b4916fa4e3417b3
+      suffix: GameObject
+    - name: MainMenuVignettePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/MainMenuVignettePrefab
+      GUID: aa1b601705fab45b6a5f48c6c8c834f0
+      suffix: GameObject
+    - name: PathButtonActiveEffectPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonActiveEffectPrefab
+      GUID: 41bcad14ccad9430a9fc0a39c905d39c
+      suffix: GameObject
+    - name: PathButtonChestPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonChestPrefab
+      GUID: 90ecab7f4e622fd448911658a5ae64e5
+      suffix: GameObject
+    - name: PathButtonDailyDiamondsPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonDailyDiamondsPrefab
+      GUID: 61c701ff52b51fd46a3c3656963437e9
+      suffix: GameObject
+    - name: PathButtonFindStarsPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonFindStarsPrefab
+      GUID: 6f3cb65e729da4a4098b21ccb2261b7c
+      suffix: GameObject
+    - name: PathButtonFreshAndFreePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonFreshAndFreePrefab
+      GUID: 4ff16231592539541837bef55df0da3e
+      suffix: GameObject
+    - name: PathButtonInsanePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonInsanePrefab
+      GUID: 1714cf15057542044bb6fa32d6ad9cfa
+      suffix: GameObject
+    - name: PathButtonLargePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonLargePrefab
+      GUID: a6d7b31e3b945f643aaf7f5ff94de7cf
+      suffix: GameObject
+    - name: PathButtonPuzzlePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonPuzzlePrefab
+      GUID: 24aee64474c3e254e886635a7308c978
+      suffix: GameObject
+    - name: PathButtonRacePrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonRacePrefab
+      GUID: bf27788b9561b1d439921d823d80aa0d
+      suffix: GameObject
+    - name: PathButtonTournamentPrefab_GameObject
+      path: PlaySomething/Menu/Prefabs/PathButtonTournamentPrefab
+      GUID: ae6b25d0f698bfd42ad576fb0ee485cb
+      suffix: GameObject
+    - name: CollectibleGemPlanetPrefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleGem/CollectibleGemPlanetPrefab
+      GUID: b33d993ece0e743898cd45a404550c6e
+      suffix: GameObject
+  - name: GAME
+    items:
+    - name: SandGroundPropStorage_GameObject
+      path: PlaySomething/Environments/Autogeometry/GroundDecorations/SandGroundPropStorage
+      GUID: 7c7ff51469dec48fa925dc9a51fd5157
+      suffix: GameObject
+    - name: Map_Play_Human_Large_GameObject
+      path: PlaySomething/Environments/Map_Play_Human_Large
+      GUID: 714f893470feb114e8792349e4073535
+      suffix: GameObject
+    - name: Map_Play_Large_GameObject
+      path: PlaySomething/Environments/Map_Play_Large
+      GUID: 289d2aeb066d8d143b2c1b15db71af10
+      suffix: GameObject
+    - name: Map_Play_Medium_GameObject
+      path: PlaySomething/Environments/Map_Play_Medium
+      GUID: a71bf68882ebebe4286e8227ee080231
+      suffix: GameObject
+    - name: Map_Play_Small_GameObject
+      path: PlaySomething/Environments/Map_Play_Small
+      GUID: ad335d0ebfea141498d05109a04404e8
+      suffix: GameObject
+    - name: EffectSpeedBoost_GameObject
+      path: PlaySomething/FX/IngameEffects/EffectSpeedBoost
+      GUID: 3325ed2bbb58044e5af2905332e68eb2
+      suffix: GameObject
+    - name: PickUpSparks_GameObject
+      path: PlaySomething/FX/IngameEffects/PickUpSparks
+      GUID: 39cb04054ccab9c4eb266be466f1b04a
+      suffix: GameObject
+    - name: PickUpStarSparks_GameObject
+      path: PlaySomething/FX/IngameEffects/PickUpStarSparks
+      GUID: e57e9764c59a48c4faf80929bdbb687b
+      suffix: GameObject
+    - name: SpeedBoostTrail_GameObject
+      path: PlaySomething/FX/IngameEffects/SpeedBoostTrail
+      GUID: bc5c3704baa9543d1a447efff15fa5af
+      suffix: GameObject
+    - name: StarMagnetBoost_GameObject
+      path: PlaySomething/FX/IngameEffects/StarMagnetBoost
+      GUID: 6ccd1068977f64fe88cf2a55aefb5219
+      suffix: GameObject
+    - name: StarReward0_GameObject
+      path: PlaySomething/FX/IngameEffects/StarRewards/StarReward0
+      GUID: f34fbfc2b244a4c4784fd016b9efcac3
+      suffix: GameObject
+    - name: StarReward1_GameObject
+      path: PlaySomething/FX/IngameEffects/StarRewards/StarReward1
+      GUID: b1e22ed9299f64858b2c3478c2bcc792
+      suffix: GameObject
+    - name: StarReward2_GameObject
+      path: PlaySomething/FX/IngameEffects/StarRewards/StarReward2
+      GUID: 9927f480a3513481ebf75c6c9779098b
+      suffix: GameObject
+    - name: StarReward3_GameObject
+      path: PlaySomething/FX/IngameEffects/StarRewards/StarReward3
+      GUID: f58589419c069414898bc58b56768790
+      suffix: GameObject
+    - name: StarTrail_GameObject
+      path: PlaySomething/FX/IngameEffects/StarTrail
+      GUID: bf119b91f9db34c3594f30aaf44b4598
+      suffix: GameObject
+    - name: BeamUp_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/BeamUp
+      GUID: 210c98ebb3d03be42bdb0085aac4f87b
+      suffix: GameObject
+    - name: CardboardBoxPuff_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/CardboardBoxPuff
+      GUID: 244e1089f0d954832926db8b39e17076
+      suffix: GameObject
+    - name: ConfettiBurst_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/ConfettiBurst
+      GUID: 97292ac17a6d74cd0be686a60693f61b
+      suffix: GameObject
+    - name: CrumblingMaterialBreakdown_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/CrumblingMaterialBreakdown
+      GUID: 6ef088a9305f1d64393b70cc3ddfb8ea
+      suffix: GameObject
+    - name: CrumblingMaterialCountdown_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/CrumblingMaterialCountdown
+      GUID: 98fa980dbf8d54be19ae85d544e559bf
+      suffix: GameObject
+    - name: DrawingDanger_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/DrawingDanger
+      GUID: cf8d18d5b7c694ba28b5d71612a8bdb5
+      suffix: GameObject
+    - name: DrawingIce_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/DrawingIce
+      GUID: 8e925795595e64390bd96133c3ec0504
+      suffix: GameObject
+    - name: DrawingMud_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/DrawingMud
+      GUID: 389d8f5051dcc423d91e34b6faba6568
+      suffix: GameObject
+    - name: DrawingSand_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/DrawingSand
+      GUID: 4c666fd40426a4b7f949f0bb0bba6a4c
+      suffix: GameObject
+    - name: DrivingIce_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/DrivingIce
+      GUID: 7a3a6923e2a764b4eae1e324c8fcbab5
+      suffix: GameObject
+    - name: DrivingSand_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/DrivingSand
+      GUID: 938322d26800c4aada14a76ce6760661
+      suffix: GameObject
+    - name: EffectBoost_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EffectBoost
+      GUID: 8ec9d4e737a013741bcb3fc4c94c7bc7
+      suffix: GameObject
+    - name: EffectBoostMotorcycleBack_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EffectBoostMotorcycleBack
+      GUID: 8dee83c249d32ee45aa0f813cd088b14
+      suffix: GameObject
+    - name: EffectBoostMotorcycleFront_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EffectBoostMotorcycleFront
+      GUID: b6524b4b01a05144f995f70d1fbc8b27
+      suffix: GameObject
+    - name: EffectBoostOffroadCarBack_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EffectBoostOffroadCarBack
+      GUID: 19562411635bd4544b412bfcc0eaded6
+      suffix: GameObject
+    - name: EffectBoostOffroadCarFront_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EffectBoostOffroadCarFront
+      GUID: d1c46bc2344ce8d49ae231623f703eb4
+      suffix: GameObject
+    - name: EffectObjectFlames_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EffectObjectFlames
+      GUID: 25e1e2b771557784b8c6338138831eb4
+      suffix: GameObject
+    - name: ElectricBurst_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/ElectricBurst
+      GUID: 0cdbedf144f3b4bc1a881bf7fbd7278f
+      suffix: GameObject
+    - name: EngineBreakdown_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/EngineBreakdown
+      GUID: 44044b27099084e749a1cb866205b747
+      suffix: GameObject
+    - name: ExplodingBarrelExplosion_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/ExplodingBarrelExplosion
+      GUID: 46470bc7adee1415fbd1b2e69ce1b26b
+      suffix: GameObject
+    - name: FloatingBombExplosion_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/FloatingBombExplosion
+      GUID: 82cfd44e05ce5451d9a6904b351bea5d
+      suffix: GameObject
+    - name: GeneralUpgrade_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/GeneralUpgrade
+      GUID: 9790331f3e047455b8f3a944a4c7bf01
+      suffix: GameObject
+    - name: HeadHit_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/HeadHit
+      GUID: c21015605561e43c3ae288af2b57c34c
+      suffix: GameObject
+    - name: MetalBoxCrush_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/MetalBoxCrush
+      GUID: 3fe6b584c4df9bc43964c2e06c921990
+      suffix: GameObject
+    - name: MudSplatter_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/MudSplatter
+      GUID: 655c027af132a4c618aec4a6291740db
+      suffix: GameObject
+    - name: VehicleCrushEffect_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/VehicleCrushEffect
+      GUID: 9238ece41ea8f4d4995c6bb883ed64d6
+      suffix: GameObject
+    - name: WoodenCratePuff_GameObject
+      path: PlaySomething/FX/ParticleFx/FullEffects/WoodenCratePuff
+      GUID: c64ea8b0700e84d448ffec6144edfd86
+      suffix: GameObject
+    - name: UIStarInflatePrefab_GameObject
+      path: PlaySomething/UI/UIObjects/UIStarInflate/UIStarInflatePrefab
+      GUID: 01c0fbff4411cfc479c6b1cf389b572a
+      suffix: GameObject
+    - name: VehicleSelectionButtons_GameObject
+      path: PlaySomething/UI/UnityUI/VehicleSelectionButtons
+      GUID: 8dde45d9b2ace498ca3f15f71d05f1a1
+      suffix: GameObject
+    - name: Boelb_GameObject
+      path: PlaySomething/Units/Characters/Boelb/Boelb
+      GUID: 4aa4fcabf615c0d439348e11a8a1c53d
+      suffix: GameObject
+    - name: HumanPrefab_GameObject
+      path: PlaySomething/Units/Characters/Human/HumanPrefab
+      GUID: 4fa3aed7de8ed8d4399ee1737e38c022
+      suffix: GameObject
+    - name: CollectibleCoinPrefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleCoin/CollectibleCoinPrefab
+      GUID: 16411877c490db147bd8ae2dd28401c7
+      suffix: GameObject
+    - name: CollectibleCoin100Prefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleCoins/CollectibleCoin100Prefab
+      GUID: d251f8274221b274d8b3a59398cef91a
+      suffix: GameObject
+    - name: CollectibleCoin10Prefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleCoins/CollectibleCoin10Prefab
+      GUID: 0efa4d7dd68171948aad8d48259b0d74
+      suffix: GameObject
+    - name: CollectibleCoin1Prefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleCoins/CollectibleCoin1Prefab
+      GUID: 5d099e8e219a526448379a518e635dd8
+      suffix: GameObject
+    - name: CollectibleCoin500Prefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleCoins/CollectibleCoin500Prefab
+      GUID: 15a794a669878e6448c4b683bb277b0b
+      suffix: GameObject
+    - name: CollectibleCoin5Prefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleCoins/CollectibleCoin5Prefab
+      GUID: 051bb8ac6c4021141804390e50f14079
+      suffix: GameObject
+    - name: CollectibleGemPrefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleGem/CollectibleGemPrefab
+      GUID: 33eb9785467d04df59d5c79eacb393b2
+      suffix: GameObject
+    - name: CollectibleKeyPrefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleKey/CollectibleKeyPrefab
+      GUID: f0ab69d47db6a4bf2b6702ffc27becca
+      suffix: GameObject
+    - name: CollectibleMysteryPrefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleMystery/CollectibleMysteryPrefab
+      GUID: 813f9c6f1461a4fada9f7380a7e1f989
+      suffix: GameObject
+    - name: CollectibleStarPrefab_GameObject
+      path: PlaySomething/Units/Collectibles/CollectibleStar/CollectibleStarPrefab
+      GUID: 82e4f082015b04d688a20a82bbac865b
+      suffix: GameObject
+    - name: ArrowSignPrefab_GameObject
+      path: PlaySomething/Units/Decorations/ArrowSign/ArrowSignPrefab
+      GUID: da0688cdc780e4e8b84ab446a9cadc83
+      suffix: GameObject
+    - name: DecorationalSignsPrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationalSigns/DecorationalSignsPrefab
+      GUID: a51d7c1007f684b199e2c68c4fe04458
+      suffix: GameObject
+    - name: DecorationalTreesPrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationalTrees/DecorationalTreesPrefab
+      GUID: 76140bfb813fa4fde8afabd29bdf0c34
+      suffix: GameObject
+    - name: DecorationMetalFencePrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationMetalFence/DecorationMetalFencePrefab
+      GUID: 2b49647c8c523c9488441b4529dba15d
+      suffix: GameObject
+    - name: DecorationPicketFencePrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationPicketFence/DecorationPicketFencePrefab
+      GUID: e64acc3b3fa650e4abc4930228d11d1b
+      suffix: GameObject
+    - name: DecorationPyrotechnicsChickoonBucketPrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationPyrotechnicsChickoonBucket/DecorationPyrotechnicsChickoonBucketPrefab
+      GUID: e6f2ea46f2fe4234c894326c660379b5
+      suffix: GameObject
+    - name: DecorationPyrotechnicsConfettiWorkPrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationPyrotechnicsConfettiWork/DecorationPyrotechnicsConfettiWorkPrefab
+      GUID: 2a6659739c56f4b43922e676f83650ee
+      suffix: GameObject
+    - name: DecorationPyrotehnicsDragonWorkPrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationPyrotehnicsDragonWork/DecorationPyrotehnicsDragonWorkPrefab
+      GUID: 4f28049ef04e30845bc179faef332b74
+      suffix: GameObject
+    - name: DecorationRocksPrefab_GameObject
+      path: PlaySomething/Units/Decorations/DecorationRocks/DecorationRocksPrefab
+      GUID: b851b9f9cc6a843ecbc87eb79a56c3cc
+      suffix: GameObject
+    - name: DecorationalGoldenChicken_GameObject
+      path: PlaySomething/Units/Decorations/GoldenChicken/DecorationalGoldenChicken
+      GUID: 89c43ff8052bb4ba38493180baf28a96
+      suffix: GameObject
+    - name: WarningSignPrefab_GameObject
+      path: PlaySomething/Units/Decorations/WarningSign/WarningSignPrefab
+      GUID: f57226fa4c41d4216ac7f4d47cd173ed
+      suffix: GameObject
+    - name: BlocksPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/Blocks/BlocksPrefab
+      GUID: 2e28e9f084f8a465c9f1142ca430f3f3
+      suffix: GameObject
+    - name: BoulderBigPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/Boulders/BoulderBigPrefab
+      GUID: ddaa004a923ef364cbf33cac3b419c41
+      suffix: GameObject
+    - name: BoulderMediumPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/Boulders/BoulderMediumPrefab
+      GUID: 55d7870ba8425b640a70a5334342edd5
+      suffix: GameObject
+    - name: BoulderSmallPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/Boulders/BoulderSmallPrefab
+      GUID: d1db21385151e2648821035720a00b33
+      suffix: GameObject
+    - name: BouncePlatformPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/BouncePlatform/BouncePlatformPrefab
+      GUID: 602f516b50132426c929b2e986e23bdf
+      suffix: GameObject
+    - name: ExplodingBarrelPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/ExplodingBarrel/ExplodingBarrelPrefab
+      GUID: 8271484b1e8204e1a9c45af75bd4da87
+      suffix: GameObject
+    - name: FloatingBombPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/FloatingBomb/FloatingBombPrefab
+      GUID: ee95084afbf824d1091889dcd9060a8e
+      suffix: GameObject
+    - name: GoalBotPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/GoalBot/GoalBotPrefab
+      GUID: 7e79ef6e32b274f7d92cbb439f0c411b
+      suffix: GameObject
+    - name: MetalPlatform_GameObject
+      path: PlaySomething/Units/Dynamic/MetalPlatforms/MetalPlatform
+      GUID: 5efc37e7fbf6b46db9ae66d381a0fa38
+      suffix: GameObject
+    - name: MetalPlatformPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/MetalPlatforms/MetalPlatformPrefab
+      GUID: 256bd1f525829422a82e8bb002b4892d
+      suffix: GameObject
+    - name: NutsBoltsSpringsPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/NutsBoltsSprings/NutsBoltsSpringsPrefab
+      GUID: 0c9cde60647994e37a4b6aa2278a3c40
+      suffix: GameObject
+    - name: PlankPrefab_GameObject
+      path: PlaySomething/Units/Dynamic/Planks/PlankPrefab
+      GUID: dd391b12e32e5477e921aaf411363adb
+      suffix: GameObject
+    - name: ConcreteArc45Prefab_GameObject
+      path: PlaySomething/Units/Static/ConcretePlatforms/ConcreteArc45Prefab
+      GUID: 86705641c3d524841bd30ea0fecbd4d1
+      suffix: GameObject
+    - name: ConcreteArc90Prefab_GameObject
+      path: PlaySomething/Units/Static/ConcretePlatforms/ConcreteArc90Prefab
+      GUID: 5ee8641483a794282b491b687f2dc54c
+      suffix: GameObject
+    - name: ConcretePlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/ConcretePlatforms/ConcretePlatformPrefab
+      GUID: 55e425f8366024f109ad561dc4a17f07
+      suffix: GameObject
+    - name: CrumblingPlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/CrumblingPlatform/CrumblingPlatformPrefab
+      GUID: c6cf5362f3edb4c838541d9e919e5e66
+      suffix: GameObject
+    - name: CrushingPlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/CrushingPlatform/CrushingPlatformPrefab
+      GUID: 0b46c51157706492e903f661c4643baf
+      suffix: GameObject
+    - name: DangerPlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/DangerPlatform/DangerPlatformPrefab
+      GUID: eda87711d261b4366944e2a24d985a32
+      suffix: GameObject
+    - name: DirectionBoostArrowPrefab_GameObject
+      path: PlaySomething/Units/Static/DirectionBoost/DirectionBoostArrowPrefab
+      GUID: 22f5d803808d445c68019627c2f0d098
+      suffix: GameObject
+    - name: FanPlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/FanPlatform/FanPlatformPrefab
+      GUID: 2ebdc69fd22d6494ca571ec28892e189
+      suffix: GameObject
+    - name: ForceFieldPrefab_GameObject
+      path: PlaySomething/Units/Static/ForceField/ForceFieldPrefab
+      GUID: 71f498b7471f9e54f9a38d052d4b236b
+      suffix: GameObject
+    - name: BigGearPrefab_GameObject
+      path: PlaySomething/Units/Static/Gears/BigGearPrefab
+      GUID: 8cf50ad70ec7a4b6fb1caacad9932871
+      suffix: GameObject
+    - name: SmallGearPrefab_GameObject
+      path: PlaySomething/Units/Static/Gears/SmallGearPrefab
+      GUID: 3e5f9c10f6c194deaa825c1849c3315a
+      suffix: GameObject
+    - name: GoalGatePrefab_GameObject
+      path: PlaySomething/Units/Static/GoalGate/GoalGatePrefab
+      GUID: aed203f0cdc6a8649b2c6803adf122a2
+      suffix: GameObject
+    - name: MovingPlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/MovingPlatforms/Prefabs/MovingPlatformPrefab
+      GUID: bc4e77e9e3b454f8082eb483130aa994
+      suffix: GameObject
+    - name: TriggeredMovingPlatformPrefab_GameObject
+      path: PlaySomething/Units/Static/MovingPlatforms/Prefabs/TriggeredMovingPlatformPrefab
+      GUID: 6904c23ff28f54b6cb55c4e9bd42f056
+      suffix: GameObject
+    - name: TutorialSign_GameObject
+      path: PlaySomething/Units/Static/Signs/TutorialSign/TutorialSign
+      GUID: 47c43db7ff4841b4fb9ef77b4205841a
+      suffix: GameObject
+    - name: SpeedRampPrefab_GameObject
+      path: PlaySomething/Units/Static/SpeedRamp/SpeedRampPrefab
+      GUID: 33e096e32dfc8474c9b384ae0a90e19e
+      suffix: GameObject
+    - name: TeleportPrefab_GameObject
+      path: PlaySomething/Units/Static/Teleport/TeleportPrefab
+      GUID: 59092c232689943e18b30193d628e3a8
+      suffix: GameObject
+    - name: OffroadCarEarthPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/OffroadCarEarth/OffroadCarEarthPrefab
+      GUID: 4ba800af7ae204c2e87e39662c7d98c2
+      suffix: GameObject
+    - name: DirtBikeGhostNewPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/DirtBikeGhost/DirtBikeGhostNewPrefab
+      GUID: da17056c3eafdf74bbf89bb2f27a8007
+      suffix: GameObject
+    - name: DirtBikeGhostPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/DirtBikeGhost/DirtBikeGhostPrefab
+      GUID: 18eb4fb80e57643778195504ee43a516
+      suffix: GameObject
+    - name: OffroadCarGhostNewPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarGhost/OffroadCarGhostNewPrefab
+      GUID: 8e51a3edfbae8d44ca640d52357c96a9
+      suffix: GameObject
+    - name: OffroadCarGhostPrefab_GameObject
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarGhost/OffroadCarGhostPrefab
+      GUID: b520f6a7bbf424aa88ba9f2cbc3e3d52
+      suffix: GameObject
+    - name: ConcreteBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/ConcreteBeltMat
+      GUID: d7406d98db1d643ba9a23e9c193e1bfa
+      suffix: Material
+    - name: ConcreteFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/ConcreteFrontMat
+      GUID: a2172f066af784becb6275a8f79af2d0
+      suffix: Material
+    - name: DangerBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/DangerBeltMat
+      GUID: eba76ff1f83e14070bd62dbac30a92df
+      suffix: Material
+    - name: DangerFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/DangerFrontMat
+      GUID: 1974fc724a60345eb9b03afae13edc84
+      suffix: Material
+    - name: IceBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/IceBeltMat
+      GUID: f01a969c6536a444f8dcbf05f5a82ec6
+      suffix: Material
+    - name: IceFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/IceFrontMat
+      GUID: 62bf8523b2028466a869398a70551d52
+      suffix: Material
+    - name: LavaBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/LavaBeltMat
+      GUID: 17b86b884698a4a07a93dddcc2cbf077
+      suffix: Material
+    - name: LavaFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/LavaFrontMat
+      GUID: 366fc43637ad24beba2d39a9806d389f
+      suffix: Material
+    - name: MetalBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/MetalBeltMat
+      GUID: a9c9e11de31df4dbbb26bd47e4fbe3a3
+      suffix: Material
+    - name: MetalFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/MetalFrontMat
+      GUID: 47063bd3d832346428c7b184bb8f04d6
+      suffix: Material
+    - name: MudBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/MudBeltMat
+      GUID: b902d1431687249079f9dd03631f5a18
+      suffix: Material
+    - name: MudFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/MudFrontMat
+      GUID: 64aa4eb67deb846e78c3ada2ec64cbec
+      suffix: Material
+    - name: SandBeltMat_Material
+      path: PlaySomething/Environments/Autogeometry/SandBeltMat
+      GUID: 55e6016b6fb274ed6a526e201164279e
+      suffix: Material
+    - name: SandFrontMat_Material
+      path: PlaySomething/Environments/Autogeometry/SandFrontMat
+      GUID: 2a9b46d32a08d424294f6c3983df5ef6
+      suffix: Material
+    - name: IngameShadow_Material
+      path: PlaySomething/FX/Shadows/IngameShadow
+      GUID: dae910bf2152b6b40bd13fa99a9afcff
+      suffix: Material
+    - name: ShadowMaterial_Material
+      path: PlaySomething/FX/Shadows/ShadowMaterial
+      GUID: 78c0a732ad112a541100162a44295342
+      suffix: Material
+    - name: UnitGhostMaterial_Material
+      path: PlaySomething/FX/SpecialMaterials/UnitGhostMaterial
+      GUID: ff55584e71c2d48a8975fc88215bd0fa
+      suffix: Material
+    - name: TVSignalAirbomb_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalAirbomb
+      GUID: 1dccc8f882d7a4e8192d75fd0ab29876
+      suffix: Material
+    - name: TVSignalBouncer_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalBouncer
+      GUID: 43bdc3af7e030462d82f1dd0fec322e5
+      suffix: Material
+    - name: TVSignalCardboardbox_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalCardboardbox
+      GUID: 0b71e838202a74192ad78e593acc56f7
+      suffix: Material
+    - name: TVSignalConcretePlatform_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalConcretePlatform
+      GUID: 97e0da3f728c64c68832449eddb9a4ee
+      suffix: Material
+    - name: TVSignalCrumblingPlatform_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalCrumblingPlatform
+      GUID: 4bc2d6c1f27374b63aef919fda942586
+      suffix: Material
+    - name: TVSignalCrusher_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalCrusher
+      GUID: 596d67690c45c479398f783377404a7b
+      suffix: Material
+    - name: TVSignalElevators_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalElevators
+      GUID: dec441fdfad1949438037da45443ff4b
+      suffix: Material
+    - name: TVSignalExplodingBarrels_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalExplodingBarrels
+      GUID: f86874f6b7fac4d6da99f2ffc4d99194
+      suffix: Material
+    - name: TVSignalFan_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalFan
+      GUID: 3352453d15088474c91f6b88fdeaf4d9
+      suffix: Material
+    - name: TVSignalGears_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalGears
+      GUID: 7643cf6ee70fb4c4387890b86b16fcae
+      suffix: Material
+    - name: TVSignalLava_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalLava
+      GUID: adc3c3c63456a49a8822cea2d2b3050f
+      suffix: Material
+    - name: TVSignalMaterialIce_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalMaterialIce
+      GUID: 304e2b03ef63f4050ba412b2cedac2e0
+      suffix: Material
+    - name: TVSignalMaterialMud_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalMaterialMud
+      GUID: 0e57717b352ef4b16b54b9f4c78c49c1
+      suffix: Material
+    - name: TVSignalMetalPlank_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalMetalPlank
+      GUID: 2c8f6a35d0dfe45ff87eeee6cf86d0a6
+      suffix: Material
+    - name: TVSignalModeRace_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalModeRace
+      GUID: c11f6c4d3cf36424f91a654da085071b
+      suffix: Material
+    - name: TVSignalPortals_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalPortals
+      GUID: 021b2a50e674b4161acfd07a3debe21e
+      suffix: Material
+    - name: TVSignalRocks_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalRocks
+      GUID: 98055b0067c454041ae1fcc4bc09e14d
+      suffix: Material
+    - name: TVSignalTreadmill_Material
+      path: PlaySomething/FX/TV/Channels/TVSignalTreadmill
+      GUID: fe43ae5f1500d43a4916b5361686f695
+      suffix: Material
+    - name: RetroTVTube_Material
+      path: PlaySomething/FX/TV/RetroTVTube
+      GUID: 10a0c5709e43b824ea2373233671c58d
+      suffix: Material
+    - name: TVChannelFlicksMat_Material
+      path: PlaySomething/FX/TV/TVChannelFlicksMat
+      GUID: a98642848b1a4427c91a6082d75ce919
+      suffix: Material
+    - name: ConcreteButtonMat_Material
+      path: PlaySomething/UI/Editor/ConcreteButtonMat
+      GUID: c141a72102ea243c2a6e856161a39ce0
+      suffix: Material
+    - name: DangerButtonMat_Material
+      path: PlaySomething/UI/Editor/DangerButtonMat
+      GUID: c3192990fe047430da332d649438d373
+      suffix: Material
+    - name: IceButtonMat_Material
+      path: PlaySomething/UI/Editor/IceButtonMat
+      GUID: cebc67284592f437d87135d346466b5a
+      suffix: Material
+    - name: LavaButtonMat_Material
+      path: PlaySomething/UI/Editor/LavaButtonMat
+      GUID: 5f591e2aef4cc420f8174546b9c610f7
+      suffix: Material
+    - name: MetalButtonMat_Material
+      path: PlaySomething/UI/Editor/MetalButtonMat
+      GUID: 87694977e30804e2a88cfc3980d15d09
+      suffix: Material
+    - name: MudButtonMat_Material
+      path: PlaySomething/UI/Editor/MudButtonMat
+      GUID: 2dbf3712b22524f4a82e0351846126ad
+      suffix: Material
+    - name: SandButtonMat_Material
+      path: PlaySomething/UI/Editor/SandButtonMat
+      GUID: bd8cdb08f9b4b47da9a7e6f6467daa4b
+      suffix: Material
+    - name: IngameAtlasMat_Material
+      path: PlaySomething/UI/UiAtlas/IngameAtlasMat
+      GUID: 7b09833f4b50b4feeb5a63c100ce42bd
+      suffix: Material
+    - name: BambooMaterial_Material
+      path: PlaySomething/Units/GenericMaterials/BambooMaterial
+      GUID: a2976a2b2d37c4ad1990ca890d4156c2
+      suffix: Material
+    - name: CardboardMaterial_Material
+      path: PlaySomething/Units/GenericMaterials/CardboardMaterial
+      GUID: f987827ddb91c4221b7aa2bb7781799f
+      suffix: Material
+    - name: IceMaterial_Material
+      path: PlaySomething/Units/GenericMaterials/IceMaterial
+      GUID: 4cf4d3a8ea901470b990498e644fdef7
+      suffix: Material
+    - name: MetalMaterial_Material
+      path: PlaySomething/Units/GenericMaterials/MetalMaterial
+      GUID: a10f8a50334b440ee81dbda0ca3e13dd
+      suffix: Material
+    - name: RockMaterial_Material
+      path: PlaySomething/Units/GenericMaterials/RockMaterial
+      GUID: 5631021910a5c48eea63eae52dbc9615
+      suffix: Material
+    - name: TeleportLine_Material
+      path: PlaySomething/Units/GenericMaterials/TeleportLine
+      GUID: 2d27f4473f1584198a4cd392f73751b1
+      suffix: Material
+    - name: WoodMaterial_Material
+      path: PlaySomething/Units/GenericMaterials/WoodMaterial
+      GUID: c8c8814c22a884a1381b8deb16eda62b
+      suffix: Material
+    - name: RoundedCornerMask_Texture2D
+      path: PlaySomething/FX/TV/RoundedCornerMask
+      GUID: 740e2a6166d12b5479fbc50eb9a1fc83
+      suffix: Texture2D
+    - name: TVAberration_Texture2D
+      path: PlaySomething/FX/TV/TVAberration
+      GUID: 739cbb7d52294184593ce6b7676a510b
+      suffix: Texture2D
+    - name: TVNoise_Texture2D
+      path: PlaySomething/FX/TV/TVNoise
+      GUID: df0ffcc7ed4d822408d84a34b9d048e0
+      suffix: Texture2D
+    - name: TVNoisePausePattern_Texture2D
+      path: PlaySomething/FX/TV/TVNoisePausePattern
+      GUID: 43a04c1efe2bb194e936e6b500cc884d
+      suffix: Texture2D
+    - name: TVPixel_Texture2D
+      path: PlaySomething/FX/TV/TVPixel
+      GUID: c0fffc9f0aaaf3d48958acb4c6ede296
+      suffix: Texture2D
+    - name: MotorcycleDifEarth_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifEarth
+      GUID: be8b49e20fd15491e89aa8dc5518d8a9
+      suffix: Texture2D
+    - name: MotorcycleDifRental_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitMotorcycle/MotorcycleDifRental
+      GUID: 45161aa70993b45ff870aec8249d9890
+      suffix: Texture2D
+    - name: OffroadCarDifEarth_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifEarth
+      GUID: bd0cd9b1cbe031842b6975796dd21e19
+      suffix: Texture2D
+    - name: OffroadCarDifRental_Texture2D
+      path: PlaySomething/Units/Vehicles/UnitOffroadCar/OffroadCarDifRental
+      GUID: 3a8d3a3ffaa838e4698468cf81cbf815
+      suffix: Texture2D
+--- !u!1001 &100100000
+Prefab:
+  serializedVersion: 2
+  m_ObjectHideFlags: 1
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1125408137006432}
+  m_IsPrefabParent: 1

@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: RetroTVTube
+  m_Shader: {fileID: 4800000, guid: 70b1e429bcb3f904d9bf69cad366dd3f, type: 3}
+  m_ShaderKeywords:
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _Mask
+      second:
+        m_Texture: {fileID: 2800000, guid: 480a46051fe15e243ad4b3580de48337, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _NoiseTex
+      second:
+        m_Texture: {fileID: 2800000, guid: f3900281447583e4a879f55b9f69731a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0.90626, y: 0.90865576}
+    m_Floats:
+    - first:
+        name: _BumpScale
+      second: 1
+    - first:
+        name: _ChromaticAberrationMagnetude
+      second: 0.025
+    - first:
+        name: _Cutoff
+      second: 0.5
+    - first:
+        name: _DetailNormalMapScale
+      second: 1
+    - first:
+        name: _Distortion
+      second: 0.5
+    - first:
+        name: _DstBlend
+      second: 0
+    - first:
+        name: _EmissionScaleUI
+      second: 0
+    - first:
+        name: _Glossiness
+      second: 0.5
+    - first:
+        name: _Metallic
+      second: 0
+    - first:
+        name: _Mode
+      second: 0
+    - first:
+        name: _NoiseMagnetude
+      second: 0.1
+    - first:
+        name: _OcclusionStrength
+      second: 1
+    - first:
+        name: _Parallax
+      second: 0.02
+    - first:
+        name: _ReflexMagnetude
+      second: 0.5
+    - first:
+        name: _Saturation
+      second: 1
+    - first:
+        name: _ScanLineCount
+      second: 160
+    - first:
+        name: _ScanLineMax
+      second: 1
+    - first:
+        name: _ScanLineMin
+      second: 1
+    - first:
+        name: _ScreenHeight
+      second: 120
+    - first:
+        name: _ScreenHorizontal
+      second: 0
+    - first:
+        name: _ScreenWidth
+      second: 160
+    - first:
+        name: _SrcBlend
+      second: 1
+    - first:
+        name: _StaticMagnetude
+      second: 0.0125
+    - first:
+        name: _TVChromaticAberrationMagnetude
+      second: 0
+    - first:
+        name: _TVReflexMagnetude
+      second: 0.5
+    - first:
+        name: _TVScanLineCount
+      second: 100
+    - first:
+        name: _TVScanLineMax
+      second: 1
+    - first:
+        name: _TVScanLineMin
+      second: 0
+    - first:
+        name: _TVScreenNoiseMagnetude
+      second: 0.5
+    - first:
+        name: _TVScreenNoiseRandom
+      second: 0
+    - first:
+        name: _TVScreenStaticMagnetude
+      second: 0.5
+    - first:
+        name: _TVScreenStaticRandom
+      second: 0
+    - first:
+        name: _TVTubeDistortion
+      second: 0.1
+    - first:
+        name: _TubeDistortion
+      second: -1
+    - first:
+        name: _UVSec
+      second: 0
+    - first:
+        name: _ZWrite
+      second: 1
+    m_Colors:
+    - first:
+        name: _Color
+      second: {r: 1, g: 1, b: 1, a: 1}
+    - first:
+        name: _EmissionColor
+      second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: _EmissionColorUI
+      second: {r: 1, g: 1, b: 1, a: 1}

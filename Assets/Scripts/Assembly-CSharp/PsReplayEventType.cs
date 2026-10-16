@@ -1,0 +1,26 @@
+public enum PsReplayEventType
+{
+	UpOn = 10,
+	UpOff = 11,
+	DownOn = 12,
+	DownOff = 13,
+	LeftOn = 14,
+	LeftOff = 15,
+	RightOn = 16,
+	RightOff = 17,
+	Boost = 18,
+	DieCrush = 19,
+	DieElectrify = 20,
+	DieHead = 21,
+	DetachHat = 22,
+	Finish = 23,
+	TrickBoost = 24,
+	BoostEnd = 25,
+	ElectrifiedOn = 26,
+	ElectrifiedOff = 27,
+	BurningOn = 28,
+	BurningOff = 29,
+	FrozenOn = 30,
+	FrozenOff = 31,
+	ManipulateGround = 32
+}

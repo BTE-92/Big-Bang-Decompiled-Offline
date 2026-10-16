@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: IceFrontMat
+  m_Shader: {fileID: 4800000, guid: 4b8a2da1fa47c3342b10c8e1cedafeef, type: 3}
+  m_ShaderKeywords:
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 2800000, guid: 815d9b2b3f7f6b1469c1e13bc67ebc36, type: 3}
+        m_Scale: {x: 0.5, y: 0.5}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MaskTex
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _UnitMask
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - first:
+        name: _Cutoff
+      second: 0.5
+    - first:
+        name: _EdgeTreshold
+      second: 0.4030357
+    - first:
+        name: _FPOW
+      second: 5
+    - first:
+        name: _LightStr
+      second: 1
+    - first:
+        name: _OffsetX
+      second: -30
+    - first:
+        name: _OffsetY
+      second: -30
+    - first:
+        name: _Opacity
+      second: 0.5
+    - first:
+        name: _Parallax
+      second: 0.02
+    - first:
+        name: _R0
+      second: 0.05
+    - first:
+        name: _ReflectionStrength
+      second: 1
+    - first:
+        name: _Shininess
+      second: 0.18017109
+    - first:
+        name: _Tiling
+      second: 0.2
+    m_Colors:
+    - first:
+        name: _Color
+      second: {r: 1, g: 1, b: 1, a: 1}
+    - first:
+        name: _EdgeColor
+      second: {r: 0.6325692, g: 0.835476, b: 0.9558824, a: 0}
+    - first:
+        name: _Emission
+      second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: _ReflectColor
+      second: {r: 1, g: 1, b: 1, a: 0.5}
+    - first:
+        name: _SpecColor
+      second: {r: 1, g: 1, b: 1, a: 1}
