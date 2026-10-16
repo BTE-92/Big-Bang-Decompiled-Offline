@@ -206,15 +206,15 @@ namespace Facebook.Unity
 
                 #if UNITY_EDITOR
                 ComponentFactory.GetComponent<EditorFacebookLoader>();
-                #elif UNITY_WEBPLAYER || UNITY_WEBGL
+#elif UNITY_WEBPLAYER || UNITY_WEBGL
                 ComponentFactory.GetComponent<CanvasFacebookLoader>();
-                #elif UNITY_IOS
+#elif UNITY_IOS
                 ComponentFactory.GetComponent<IOSFacebookLoader>();
-                #elif UNITY_ANDROID
+#elif UNITY_ANDROID
                 ComponentFactory.GetComponent<AndroidFacebookLoader>();
-                #else
-                throw new NotImplementedException("Facebook API does not yet support this platform");
-                #endif
+#else
+                ComponentFactory.GetComponent<EditorFacebookLoader>(); //throw new NotImplementedException("Facebook API does not yet support this platform"); Changed fallback to EditorFacebookLoader to prevent NRE spam.
+#endif
                 isInitCalled = true;
                 return;
             }

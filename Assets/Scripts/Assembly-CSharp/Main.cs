@@ -1,5 +1,8 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Threading;
+using ICSharpCode.SharpZipLib.Zip;
 using UnityEngine;
 
 public class Main : MonoBehaviour
@@ -32,7 +35,15 @@ public class Main : MonoBehaviour
 
 	private void Start()
 	{
-		SetEPOCHTime();
+        //Extras had to be added to fix some issues specifically with the standalone windows builds.
+        #region Extras
+#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+        UnityEngine.Debug.unityLogger.logEnabled = false;
+#endif
+        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;//For languages that use a , as a decimal seperator.
+        ZipConstants.DefaultCodePage = 65001; //weird error
+        #endregion
+        SetEPOCHTime();
 		m_currentGame = new PsGame("WhatOnEarth", "0-0-1");
 		m_currentGame.Initialize(new StartupScene("StartupScene"));
 	}
