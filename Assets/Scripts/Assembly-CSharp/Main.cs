@@ -37,9 +37,6 @@ public class Main : MonoBehaviour
 	{
         //Extras had to be added to fix some issues specifically with the standalone windows builds.
         #region Extras
-#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-        UnityEngine.Debug.unityLogger.logEnabled = false;
-#endif
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;//For languages that use a , as a decimal seperator.
         ZipConstants.DefaultCodePage = 65001; //weird error
         #endregion

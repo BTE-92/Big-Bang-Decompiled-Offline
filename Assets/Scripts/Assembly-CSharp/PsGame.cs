@@ -86,7 +86,11 @@ public class PsGame : IGame
 		Application.targetFrameRate = Main.m_targetFPS;
 		m_projectCode = _projectCode;
 		m_projectVersion = _projectVersion;
-		Debug.Initialize(false, true, false, false);
+		#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+		Debug.Initialize(false, false, false, false);
+#else
+        Debug.Initialize(false, true, false, false);
+#endif
 		FacebookManager.Initialize();
 		EveryplayManager.SetEnabled(PsState.m_everyplayEnabled);
 		EveryplayManager.Initialize();
