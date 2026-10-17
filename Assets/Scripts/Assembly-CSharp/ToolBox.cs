@@ -15,7 +15,11 @@ public static class ToolBox
 
 	public static Vector3 outVector3;
 
-	public static Array ConvertArray<S, T>(S[] _source)
+    private static bool s_perfClassCached;
+
+    private static PerformanceClass s_perfClass = PerformanceClass.SLOW;
+
+    public static Array ConvertArray<S, T>(S[] _source)
 	{
 		Array array = new Array[_source.Length];
 		for (int i = 0; i < _source.Length; i++)
@@ -615,16 +619,28 @@ public static class ToolBox
 		return line;
 	}
 
-	public static PerformanceClass GetDevicePerformanceClass()
-	{
-		if (Application.platform != RuntimePlatform.IPhonePlayer)
-		{
-			return PerformanceClass.SLOW;
-		}
-		return PerformanceClass.SLOW;
-	}
+    public static PerformanceClass GetDevicePerformanceClass()
+    {
+        if (!s_perfClassCached)
+        {
+            bool isMobile = Application.platform == RuntimePlatform.IPhonePlayer
+                         || Application.platform == RuntimePlatform.Android;
 
-	public static string GetUTF8String(string _string)
+            int minCores = 2;
+            int minRamMB = isMobile ? 1500 : 2000;
+            int minVramMB = isMobile ? 0 : 256;   // mobile GPUs share system memory and often report 0
+
+            bool fast = SystemInfo.processorCount >= minCores
+                     && SystemInfo.systemMemorySize >= minRamMB
+                     && SystemInfo.graphicsMemorySize >= minVramMB;
+
+            s_perfClass = fast ? PerformanceClass.FAST : PerformanceClass.SLOW;
+            s_perfClassCached = true;
+        }
+        return s_perfClass;
+    }
+
+    public static string GetUTF8String(string _string)
 	{
 		if (_string != null)
 		{
