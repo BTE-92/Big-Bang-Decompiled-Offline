@@ -81,7 +81,8 @@ public class PsGame : IGame
 
 	public PsGame(string _projectCode, string _projectVersion)
 	{
-		m_lastOutOfFocusTime = 0.0;
+        QualitySettings.vSyncCount = 0;
+        m_lastOutOfFocusTime = 0.0;
 		m_sceneManager = new SceneManager();
 		Application.targetFrameRate = Main.m_targetFPS;
 		m_projectCode = _projectCode;
