@@ -22,7 +22,7 @@ public static class PsFMODManager
 			{
 				return Application.dataPath + "/Plugins/x86";
 			}
-			if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXDashboardPlayer || Application.platform == RuntimePlatform.LinuxPlayer)
+			if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.LinuxPlayer)
 			{
 				return Application.dataPath + "/Plugins";
 			}
@@ -168,7 +168,7 @@ public static class PsFMODManager
 		{
 			return rawName + ".dll";
 		}
-		if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXDashboardPlayer)
+		if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer)
 		{
 			return rawName + ".dylib";
 		}

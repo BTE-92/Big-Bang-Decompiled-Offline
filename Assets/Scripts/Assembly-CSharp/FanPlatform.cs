@@ -20,9 +20,9 @@ public class FanPlatform : Unit
 		GameObject gameObject = ResourceManager.GetGameObject(RESOURCE.FanPlatformPrefab_GameObject);
 		TransformC transformC = TransformS.AddComponent(m_entity, _graphElement.m_name);
 		TransformS.SetTransform(transformC, _graphElement.m_position, _graphElement.m_rotation);
-		PrefabC prefabC = PrefabS.AddComponent(transformC, new Vector3(0f, 0f, 10f) + GetZBufferBias(), gameObject.transform.FindChild("fan_platform").gameObject);
-		m_fanRotorPrefab = PrefabS.AddComponent(transformC, new Vector3(0f, 0f, 10f) + GetZBufferBias(), gameObject.transform.FindChild("fan_blades").gameObject);
-		m_particleFx = prefabC.p_gameObject.transform.FindChild("effect_wind");
+		PrefabC prefabC = PrefabS.AddComponent(transformC, new Vector3(0f, 0f, 10f) + GetZBufferBias(), gameObject.transform.Find("fan_platform").gameObject);
+		m_fanRotorPrefab = PrefabS.AddComponent(transformC, new Vector3(0f, 0f, 10f) + GetZBufferBias(), gameObject.transform.Find("fan_blades").gameObject);
+		m_particleFx = prefabC.p_gameObject.transform.Find("effect_wind");
 		ucpPolyShape shape = ChipmunkProS.GeneratePolyShapeFromGameObject(gameObject.transform.Find("collision1").gameObject, Vector2.zero, 1f, 0.25f, 0.9f, (ucpCollisionType)4, 257u);
 		m_cmb = ChipmunkProS.AddStaticBody(transformC, shape, m_unitC);
 		m_fanAreaSize = new Vector2(140f, 250f);

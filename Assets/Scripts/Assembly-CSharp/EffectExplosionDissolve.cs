@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EffectExplosionDissolve : MonoBehaviour
 {
-	public ParticleRenderer pRenderer;
+    public ParticleSystemRenderer pRenderer;
 
 	public float dissolveSpeed = 1f;
 

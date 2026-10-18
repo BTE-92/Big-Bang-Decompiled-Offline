@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "WOE/Unlit/ColorUnlitTransparent" {
     Properties {
         _Color ("Color", Color) = (1,1,1,1)
@@ -48,7 +50,7 @@ Shader "WOE/Unlit/ColorUnlitTransparent" {
                 float4 tmpvar_3 = float4(v.vertex.xyz, 1.0);
                 
                 // 3. Transform using Unity 5 compatible MVP matrix
-                o.vertex = mul(UNITY_MATRIX_MVP, tmpvar_3);
+                o.vertex = UnityObjectToClipPos(tmpvar_3);
                 
                 // 4. Exact UV transform logic
                 o.uv = v.uv * _MainTex_ST.xy + _MainTex_ST.zw;

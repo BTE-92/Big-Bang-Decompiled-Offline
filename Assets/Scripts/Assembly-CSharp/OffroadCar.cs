@@ -848,7 +848,7 @@ public class OffroadCar : Vehicle, ISpeedBoost
 		for (int i = 1; i < m_antennaSegments.Count; i++)
 		{
 			text = text + "/Bone" + (i + 1);
-			Transform transform = m_antennaPrefab.p_gameObject.transform.FindChild(text);
+			Transform transform = m_antennaPrefab.p_gameObject.transform.Find(text);
 			if (transform != null)
 			{
 				transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, m_antennaSegments[i].TC.transform.rotation.eulerAngles.z));
@@ -1244,9 +1244,9 @@ public class OffroadCar : Vehicle, ISpeedBoost
 			LaunchRagdoll();
 			if (_damageType != DamageType.Impact)
 			{
-				Debris.CreateDebrisFromGO(m_chassisPrefab.p_gameObject.transform.FindChild("Bumper"), GetRandomDebrisVel(), GetRandomDebrisAngVel(), true, m_alienCharacter.m_group, false, null, Vector3.zero, -1f, 17895696u);
-				Debris.CreateDebrisFromGO(m_chassisPrefab.p_gameObject.transform.FindChild("Hood"), GetRandomDebrisVel(), GetRandomDebrisAngVel(), true, m_alienCharacter.m_group, false, null, Vector3.zero, -1f, 17895696u);
-				Debris.CreateDebrisFromGO(m_chassisPrefab.p_gameObject.transform.FindChild("Motor"), GetRandomDebrisVel(), GetRandomDebrisAngVel(), true, m_alienCharacter.m_group, false, null, Vector3.zero, -1f, 17895696u);
+				Debris.CreateDebrisFromGO(m_chassisPrefab.p_gameObject.transform.Find("Bumper"), GetRandomDebrisVel(), GetRandomDebrisAngVel(), true, m_alienCharacter.m_group, false, null, Vector3.zero, -1f, 17895696u);
+				Debris.CreateDebrisFromGO(m_chassisPrefab.p_gameObject.transform.Find("Hood"), GetRandomDebrisVel(), GetRandomDebrisAngVel(), true, m_alienCharacter.m_group, false, null, Vector3.zero, -1f, 17895696u);
+				Debris.CreateDebrisFromGO(m_chassisPrefab.p_gameObject.transform.Find("Motor"), GetRandomDebrisVel(), GetRandomDebrisAngVel(), true, m_alienCharacter.m_group, false, null, Vector3.zero, -1f, 17895696u);
 			}
 			SoundS.PlaySingleShot("/InGame/Characters/AlienDisappointment", Vector3.zero);
 			if (_damageType == DamageType.Weapon)

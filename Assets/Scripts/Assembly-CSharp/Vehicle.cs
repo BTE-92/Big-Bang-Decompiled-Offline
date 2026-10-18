@@ -405,7 +405,7 @@ public abstract class Vehicle : Unit
 		if (chassisPartNames.Length > 0)
 		{
 			int num = UnityEngine.Random.Range(0, chassisPartNames.Length);
-			Transform transform = m_chassisPrefab.p_gameObject.transform.FindChild(chassisPartNames[num]);
+			Transform transform = m_chassisPrefab.p_gameObject.transform.Find(chassisPartNames[num]);
 			if (transform != null && transform.gameObject.activeInHierarchy)
 			{
 				Debris.CreateDebrisFromGO(transform, randomDebrisVel, randomDebrisAngVel, true, GetGroup(), false, null, default(Vector3), -1f);
@@ -424,18 +424,18 @@ public abstract class Vehicle : Unit
 		Transform transform = null;
 		for (int i = 0; i <= 3; i++)
 		{
-			transform = m_chassisPrefab.p_gameObject.transform.FindChild(type + "T" + i);
+			transform = m_chassisPrefab.p_gameObject.transform.Find(type + "T" + i);
 			if (transform != null)
 			{
 				transform.gameObject.SetActive(false);
 			}
 		}
 		int num = Mathf.FloorToInt((float)level / 5f);
-		transform = m_chassisPrefab.p_gameObject.transform.FindChild(type + "T" + num);
+		transform = m_chassisPrefab.p_gameObject.transform.Find(type + "T" + num);
 		while (transform == null && num != 0)
 		{
 			num--;
-			transform = m_chassisPrefab.p_gameObject.transform.FindChild(type + "T" + num);
+			transform = m_chassisPrefab.p_gameObject.transform.Find(type + "T" + num);
 		}
 		if (transform != null)
 		{

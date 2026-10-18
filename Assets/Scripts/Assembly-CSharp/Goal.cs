@@ -61,7 +61,7 @@ public class Goal : Unit
 		{
 			m_materialInstances = null;
 		}
-		m_confettiLocator = m_prefabC.p_gameObject.transform.FindChild("GoalBotBody/ConfettiLocator").gameObject;
+		m_confettiLocator = m_prefabC.p_gameObject.transform.Find("GoalBotBody/ConfettiLocator").gameObject;
 		m_animator = m_prefabC.p_gameObject.GetComponent("Animator") as Animator;
 		if (!m_minigame.m_editing)
 		{

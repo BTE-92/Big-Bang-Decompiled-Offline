@@ -33,11 +33,11 @@ public class EffectCollectibleCoin : MonoBehaviour
 
 	private void Start()
 	{
-		coin = base.transform.FindChild("CoinHover/Coin");
-		coinFx = base.transform.FindChild("CoinHover/Coin/Fx");
+		coin = base.transform.Find("CoinHover/Coin");
+		coinFx = base.transform.Find("CoinHover/Coin/Fx");
 		coinRenderer = coin.gameObject.GetComponent<Renderer>();
-		coinHover = base.transform.FindChild("CoinHover");
-		pickUpEffect = base.transform.FindChild("PickUpSparks").GetComponent<ParticleSystem>();
+		coinHover = base.transform.Find("CoinHover");
+		pickUpEffect = base.transform.Find("PickUpSparks").GetComponent<ParticleSystem>();
 		coinHover.Rotate(0f, Random.Range(0f, 360f), 0f);
 	}
 

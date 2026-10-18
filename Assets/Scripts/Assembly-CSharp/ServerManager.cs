@@ -230,7 +230,7 @@ public static class ServerManager
 		}
 		else if (Application.platform == RuntimePlatform.Android)
 		{
-			Application.OpenURL("market://details?id=" + Application.bundleIdentifier);
+			Application.OpenURL("market://details?id=" + Application.identifier);
 		}
 		else
 		{

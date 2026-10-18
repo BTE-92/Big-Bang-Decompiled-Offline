@@ -24,8 +24,8 @@ public class PsFloatingVersusNode : PsFloatingPlanetNode
 	{
 		if (!m_grey && m_prefab != null)
 		{
-			m_prefab.p_gameObject.transform.FindChild("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find("WOE/Units/Greyscale");
-			m_prefab.p_gameObject.transform.FindChild("CollectibleTrophy").transform.GetComponent<Renderer>().material.shader = Shader.Find("WOE/Units/Greyscale");
+			m_prefab.p_gameObject.transform.Find("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find("WOE/Units/Greyscale");
+			m_prefab.p_gameObject.transform.Find("CollectibleTrophy").transform.GetComponent<Renderer>().material.shader = Shader.Find("WOE/Units/Greyscale");
 			m_grey = true;
 		}
 	}
@@ -34,8 +34,8 @@ public class PsFloatingVersusNode : PsFloatingPlanetNode
 	{
 		if (m_grey && m_prefab != null)
 		{
-			m_prefab.p_gameObject.transform.FindChild("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find(m_domeShader);
-			m_prefab.p_gameObject.transform.FindChild("CollectibleTrophy").transform.GetComponent<Renderer>().material.shader = Shader.Find(m_trophyShader);
+			m_prefab.p_gameObject.transform.Find("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find(m_domeShader);
+			m_prefab.p_gameObject.transform.Find("CollectibleTrophy").transform.GetComponent<Renderer>().material.shader = Shader.Find(m_trophyShader);
 			m_grey = false;
 		}
 	}

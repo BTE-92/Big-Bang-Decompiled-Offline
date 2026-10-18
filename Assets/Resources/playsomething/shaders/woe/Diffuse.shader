@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Upgrade NOTE: replaced 'glstate_matrix_invtrans_modelview0' with 'UNITY_MATRIX_IT_MV'
 // Upgrade NOTE: replaced 'glstate_matrix_modelview0' with 'UNITY_MATRIX_MV'
 // Upgrade NOTE: replaced 'glstate_matrix_mvp' with 'UNITY_MATRIX_MVP'
@@ -46,7 +48,7 @@ Shader "WOE/Diffuse" {
                 v2f o;
                 
                 // Matches cb2[0..3] (glstate_matrix_mvp * v.vertex)
-                o.vertex = mul(UNITY_MATRIX_MVP, float4(v.vertex.xyz, 1.0));
+                o.vertex = UnityObjectToClipPos(float4(v.vertex.xyz, 1.0));
                 
                 // Matches cb0[6] (_MainTex_ST)
                 o.uv = v.uv * _MainTex_ST.xy + _MainTex_ST.zw;

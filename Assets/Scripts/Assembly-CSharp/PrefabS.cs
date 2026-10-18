@@ -824,7 +824,7 @@ public static class PrefabS
 			}
 			if (_optimize)
 			{
-				prefabC.p_mesh.Optimize();
+				var o_826_4_639279373132866896 = prefabC.p_mesh;
 			}
 			prefabC.p_gameObject.GetComponent<Renderer>().material = _material;
 			prefabC.p_gameObject.layer = _cameraLayer;
@@ -862,7 +862,7 @@ public static class PrefabS
 		}
 		if (_optimize)
 		{
-			prefabC.p_mesh.Optimize();
+			var o_864_3_639279373133081408 = prefabC.p_mesh;
 		}
 		prefabC.p_gameObject.GetComponent<Renderer>().material = _material;
 		prefabC.p_gameObject.layer = _cameraLayer;

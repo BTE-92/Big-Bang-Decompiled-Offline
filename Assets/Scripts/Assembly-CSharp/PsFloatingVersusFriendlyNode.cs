@@ -16,7 +16,7 @@ public class PsFloatingVersusFriendlyNode : PsFloatingVersusNode
 	{
 		if (!m_grey && m_prefab != null)
 		{
-			m_prefab.p_gameObject.transform.FindChild("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find("WOE/Units/Greyscale");
+			m_prefab.p_gameObject.transform.Find("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find("WOE/Units/Greyscale");
 			m_grey = true;
 		}
 	}
@@ -25,7 +25,7 @@ public class PsFloatingVersusFriendlyNode : PsFloatingVersusNode
 	{
 		if (m_grey && m_prefab != null)
 		{
-			m_prefab.p_gameObject.transform.FindChild("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find(m_domeShader);
+			m_prefab.p_gameObject.transform.Find("FloatingPlatform").transform.GetComponent<Renderer>().material.shader = Shader.Find(m_domeShader);
 			m_grey = false;
 		}
 	}

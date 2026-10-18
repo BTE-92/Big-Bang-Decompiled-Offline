@@ -63,7 +63,7 @@ public abstract class PsGameModeBase
 			break;
 		}
 		PsState.m_activeMinigame.m_backgroundPrefab = PrefabS.AddComponent(PsState.m_activeMinigame.m_environmentTC, new Vector3(0f, 30f, 70f), gameObject);
-		GameObject gameObject2 = PsState.m_activeMinigame.m_backgroundPrefab.p_gameObject.transform.FindChild("Static").gameObject;
+		GameObject gameObject2 = PsState.m_activeMinigame.m_backgroundPrefab.p_gameObject.transform.Find("Static").gameObject;
 		if ((bool)gameObject2)
 		{
 			StaticBatchingUtility.Combine(gameObject2);

@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Upgrade NOTE: replaced 'glstate_matrix_invtrans_modelview0' with 'UNITY_MATRIX_IT_MV'
 // Upgrade NOTE: replaced 'glstate_matrix_modelview0' with 'UNITY_MATRIX_MV'
 // Upgrade NOTE: replaced 'glstate_matrix_mvp' with 'UNITY_MATRIX_MVP'
@@ -47,7 +49,7 @@ Shader "WOE/Units/Diffuse" {
                 
                 // Position clip transform (matches glstate_matrix_mvp)
                 float4 pos = float4(v.vertex.xyz, 1.0);
-                o.vertex = mul(UNITY_MATRIX_MVP, pos);
+                o.vertex = UnityObjectToClipPos(pos);
                 o.uv = v.uv * _MainTex_ST.xy + _MainTex_ST.zw;
 
                 // Transform normal to view-space (Vector-left multiplication ensures correct D3D/OpenGL assembly)

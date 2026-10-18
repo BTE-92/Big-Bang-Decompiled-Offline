@@ -142,12 +142,12 @@ public class ForceField : Unit
 		PrefabC prefabC = PrefabS.AddComponent(transformC, Vector3.zero, m_mainPrefab);
 		m_effect = prefabC.p_gameObject.GetComponent<EffectForceField>();
 		m_effect.Initialize(m_color, m_enabled);
-		m_base = prefabC.p_gameObject.transform.FindChild("ForceFieldButton");
+		m_base = prefabC.p_gameObject.transform.Find("ForceFieldButton");
 		m_base.position = m_triggerTC.transform.position + Vector3.forward * m_depth * 0.5f;
 		m_base.rotation = Quaternion.Euler(m_trigger.m_rotation);
-		m_top = prefabC.p_gameObject.transform.FindChild("ForceFieldStart");
+		m_top = prefabC.p_gameObject.transform.Find("ForceFieldStart");
 		m_top.position = m_node1TC.transform.position;
-		m_bottom = prefabC.p_gameObject.transform.FindChild("ForceFieldEnd");
+		m_bottom = prefabC.p_gameObject.transform.Find("ForceFieldEnd");
 		m_bottom.position = m_node2TC.transform.position;
 		TransformS.SetGlobalRotation(m_node1TC, m_top.transform.rotation.eulerAngles);
 		TransformS.SetGlobalRotation(m_node2TC, m_bottom.transform.rotation.eulerAngles);

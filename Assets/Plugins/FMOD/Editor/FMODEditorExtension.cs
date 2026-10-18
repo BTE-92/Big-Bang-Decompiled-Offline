@@ -124,7 +124,7 @@ public class FMODEditorExtension : MonoBehaviour
 	public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
 	{		
 		if (target == BuildTarget.StandaloneOSXIntel 
-			|| target == BuildTarget.StandaloneOSXUniversal
+			|| target == BuildTarget.StandaloneOSX
 #if !(UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1)
 			|| target == BuildTarget.StandaloneOSXIntel64
 #endif
