@@ -89,39 +89,14 @@ public static class TouchAreaS
 
     private static Mesh GetCircleMesh(float _radius)
     {
-        if (!m_colliderMeshesCreated)
-        {
-            CreateColliderMeshes();
-        }
-        Mesh mesh = UnityEngine.Object.Instantiate(m_circleMesh);
-        Vector3[] vertices = mesh.vertices;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] *= _radius;
-        }
-        mesh.vertices = vertices;
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        return mesh;
+        Vector2[] circle = DebugDraw.GetCircle(_radius, 16, Vector2.zero);
+        return GeometryGenerator.GenerateFlatMesh(new GGData(circle));
     }
 
     private static Mesh GetRectMesh(float _width, float _height)
     {
-        if (!m_colliderMeshesCreated)
-        {
-            CreateColliderMeshes();
-        }
-        Mesh mesh = UnityEngine.Object.Instantiate(m_rectMesh);
-        Vector3 scale = new Vector3(_width, _height, 1f);
-        Vector3[] vertices = mesh.vertices;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i].Scale(scale);
-        }
-        mesh.vertices = vertices;
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        return mesh;
+        Vector2[] rect = DebugDraw.GetRect(_width, _height, Vector2.zero);
+        return GeometryGenerator.GenerateFlatMesh(new GGData(rect));
     }
 
     public static void ResizeRectCollider(TouchAreaC _c, float _width, float _height)
