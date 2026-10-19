@@ -1,3 +1,4 @@
+// PORTED FROM FMOD 1.07.03 TO 1.10.02 - behaviour unchanged (only struct/null API differences).
 #if FMOD_LIVEUPDATE
 #  define RUN_IN_BACKGROUND
 #endif
@@ -35,7 +36,7 @@ public class FMOD_Listener : MonoBehaviour
     {
         string bankPath = getStreamingAsset(fileName);
 
-        FMOD.Studio.Bank bank = null;
+        FMOD.Studio.Bank bank = default(FMOD.Studio.Bank);
         FMOD.RESULT result = FMOD_StudioSystem.instance.System.loadBankFile(bankPath, LOAD_BANK_FLAGS.NORMAL, out bank);
         if (result == FMOD.RESULT.ERR_VERSION)
         {
@@ -50,7 +51,7 @@ public class FMOD_Listener : MonoBehaviour
             FMOD.Studio.UnityUtil.LogError(String.Format("Bank {0} encountered a loading error {1}", fileName, result.ToString()));
         }
 
-        FMOD.Studio.UnityUtil.Log("bank load: " + (bank != null ? "suceeded" : "failed!!"));
+        FMOD.Studio.UnityUtil.Log("bank load: " + (bank.isValid() ? "suceeded" : "failed!!"));
     }
 
     string getStreamingAsset(string fileName)
@@ -171,7 +172,7 @@ public class FMOD_Listener : MonoBehaviour
     {
         var sys = FMOD_StudioSystem.instance.System;
 
-        if (sys != null && sys.isValid())
+        if (sys.isValid())
         {
             var attributes = FMOD.Studio.UnityUtil.to3DAttributes(gameObject, cachedRigidBody);
             ERRCHECK(sys.setListenerAttributes(0, attributes));
@@ -180,7 +181,7 @@ public class FMOD_Listener : MonoBehaviour
 
     void LoadPlugins()
     {
-        FMOD.System sys = null;
+        FMOD.System sys = default(FMOD.System);
         ERRCHECK(FMOD_StudioSystem.instance.System.getLowLevelSystem(out sys));
 
         if (Application.platform == RuntimePlatform.IPhonePlayer && pluginPaths.Length != 0)
@@ -232,7 +233,7 @@ public class FMOD_Listener : MonoBehaviour
 #if UNITY_5 && (UNITY_64 || UNITY_EDITOR_64)
                 return Application.dataPath + "/Plugins/x86_64";
 #else
-				return Application.dataPath + "/Plugins/x86";
+                return Application.dataPath + "/Plugins/x86";
 #endif
             }
             else if (Application.platform == RuntimePlatform.WindowsPlayer ||

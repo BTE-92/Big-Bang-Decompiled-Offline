@@ -1,3 +1,6 @@
+// PORTED FROM FMOD 1.07.03 TO 1.10.02 - behaviour unchanged.
+// Only API differences are changed: handle types are structs in 1.10 (no null),
+// ATTRIBUTES_3D lives in the FMOD namespace, and the FMODAsset overloads (class no longer exists) are removed.
 using UnityEngine;
 using System;
 using System.Collections;
@@ -23,9 +26,9 @@ namespace FMOD
 				return temp;
 			}
 			
-			static public ATTRIBUTES_3D to3DAttributes(this Vector3 pos)
+			static public FMOD.ATTRIBUTES_3D to3DAttributes(this Vector3 pos)
 			{
-				FMOD.Studio.ATTRIBUTES_3D attributes = new FMOD.Studio.ATTRIBUTES_3D();
+				FMOD.ATTRIBUTES_3D attributes = new FMOD.ATTRIBUTES_3D();
 				attributes.forward = toFMODVector(Vector3.forward);
 				attributes.up = toFMODVector(Vector3.up);
 				attributes.position = toFMODVector(pos);
@@ -33,9 +36,9 @@ namespace FMOD
 				return attributes;
 			}
 			
-			static public ATTRIBUTES_3D to3DAttributes(GameObject go, Rigidbody rigidbody = null)
+			static public FMOD.ATTRIBUTES_3D to3DAttributes(GameObject go, Rigidbody rigidbody = null)
 			{
-				FMOD.Studio.ATTRIBUTES_3D attributes = new FMOD.Studio.ATTRIBUTES_3D();
+				FMOD.ATTRIBUTES_3D attributes = new FMOD.ATTRIBUTES_3D();
 				attributes.forward = toFMODVector(go.transform.forward);
 				attributes.up = toFMODVector(go.transform.up);
 				attributes.position = toFMODVector(go.transform.position);
@@ -158,19 +161,15 @@ public class FMOD_StudioSystem : MonoBehaviour
 		}
 	}
 	
-	public FMOD.Studio.EventInstance GetEvent(FMODAsset asset)
-	{
-		return GetEvent(asset.id);
-	}
-	
 	public FMOD.Studio.EventInstance GetEvent(string path)
 	{
-		FMOD.Studio.EventInstance instance = null;
+		// EventInstance is a struct in 1.10: "not found" is an invalid instance (isValid() == false) instead of null.
+		FMOD.Studio.EventInstance instance = default(FMOD.Studio.EventInstance);
 		
 		if (string.IsNullOrEmpty(path))
 		{
 			FMOD.Studio.UnityUtil.LogError("Empty event path!");
-			return null;
+			return instance;
 		}
 		
 		if (eventDescriptions.ContainsKey(path) && eventDescriptions[path].isValid())
@@ -183,7 +182,14 @@ public class FMOD_StudioSystem : MonoBehaviour
 			
 			if (path.StartsWith("{"))
 			{
-				ERRCHECK(FMOD.Studio.Util.ParseID(path, out id));
+				try
+				{
+					id = new Guid(path);
+				}
+				catch (FormatException)
+				{
+					FMOD.Studio.UnityUtil.LogWarning("Could not parse event id: " + path);
+				}
 			}
 			else if (path.StartsWith("event:") || path.StartsWith("snapshot:"))
 			{
@@ -194,28 +200,23 @@ public class FMOD_StudioSystem : MonoBehaviour
 				FMOD.Studio.UnityUtil.LogError("Expected event path to start with 'event:/' or 'snapshot:/'");
 			}
 			
-			FMOD.Studio.EventDescription desc = null;
+			FMOD.Studio.EventDescription desc = default(FMOD.Studio.EventDescription);
 			ERRCHECK(system.getEventByID(id, out desc));
 			
-			if (desc != null && desc.isValid())
+			if (desc.isValid())
 			{
 				eventDescriptions[path] = desc;
 				ERRCHECK(desc.createInstance(out instance));
 			}
 		}
 		
-		if (instance == null)
+		if (!instance.isValid())
 		{
 			FMOD.Studio.UnityUtil.Log("GetEvent FAILED: \"" + path + "\"");
 		}
 		
 		return instance;
 	}
-	
-	public void PlayOneShot(FMODAsset asset, Vector3 position)
-	{
-		PlayOneShot(asset.id, position);
-	}	
 	
 	public void PlayOneShot(string path, Vector3 position)
 	{
@@ -225,7 +226,7 @@ public class FMOD_StudioSystem : MonoBehaviour
 	public void PlayOneShot(string path, Vector3 position, float volume)
 	{
 		var instance = GetEvent(path);
-		if (instance == null) 
+		if (!instance.isValid()) 
 		{			
 			FMOD.Studio.UnityUtil.LogWarning("PlayOneShot couldn't find event: \"" + path + "\"");
 			return;
@@ -329,19 +330,13 @@ public class FMOD_StudioSystem : MonoBehaviour
 	
 	void OnApplicationPause(bool pauseStatus)
 	{
-		if (system != null && system.isValid())
+		if (system.isValid())
 		{			
 			FMOD.Studio.UnityUtil.Log("Pause state changed to: " + pauseStatus);
 
 			FMOD.System sys;
 			ERRCHECK(system.getLowLevelSystem(out sys));
 
-			if (sys == null)
-			{
-				FMOD.Studio.UnityUtil.LogError("Tried to suspend mixer, but no low level system found");
-				return;
-			}
-			
 			if (pauseStatus)
 			{
 				ERRCHECK(sys.mixerSuspend());

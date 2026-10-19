@@ -14,13 +14,13 @@ PluginImporter:
       enabled: 0
       settings: {}
     Editor:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: x86_64
         DefaultValueInitialized: true
         OS: AnyOS
     Linux:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: None
     Linux64:
@@ -30,40 +30,31 @@ PluginImporter:
     LinuxUniversal:
       enabled: 1
       settings:
-        CPU: x86_64
+        CPU: AnyCPU
     OSXIntel:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: None
     OSXIntel64:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: None
     OSXUniversal:
-      enabled: 1
-      settings:
-        CPU: None
-    WP8:
       enabled: 0
       settings:
-        CPU: AnyCPU
-        DontProcess: False
-        PlaceholderPath: 
+        CPU: None
+    SamsungTV:
+      enabled: 0
+      settings:
+        STV_MODEL: STANDARD_15
     Win:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: None
     Win64:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-    WindowsStoreApps:
       enabled: 0
       settings:
-        CPU: AnyCPU
-        DontProcess: False
-        PlaceholderPath: 
-        SDK: AnySDK
+        CPU: None
     iOS:
       enabled: 0
       settings:
