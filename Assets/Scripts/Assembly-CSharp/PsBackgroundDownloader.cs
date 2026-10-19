@@ -14,8 +14,28 @@ public static class PsBackgroundDownloader
 
     private static List<FileMetaData> m_metas = new List<FileMetaData>();
 
+#if UNITY_WEBGL
+    private static WWW m_bankListWWW;
+#endif
+
     public static void Initialize()
     {
+#if UNITY_WEBGL
+        string url = Application.streamingAssetsPath + "/FMOD_bank_list.txt";
+        try
+        {
+            m_checksDone = false;
+            m_checkCount = 0;
+            m_metas.Clear();
+            m_fireNext = true;
+            m_bankListWWW = new WWW(url);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("BANK LIST NOT FOUND: " + e.Message);
+            m_checksDone = true;
+        }
+#else
         string rawContent = null;
 
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -75,6 +95,12 @@ public static class PsBackgroundDownloader
             return;
         }
 
+        ProcessBankList(rawContent);
+#endif
+    }
+
+    private static void ProcessBankList(string rawContent)
+    {
         string[] array = rawContent.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         foreach (string rawText in array)
         {
@@ -169,6 +195,28 @@ public static class PsBackgroundDownloader
 
     public static void Update()
     {
+#if UNITY_WEBGL
+        if (m_bankListWWW != null)
+        {
+            if (m_bankListWWW.isDone)
+            {
+                if (string.IsNullOrEmpty(m_bankListWWW.error))
+                {
+                    ProcessBankList(m_bankListWWW.text);
+                }
+                else
+                {
+                    Debug.LogError("BANK LIST NOT FOUND: " + m_bankListWWW.error);
+                    m_checksDone = true;
+                }
+
+                m_bankListWWW.Dispose();
+                m_bankListWWW = null;
+            }
+            return;
+        }
+#endif
+
         if (m_metas.Count > 0 && m_fireNext)
         {
             DownloadFile(m_metas[0]);
