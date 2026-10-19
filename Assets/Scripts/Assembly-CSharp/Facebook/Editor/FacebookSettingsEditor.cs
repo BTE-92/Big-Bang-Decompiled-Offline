@@ -31,10 +31,16 @@ namespace Facebook.Unity.Editor
     public class FacebookSettingsEditor : UnityEditor.Editor
     {
         private bool showFacebookInitSettings = false;
-        private bool showAndroidUtils = EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
-        private bool showIOSSettings = EditorUserBuildSettings.activeBuildTarget.ToString() == "iOS";
+        private bool showAndroidUtils = false;
+        private bool showIOSSettings = false;
         private bool showAppLinksSettings = false;
         private bool showAboutSection = false;
+
+        private void OnEnable()
+        {
+            showAndroidUtils = EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android;
+            showIOSSettings = EditorUserBuildSettings.activeBuildTarget == BuildTarget.iOS;
+        }
 
         private GUIContent appNameLabel = new GUIContent("App Name [?]:", "For your own use and organization.\n(ex. 'dev', 'qa', 'prod')");
         private GUIContent appIdLabel = new GUIContent("App Id [?]:", "Facebook App Ids can be found at https://developers.facebook.com/apps");

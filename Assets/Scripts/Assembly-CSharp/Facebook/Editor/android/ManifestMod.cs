@@ -177,8 +177,8 @@ namespace UnityEditor.FacebookEditor
             //   android:name="com.facebook.FacebookContentProvider"
             //   android:authorities="com.facebook.app.FacebookContentProvider<APPID>"
             //   android:exported="true" />
-            XmlElement contentProviderElement = CreateContentProviderElement(doc, ns, appId);
-            ManifestMod.SetOrReplaceXmlElement(dict, contentProviderElement);
+            // XmlElement contentProviderElement = CreateContentProviderElement(doc, ns, appId);
+            // ManifestMod.SetOrReplaceXmlElement(dict, contentProviderElement);
 
             // Add the facebook activity
             // <activity
