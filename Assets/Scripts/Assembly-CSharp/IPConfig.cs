@@ -56,10 +56,24 @@ public static class IpConfig
         if (s_activeConfigDir != null)
             return s_activeConfigDir;
 
+        // 1. PC/Desktop Standalone (.exe folder) - Skipped in Editor to keep project clean
+        string standaloneDir = GetStandaloneExecutableDirectory();
+        if (standaloneDir != null)
+        {
+            string candidate = Path.Combine(standaloneDir, Path.Combine(ROOT_FOLDER_NAME, SUB_FOLDER_NAME));
+            if (TryEnsureWritableDirectory(candidate))
+            {
+                s_activeConfigDir = candidate;
+                Debug.Log("[IpConfig] Desktop Exe Folder: " + s_activeConfigDir);
+                return s_activeConfigDir;
+            }
+        }
+
+        // 2. Android Tier 1 (/storage/emulated/0/)
         string emulatedRoot = GetEmulatedStorageRoot();
         if (emulatedRoot != null)
         {
-            string candidate = Path.Combine(emulatedRoot, ROOT_FOLDER_NAME, SUB_FOLDER_NAME);
+            string candidate = Path.Combine(emulatedRoot, Path.Combine(ROOT_FOLDER_NAME, SUB_FOLDER_NAME));
             if (TryEnsureWritableDirectory(candidate))
             {
                 s_activeConfigDir = candidate;
@@ -68,10 +82,11 @@ public static class IpConfig
             }
         }
 
+        // 3. Android Tier 2 (app-specific external storage)
         string appExternal = GetAppExternalFilesDir();
         if (appExternal != null)
         {
-            string candidate = Path.Combine(appExternal, ROOT_FOLDER_NAME, SUB_FOLDER_NAME);
+            string candidate = Path.Combine(appExternal, Path.Combine(ROOT_FOLDER_NAME, SUB_FOLDER_NAME));
             if (TryEnsureWritableDirectory(candidate))
             {
                 s_activeConfigDir = candidate;
@@ -80,12 +95,36 @@ public static class IpConfig
             }
         }
 
+        // 4. Fallback (Editor / iOS / persistentDataPath)
         string fallback = Path.Combine(Application.persistentDataPath,
-                                       ROOT_FOLDER_NAME, SUB_FOLDER_NAME);
+                                       Path.Combine(ROOT_FOLDER_NAME, SUB_FOLDER_NAME));
         TryEnsureWritableDirectory(fallback);
         s_activeConfigDir = fallback;
-        Debug.Log("[IpConfig] Tier 3 - persistent: " + s_activeConfigDir);
+        Debug.Log("[IpConfig] Fallback persistent: " + s_activeConfigDir);
         return s_activeConfigDir;
+    }
+
+    private static string GetStandaloneExecutableDirectory()
+    {
+#if UNITY_STANDALONE && !UNITY_EDITOR
+        try
+        {
+            DirectoryInfo parent = Directory.GetParent(Application.dataPath);
+            if (parent != null)
+            {
+#if UNITY_STANDALONE_OSX
+                if (parent.Parent != null && parent.Parent.Parent != null)
+                    return parent.Parent.Parent.FullName;
+#endif
+                return parent.FullName;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("[IpConfig] GetStandaloneExecutableDirectory failed: " + e.Message);
+        }
+#endif
+        return null;
     }
 
     private static string GetEmulatedStorageRoot()
