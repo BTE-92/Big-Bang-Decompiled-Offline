@@ -6,7 +6,7 @@ public class WOEURL : URL
 	{
 		if (!string.IsNullOrEmpty(_command))
 		{
-			host = "http://192.168.0.24";//"https://woeprod.traplightgames.com";
+			host = IpConfig.ServerUrl;//"https://woeprod.traplightgames.com";
 			command = _command;
 		}
 	}
