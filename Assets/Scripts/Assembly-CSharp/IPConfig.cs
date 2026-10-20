@@ -56,20 +56,19 @@ public static class IpConfig
         if (s_activeConfigDir != null)
             return s_activeConfigDir;
 
-        // 1. PC/Desktop Standalone (.exe folder) - Skipped in Editor to keep project clean
+        // 1. PC/Desktop Standalone (.exe folder directly - no subfolders)
         string standaloneDir = GetStandaloneExecutableDirectory();
         if (standaloneDir != null)
         {
-            string candidate = Path.Combine(standaloneDir, Path.Combine(ROOT_FOLDER_NAME, SUB_FOLDER_NAME));
-            if (TryEnsureWritableDirectory(candidate))
+            if (TryEnsureWritableDirectory(standaloneDir))
             {
-                s_activeConfigDir = candidate;
+                s_activeConfigDir = standaloneDir;
                 Debug.Log("[IpConfig] Desktop Exe Folder: " + s_activeConfigDir);
                 return s_activeConfigDir;
             }
         }
 
-        // 2. Android Tier 1 (/storage/emulated/0/)
+        // 2. Android Tier 1 (/storage/emulated/0/BigBangRacing/BigBang249_ipConfig/)
         string emulatedRoot = GetEmulatedStorageRoot();
         if (emulatedRoot != null)
         {
