@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using UnityEngine;
 
@@ -41,22 +40,12 @@ public static class IpConfig
         get { return Path.Combine(ActiveConfigDirectory, CONFIG_FILENAME); }
     }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void AutoInitPermissions()
-    {
-        GameObject go = new GameObject("[IpConfig_Permissions]");
-        go.AddComponent<PermissionHelper>();
-        UnityEngine.Object.DontDestroyOnLoad(go);
-    }
-#endif
 
     private static string ResolveConfigDirectory()
     {
         if (s_activeConfigDir != null)
             return s_activeConfigDir;
 
-        // 1. PC/Desktop Standalone (.exe folder directly - no subfolders)
         string standaloneDir = GetStandaloneExecutableDirectory();
         if (standaloneDir != null)
         {
@@ -68,7 +57,6 @@ public static class IpConfig
             }
         }
 
-        // 2. Android Tier 1 (/storage/emulated/0/BigBangRacing/BigBang249_ipConfig/)
         string emulatedRoot = GetEmulatedStorageRoot();
         if (emulatedRoot != null)
         {
@@ -76,12 +64,10 @@ public static class IpConfig
             if (TryEnsureWritableDirectory(candidate))
             {
                 s_activeConfigDir = candidate;
-                Debug.Log("[IpConfig] Tier 1 - emulated root: " + s_activeConfigDir);
                 return s_activeConfigDir;
             }
         }
 
-        // 3. Android Tier 2 (app-specific external storage)
         string appExternal = GetAppExternalFilesDir();
         if (appExternal != null)
         {
@@ -89,12 +75,10 @@ public static class IpConfig
             if (TryEnsureWritableDirectory(candidate))
             {
                 s_activeConfigDir = candidate;
-                Debug.Log("[IpConfig] Tier 2 - app external: " + s_activeConfigDir);
                 return s_activeConfigDir;
             }
         }
 
-        // 4. Fallback (Editor / iOS / persistentDataPath)
         string fallback = Path.Combine(Application.persistentDataPath,
                                        Path.Combine(ROOT_FOLDER_NAME, SUB_FOLDER_NAME));
         TryEnsureWritableDirectory(fallback);
@@ -176,6 +160,9 @@ public static class IpConfig
 #endif
     }
 
+    // ---- Storage permission: call these yourself (e.g. from Main.Start) ----
+    // Plain Android calls through AndroidJavaObject, so this works on Unity 5.4 (no UnityEngine.Android).
+
     private static int GetSdkInt()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -192,18 +179,17 @@ public static class IpConfig
 #endif
     }
 
-    private static bool HasStoragePermission()
+    // True when the storage permission is granted (always true off-device / below Android 6).
+    public static bool HasStoragePermission()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
         try
         {
-            int sdk = GetSdkInt();
-            if (sdk < 23) return true;
+            if (GetSdkInt() < 23) return true;
 
             AndroidJavaClass player = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = player.GetStatic<AndroidJavaObject>("currentActivity");
-            int result = activity.Call<int>("checkSelfPermission",
-                "android.permission.WRITE_EXTERNAL_STORAGE");
+            int result = activity.Call<int>("checkSelfPermission", "android.permission.WRITE_EXTERNAL_STORAGE");
             activity.Dispose();
             player.Dispose();
             return result == 0;
@@ -218,25 +204,42 @@ public static class IpConfig
 #endif
     }
 
-    private static void RequestStoragePermissionNative()
+    // Shows the system Allow/Deny popup if the permission isn't granted yet.
+    // Same call Unity's own Permission.RequestUserPermission ends up making: one permission,
+    // request code 96489. Only WRITE is requested: READ and WRITE are the same permission group.
+    public static void RequestStoragePermission()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
         try
         {
+            if (GetSdkInt() < 23 || HasStoragePermission()) return;
+
             AndroidJavaClass player = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = player.GetStatic<AndroidJavaObject>("currentActivity");
-            activity.Call("requestPermissions",
-                new string[] { "android.permission.WRITE_EXTERNAL_STORAGE" }, 1);
-            activity.Dispose();
-            player.Dispose();
+
+            // must run on the Android UI thread, not Unity's thread
+            activity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
+            {
+                try
+                {
+                    string[] permissions = new string[] { "android.permission.WRITE_EXTERNAL_STORAGE" };
+                    object[] args = new object[] { permissions, 96489 };
+                    activity.Call("requestPermissions", args);
+                }
+                catch (Exception inner)
+                {
+                    Debug.LogError("[IpConfig] requestPermissions failed: " + inner.Message);
+                }
+            }));
         }
         catch (Exception e)
         {
-            Debug.LogError("[IpConfig] requestPermissions failed: " + e.Message);
+            Debug.LogError("[IpConfig] RequestStoragePermission failed: " + e.Message);
         }
 #endif
     }
 
+    // Call after the permission was granted so the config folder is resolved again.
     public static void ResetAndReload()
     {
         s_activeConfigDir = null;
@@ -332,46 +335,4 @@ public static class IpConfig
         return result.Scheme == Uri.UriSchemeHttp || result.Scheme == Uri.UriSchemeHttps;
     }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-    private class PermissionHelper : MonoBehaviour
-    {
-        void Start()
-        {
-            int sdk = GetSdkInt();
-
-            if (sdk >= 23 && sdk <= 29)
-            {
-                if (!HasStoragePermission())
-                {
-                    RequestStoragePermissionNative();
-                    StartCoroutine(WaitForPermissionResult());
-                    return;
-                }
-            }
-
-            Destroy(gameObject);
-        }
-
-        private IEnumerator WaitForPermissionResult()
-        {
-            float elapsed = 0f;
-            float timeout = 120f;
-
-            while (elapsed < timeout)
-            {
-                yield return new WaitForSeconds(0.5f);
-                elapsed += 0.5f;
-
-                if (HasStoragePermission())
-                {
-                    Debug.Log("[IpConfig] Permission granted, re-resolving path.");
-                    ResetAndReload();
-                    break;
-                }
-            }
-
-            Destroy(gameObject);
-        }
-    }
-#endif
 }

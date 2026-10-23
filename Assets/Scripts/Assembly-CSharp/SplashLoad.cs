@@ -14,7 +14,10 @@ public class SplashLoad : MonoBehaviour
 
 	private void Start()
 	{
-		EveryplayManager.SetEnabled(PsState.m_everyplayEnabled);
+#if UNITY_ANDROID && !UNITY_EDITOR
+        IpConfig.RequestStoragePermission(); //Added so permission popup instantly calls as soon as game runs!
+#endif
+        EveryplayManager.SetEnabled(PsState.m_everyplayEnabled);
 		EveryplayManager.Initialize();
 		Color color = m_fadeMaterial.color;
 		color.a = 0f;
