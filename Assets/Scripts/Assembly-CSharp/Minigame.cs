@@ -505,7 +505,13 @@ public class Minigame : Level
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			GraphElement graphElement = new GraphNode(GraphNodeType.Normal, Type.GetType("CollectibleStar"), "CollectibleStar", Vector3.zero, Vector3.zero, Vector3.one);
+			int num = (int)m_settings["domeSizeIndex"];
+			float num2 = PsState.m_domeSizes[num].x * 2048f;
+			float num3 = PsState.m_domeSizes[num].y * 2048f;
+			float num4 = (float)LevelManager.m_currentLevel.m_currentLayer.m_layerHeight * -0.5f;
+			float x = num2 * 0.1f * (float)(i - 1);
+			float y = num4 + num3 * 0.35f;
+			GraphElement graphElement = new GraphNode(GraphNodeType.Normal, Type.GetType("CollectibleStar"), "CollectibleStar", new Vector3(x, y, 0f), Vector3.zero, Vector3.one);
 			LevelManager.m_currentLevel.m_currentLayer.AddElement(graphElement);
 			graphElement.Assemble();
 		}

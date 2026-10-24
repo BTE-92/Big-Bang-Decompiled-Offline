@@ -37,6 +37,10 @@ public class EditorSelectorGameMode : EditorSelectorBase
 				PsState.m_wizardGameMode = text;
 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new EditorSelectorArea(EditorSelectorContext.START_WIZARD));
 			}
+			if (PsState.m_activeMinigame != null)
+			{
+				PsState.m_activeMinigame.m_changed = true;
+			}
 			SoundS.PlaySingleShot("/UI/ItemCreate", Vector3.zero);
 		}
 	}

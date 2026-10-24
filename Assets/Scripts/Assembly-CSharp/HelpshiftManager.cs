@@ -43,13 +43,6 @@ public class HelpshiftManager : MonoBehaviour
 
 	public static void ShowAlertToRate(string _appID, Action _successCallback = null, Action _feedbackCallback = null, Action _closeCallback = null)
 	{
-		if (m_sdk != null)
-		{
-			m_rateSuccessCallback = _successCallback;
-			m_rateFeedbackCallback = _feedbackCallback;
-			m_rateCloceCallback = _closeCallback;
-			m_sdk.showAlertToRateAppWithURL("market://details?id=" + _appID);
-		}
 	}
 
 	public void alertToRateAppAction(string message)

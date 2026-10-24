@@ -65,7 +65,7 @@ public class PsUISideCreateFriends : UICanvas
 	private void DataSUCCEED(PsMinigameMetaData[] _data)
 	{
 		m_contentArea.DestroyChildren();
-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
+		if (string.IsNullOrEmpty("x"))
 		{
 			m_fbButton = new PsUIGenericButton(m_contentArea);
 			m_fbButton.SetIcon("menu_icon_facebook", 0.045f);

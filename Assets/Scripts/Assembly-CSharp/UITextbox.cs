@@ -116,8 +116,9 @@ public class UITextbox : UIComponent
 		CalculateReferenceSizes();
 		UpdateSize();
 		UpdateMargins();
-		float fontSizeINT = ((!m_intFontSize) ? (m_fontSize * m_fontSizeRelative) : ((float)Mathf.FloorToInt(m_fontSize * m_fontSizeRelative)));
-		TextMeshS.SetFontSize(m_tmc, fontSizeINT);
+		float size = ((!m_intFontSize) ? (m_fontSize * m_fontSizeRelative) : ((float)Mathf.FloorToInt(m_fontSize * m_fontSizeRelative)));
+		size = LocUI.FitBoxFont(this, size);
+		TextMeshS.SetFontSize(m_tmc, size);
 		float width = (m_actualWidth - m_actualMargins.l - m_actualMargins.r) * ((float)TextMeshS.m_defaultCharacterSize / m_tmc.m_textMesh.characterSize);
 		string text = TextMeshS.WrapText(m_tmc, m_text, width, m_maxRows, m_dots);
 		Vector2 textSize = TextMeshS.GetTextSize(m_tmc, text);

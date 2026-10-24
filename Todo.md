@@ -3,5 +3,5 @@
   - [x] Compile armv8 chipmunk plugin
   - [x] Upgrade FMOD from 1.07.03 to 1.10.2 for Android armv8
   - [x] Unity 2018 specific issues (PhysX mesh cooking, PaticleSeedRamdomiser)
-  - [ ] Add Compiled Builds
-  - [ ] Add a source to the game server
+  - [x] Add Compiled Builds (Windows, Android APK, iOS Xcode project: folder Builds next to the project)
+  - [x] Add a source to the game server (embedded offline server, see README.md)

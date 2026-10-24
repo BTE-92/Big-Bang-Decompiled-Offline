@@ -70,7 +70,7 @@ public class EditorBaseState : BasicState
 		m_fullscreenTAC.m_cancelOtherTouches = false;
 		m_everyplayPauseTicks = 0;
 		m_recording = true;
-		if (!PsState.m_adminMode)
+		if (1 == 0)
 		{
 		}
 	}

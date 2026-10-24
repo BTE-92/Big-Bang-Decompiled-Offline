@@ -425,7 +425,7 @@ public class PsGameLoop
 	protected virtual void SaveMinigame(bool _exiting = false)
 	{
 		Debug.Log(m_autosave);
-		if (_exiting && PsState.m_adminMode && m_autosave)
+		if (_exiting && true && m_autosave)
 		{
 			new PsUIBasePopup(typeof(PsUICenterEditorSave), null, null, null, true, false);
 		}
@@ -501,7 +501,7 @@ public class PsGameLoop
 		}
 		PsState.m_activeMinigame.SetLayerItems();
 		string creationTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
-		if (PsState.m_activeGameLoop.m_minigameMetaData.template && PsState.m_adminMode)
+		if (PsState.m_activeGameLoop.m_minigameMetaData.template ? true : false)
 		{
 			return Template.Save(PsState.m_activeGameLoop.m_minigameMetaData.id, LevelSendToServerOk, LevelSendToServerFailed);
 		}

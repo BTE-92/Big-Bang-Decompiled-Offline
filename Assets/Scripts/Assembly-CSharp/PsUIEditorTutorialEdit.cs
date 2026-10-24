@@ -12,7 +12,7 @@ public class PsUIEditorTutorialEdit : PsUIEditorEdit
 		m_exitButton = new PsUIGenericButton(_parent);
 		m_exitButton.SetIcon("menu_icon_exit", 0.06f);
 		m_exitButton.SetOrangeColors();
-		if (PsState.m_adminMode)
+		if (true)
 		{
 			m_freeWizardButton = new UIRectSpriteButton(_parent, string.Empty, PsState.m_uiSheet, PsState.m_uiSheet.m_atlas.GetFrame("hud_button_settings"), false);
 			m_freeWizardButton.SetHeight(0.12f, RelativeTo.ScreenShortest);

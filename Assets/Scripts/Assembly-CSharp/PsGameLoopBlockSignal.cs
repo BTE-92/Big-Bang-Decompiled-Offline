@@ -103,7 +103,7 @@ public class PsGameLoopBlockSignal : PsGameLoop
 		m_winFirtTime = false;
 		if (PsState.m_activeGameLoop == null)
 		{
-			if (Input.GetKey(KeyCode.LeftShift) || (PsState.m_adminMode && PsState.m_adminModeSkipping))
+			if (Input.GetKey(KeyCode.LeftShift) || (true && PsState.m_adminModeSkipping))
 			{
 				m_skip = true;
 			}

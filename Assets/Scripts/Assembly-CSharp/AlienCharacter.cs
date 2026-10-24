@@ -166,16 +166,13 @@ public class AlienCharacter : Unit
 		gameObject.transform.localPosition = Vector3.zero;
 	}
 
+	// the game ships nine head props; the original build always picked the helmet, here each rider gets a random one
 	public string SetRandomHat()
 	{
-		bool flag = true;
 		string empty = string.Empty;
 		UnityEngine.Random.seed = (int)(Main.m_gameTimeSinceAppStarted * 60.0);
-		int num = 1;
-		if (!flag)
-		{
-			num = UnityEngine.Random.Range(0, 5);
-		}
+		int choice = HatChoice.Current;
+		int num = (choice == HatChoice.Random) ? UnityEngine.Random.Range(0, 9) : (choice - 1);
 		RESOURCE resourceObject;
 		switch (num)
 		{
@@ -199,9 +196,21 @@ public class AlienCharacter : Unit
 			resourceObject = RESOURCE.HorseHeadMaskPrefab_GameObject;
 			empty = "HorseHead";
 			break;
+		case 5:
+			resourceObject = RESOURCE.ChickenHatPrefab_GameObject;
+			empty = "ChickenHat";
+			break;
+		case 6:
+			resourceObject = RESOURCE.MushroomHatPrefab_GameObject;
+			empty = "MushroomHat";
+			break;
+		case 7:
+			resourceObject = RESOURCE.PaperBagHatPrefab_GameObject;
+			empty = "PaperBagHat";
+			break;
 		default:
-			resourceObject = RESOURCE.AlienHelmetPrefab_GameObject;
-			empty = "Helmet";
+			resourceObject = RESOURCE.DeathMaskPrefab_GameObject;
+			empty = "DeathMask";
 			break;
 		}
 		SetPropToLocator(resourceObject, "Hips/Spine1/Spine2/Neck/Head/HeadCollider/HeadGearLocator");

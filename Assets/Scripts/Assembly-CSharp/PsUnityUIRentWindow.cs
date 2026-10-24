@@ -18,7 +18,7 @@ public class PsUnityUIRentWindow : UnityUIComponent<PsUnityUIRentWindowBundle>
 	{
 		m_hidden = true;
 		SetUpgradeValues(_upgradeValues, _rentUpgradeValues);
-		m_uiBundle.m_banner.m_name.text = string.Empty;
+		m_uiBundle.m_banner.m_name.text = Loc.T(string.Empty);
 		m_uiBundle.m_rentButtonBundle.m_button.onClick.AddListener(delegate
 		{
 			if (PsState.m_activeGameLoop.m_freeConsumableUnlock == "Rent")
@@ -40,16 +40,16 @@ public class PsUnityUIRentWindow : UnityUIComponent<PsUnityUIRentWindowBundle>
 		m_rentPrice = 0;
 		for (int i = 0; i < 3; i++)
 		{
-			m_uiBundle.m_upgradeTexts[i].text = Vehicle.GetUpgradeName(m_upgradesValues[i].Key).ToUpper();
+			m_uiBundle.m_upgradeTexts[i].text = Loc.T(Vehicle.GetUpgradeName(m_upgradesValues[i].Key).ToUpper());
 			int num = m_rentUpgradeValues[i] - m_upgradesValues[i].Value;
 			if (num < 0)
 			{
-				m_uiBundle.m_upgradeValues[i].text = num.ToString();
+				m_uiBundle.m_upgradeValues[i].text = Loc.T(num.ToString());
 				m_uiBundle.m_upgradeValues[i].color = Color.red;
 			}
 			else
 			{
-				m_uiBundle.m_upgradeValues[i].text = "+" + num;
+				m_uiBundle.m_upgradeValues[i].text = Loc.T("+" + num);
 				m_uiBundle.m_upgradeValues[i].color = Color.green;
 			}
 			m_rentPrice += num;

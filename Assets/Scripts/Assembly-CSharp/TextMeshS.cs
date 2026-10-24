@@ -117,6 +117,7 @@ public static class TextMeshS
 
 	public static void FitTextToRect(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, string _text, bool _fitTextToWidth = true)
 	{
+		_text = Loc.T(_text);
 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
 		int num = Mathf.FloorToInt(_tmc.m_textboxHeight);
@@ -128,6 +129,7 @@ public static class TextMeshS
 				float num2 = textSize.x / _tmc.m_textboxWidth;
 				num = Mathf.FloorToInt(_tmc.m_textboxHeight / num2);
 			}
+			num = LocUI.ShrinkFit(num);
 		}
 		else
 		{
@@ -147,6 +149,7 @@ public static class TextMeshS
 
 	public static void SetText(TextMeshC _tmc, string _text, bool _offsetGO = true)
 	{
+		_text = Loc.T(_text);
 		_text = ToolBox.GetUTF8String(_text);
 		_tmc.m_textMesh.text = _text;
 		_tmc.m_textWidth = _tmc.m_renderer.bounds.size.x;
@@ -156,6 +159,7 @@ public static class TextMeshS
 
 	public static void SetTextOptimized(TextMeshC _tmc, string _text)
 	{
+		_text = Loc.T(_text);
 		_tmc.m_textMesh.text = _text;
 		_tmc.m_textWidth = _tmc.m_renderer.bounds.size.x;
 		_tmc.m_textHeight = _tmc.m_renderer.bounds.size.y;
@@ -163,6 +167,7 @@ public static class TextMeshS
 
 	public static string CutTextToWidth(TextMeshC _tmc, string _text, float _width)
 	{
+		_text = Loc.T(_text);
 		_text = ToolBox.GetUTF8String(_text);
 		for (float x = GetTextSize(_tmc, _text).x; x > _width; x = GetTextSize(_tmc, _text).x)
 		{
@@ -206,6 +211,7 @@ public static class TextMeshS
 
 	public static void SetTextToTextbox(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, string _text)
 	{
+		_text = Loc.T(_text);
 		_text = ToolBox.GetUTF8String(_text);
 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
@@ -217,6 +223,7 @@ public static class TextMeshS
 
 	public static void WrapTextToTextbox(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, string _text, int _maxRows = -1)
 	{
+		_text = Loc.T(_text);
 		_text = ToolBox.GetUTF8String(_text);
 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
@@ -228,6 +235,7 @@ public static class TextMeshS
 
 	public static void WrapTextToTextbox(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, float _rowHeight, string _text, int _maxRows = -1)
 	{
+		_text = Loc.T(_text);
 		_text = ToolBox.GetUTF8String(_text);
 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
@@ -240,22 +248,26 @@ public static class TextMeshS
 
 	public static float GetHeightToWidthRatio(TextMeshC _tmc, string _text)
 	{
+		_text = Loc.T(_text);
 		return GetHeightToWidthRatio(_tmc.m_textMesh.font, _tmc.m_textMesh.fontSize, _tmc.m_textMesh.lineSpacing, _text);
 	}
 
 	public static float GetHeightToWidthRatio(Font _font, int _fontSize, float _lineSpacing, string _text)
 	{
+		_text = Loc.T(_text);
 		Vector2 textSize = GetTextSize(_font, _fontSize, _lineSpacing, _text);
 		return textSize.y / textSize.x;
 	}
 
 	public static Vector2 GetTextSize(TextMeshC _tmc, string _text)
 	{
+		_text = Loc.T(_text);
 		return GetTextSize(_tmc.m_textMesh.font, _tmc.m_textMesh.fontSize, _tmc.m_textMesh.lineSpacing, _text);
 	}
 
 	public static Vector2 GetTextSize(Font _font, int _fontSize, float _lineSpacing, string _text)
 	{
+		_text = Loc.T(_text);
 		_text = ToolBox.GetUTF8String(_text);
 		_font.RequestCharactersInTexture(_text, _fontSize);
 		GUIStyle gUIStyle = new GUIStyle();
@@ -307,11 +319,13 @@ public static class TextMeshS
 
 	public static string WrapText(TextMeshC _tmc, string _text, float _width, int _maxRows = -1, bool _dots = false)
 	{
+		_text = Loc.T(_text);
 		return WrapText(_tmc.m_textMesh.font, _tmc.m_textMesh.fontSize, _tmc.m_textMesh.lineSpacing, _text, _width, _maxRows, _dots);
 	}
 
 	public static string WrapText(Font _font, int _fontSize, float _lineSpacing, string _text, float _width, int _maxRows = -1, bool _dots = false)
 	{
+		_text = Loc.T(_text);
 		if (_width == 0f || _text.Length <= 0 || (_maxRows >= 0 && _maxRows < 2))
 		{
 			return _text;

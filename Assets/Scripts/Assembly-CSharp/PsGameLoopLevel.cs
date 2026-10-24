@@ -49,7 +49,7 @@ public class PsGameLoopLevel : PsGameLoop
 				PsMetagameManager.SaveProgression(progressionJSON2, false);
 			}
 		}
-		if (m_nodeId <= m_path.m_currentNodeId && !Input.GetKey(KeyCode.LeftShift) && (!PsState.m_adminMode || !PsState.m_adminModeSkipping))
+		if (m_nodeId <= m_path.m_currentNodeId && !Input.GetKey(KeyCode.LeftShift) && (1 == 0 || !PsState.m_adminModeSkipping))
 		{
 			m_unlocked = true;
 			new PsMenuDialogueFlow(this, PsNodeEventTrigger.LoopStart, 0f, delegate
@@ -69,7 +69,7 @@ public class PsGameLoopLevel : PsGameLoop
 				}
 			});
 		}
-		else if (Input.GetKey(KeyCode.LeftShift) || (PsState.m_adminMode && PsState.m_adminModeSkipping))
+		else if (Input.GetKey(KeyCode.LeftShift) || (true && PsState.m_adminModeSkipping))
 		{
 			m_unlocked = true;
 			m_backAtMenu = false;

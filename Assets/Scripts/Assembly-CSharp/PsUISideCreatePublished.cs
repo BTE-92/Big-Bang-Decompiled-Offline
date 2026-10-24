@@ -87,6 +87,7 @@ public class PsUISideCreatePublished : UICanvas
 
 	public override void Step()
 	{
+		HandleDelete();
 		PsUIBasePopup psUIBasePopup = GetRoot() as PsUIBasePopup;
 		float currentScrollX = psUIBasePopup.m_scrollableCanvas.m_currentScrollX;
 		if (psUIBasePopup.m_pageButtonLeft == null && psUIBasePopup.m_pageButtonRight == null && currentScrollX < 0.1f)
@@ -108,5 +109,20 @@ public class PsUISideCreatePublished : UICanvas
 			}
 		}
 		base.Step();
+	}
+
+	public void HandleDelete()
+	{
+		for (int i = 0; i < m_levels.Count; i++)
+		{
+			if (m_levels[i].m_bannerEndIcon.m_hit)
+			{
+				PsMetagameManager.DeleteMinigame(m_levels[i].m_loop.m_minigameId);
+				m_levels[i].Destroy();
+				m_levels.RemoveAt(i);
+				m_scrollArea.Update();
+				break;
+			}
+		}
 	}
 }

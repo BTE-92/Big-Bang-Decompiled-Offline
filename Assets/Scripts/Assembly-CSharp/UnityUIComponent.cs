@@ -24,6 +24,7 @@ public class UnityUIComponent<T> : IUnityUIComponent where T : UnityUIBundle, ne
 			m_canvasGroup = m_uiGameObject.AddComponent<CanvasGroup>();
 		}
 		m_uiBundle = m_uiGameObject.GetComponent<T>();
+		LocUI.TranslateUI(m_uiGameObject);
 	}
 
 	public virtual void Step()

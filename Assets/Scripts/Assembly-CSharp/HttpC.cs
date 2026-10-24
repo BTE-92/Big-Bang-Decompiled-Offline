@@ -6,7 +6,7 @@ public class HttpC : BasicComponent
 {
 	public static int m_componentCount;
 
-	public WWW www;
+	public GameWWW www;
 
 	public string url;
 
@@ -92,7 +92,7 @@ public class HttpC : BasicComponent
 		{
 			retryCount--;
 			timeOut = Main.m_gameTimeSinceAppStarted + HttpS.m_localTimeOut;
-			www = new WWW(wwwUrl, wwwData, wwwHeaders);
+			www = new GameWWW(wwwUrl, wwwData, wwwHeaders);
 			return;
 		}
 		if (requestFailed != null && !executed)

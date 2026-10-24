@@ -23,6 +23,7 @@
 		<activity android:name="com.facebook.unity.FBUnityJoinGameGroupActivity" />
 		<activity android:name="com.facebook.unity.AppInviteDialogActivity" />
 		<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="fb1374618442808673" />
+		<activity android:name="com.bbr.picker.PickerActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 		<activity android:name="com.facebook.FacebookActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 	</application>
 </manifest>

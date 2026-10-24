@@ -217,7 +217,7 @@ public class PsGameLoopEditorTemplate : PsGameLoop
 		List<GraphElement> childElements = LevelManager.m_currentLevel.m_currentLayer.m_childElements;
 		for (int num5 = childElements.Count - 1; num5 > -1; num5--)
 		{
-			if (!PsState.m_adminMode && (childElements[num5].m_name == "PlayerSpawnPoint" || childElements[num5].m_name == "GoalSpawnPoint" || childElements[num5].m_name == "StarSpawnPoint" || (childElements[num5].m_name == "CollectibleStar" && m_minigameMetaData.gameMode != PsGameMode.StarCollect)))
+			if (1 == 0 && (childElements[num5].m_name == "PlayerSpawnPoint" || childElements[num5].m_name == "GoalSpawnPoint" || childElements[num5].m_name == "StarSpawnPoint" || (childElements[num5].m_name == "CollectibleStar" && m_minigameMetaData.gameMode != PsGameMode.StarCollect)))
 			{
 				childElements[num5].Clear(false);
 				LevelManager.m_currentLevel.m_currentLayer.RemoveElement(childElements[num5]);

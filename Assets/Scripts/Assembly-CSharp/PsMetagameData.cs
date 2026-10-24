@@ -369,6 +369,7 @@ public static class PsMetagameData
 			{
 				AddCategory(_helper.m_outputs[i], psUnlockableCategory);
 			}
+			AddDevItems(psUnlockableCategory);
 		}
 		else if (_helper.m_metagameNodeData.m_nodeDataType == MetagameNodeDataType.Unlockable)
 		{
@@ -579,5 +580,116 @@ public static class PsMetagameData
 			}
 		}
 		return false;
+	}
+
+	public static int DevItemDest(string s)
+	{
+		switch (s)
+		{
+		case "DecorationalTree":
+		case "DecorationalSign":
+		case "DecorationalPyrotechnics":
+		case "DecorationalPyroDragon":
+		case "DecorationalPyroChickoon":
+		case "DecorationalRock":
+		case "DecorationalMetalFence":
+		case "DecorationalPicketFence":
+			return 1;
+		case "PsWoodenBlockHard":
+			return 2;
+		case "ForceField":
+			return 3;
+		default:
+			return 0;
+		}
+	}
+
+	public static void MakeDecorations(PsUnlockableCategory c)
+	{
+		PsUnlockableCategory psUnlockableCategory = new PsUnlockableCategory("Decorations");
+		psUnlockableCategory.m_type = c.m_type;
+		int num = 0;
+		while (num < c.m_items.Count)
+		{
+			PsUnlockable psUnlockable = c.m_items[num];
+			int num2 = DevItemDest(psUnlockable.m_identifier);
+			if (num2 != 0)
+			{
+				PsUnlockableCategory psUnlockableCategory2 = (num2 == 1) ? psUnlockableCategory : ((num2 == 2) ? m_units[0] : m_units[1]);
+				psUnlockableCategory2.m_items.Add(psUnlockable);
+				psUnlockable.m_container = psUnlockableCategory2;
+				c.m_items.RemoveAt(num);
+			}
+			else
+			{
+				num++;
+			}
+		}
+		m_units.Insert(m_units.Count - 2, psUnlockableCategory);
+	}
+
+	public static void AddDevItem(PsUnlockableCategory c, string name, string desc, string icon, string id, string cls)
+	{
+		PsEditorItem psEditorItem = new PsEditorItem(name);
+		psEditorItem.m_description = desc;
+		psEditorItem.m_iconImage = icon;
+		psEditorItem.m_identifier = id;
+		psEditorItem.m_graphNodeClassName = cls;
+		psEditorItem.m_maxAmount = 99;
+		psEditorItem.m_unlocked = true;
+		psEditorItem.m_container = c;
+		c.m_items.Add(psEditorItem);
+	}
+
+	public static void AddDevItemAt(PsUnlockableCategory c, string name, string desc, string icon, string id, string cls, int index)
+	{
+		PsEditorItem psEditorItem = new PsEditorItem(name);
+		psEditorItem.m_description = desc;
+		psEditorItem.m_iconImage = icon;
+		psEditorItem.m_identifier = id;
+		psEditorItem.m_graphNodeClassName = cls;
+		psEditorItem.m_maxAmount = 99;
+		psEditorItem.m_unlocked = true;
+		psEditorItem.m_container = c;
+		c.m_items.Insert(index, psEditorItem);
+	}
+
+	public static void AddToTest(PsUnlockableCategory c)
+	{
+		PsUnlockableCategory psUnlockableCategory = new PsUnlockableCategory("A tester");
+		psUnlockableCategory.m_type = c.m_type;
+		AddDevItem(psUnlockableCategory, "Collectible Star", "A collectible star", "item_mode_3stars", "CollectibleStar", "GraphNode");
+		AddDevItem(psUnlockableCategory, "Goal", "The goal robot", "item_mode_timeattack", "Goal", "GraphNode");
+		m_units.Add(psUnlockableCategory);
+	}
+
+	public static void AddDevItems(PsUnlockableCategory c)
+	{
+		if (c != null && c.m_name == "Dev Items")
+		{
+			// the sensor goal has no picture of its own: it uses the goal's chequered flag (not the force field's picture)
+			for (int i = 0; i < c.m_items.Count; i++)
+			{
+				PsEditorItem sensorGoal = c.m_items[i] as PsEditorItem;
+				if (sensorGoal != null && sensorGoal.m_identifier == "SensorGoal")
+				{
+					sensorGoal.m_iconImage = "item_mode_timeattack";
+				}
+			}
+			AddDevItem(c, "Metal Fence", "Decorational metal fence", "item_deco_metalfence", "DecorationalMetalFence", "LevelDecorationNode");
+			AddDevItem(c, "Picket Fence", "Decorational picket fence", "item_deco_picketfence", "DecorationalPicketFence", "LevelDecorationNode");
+			AddDevItem(c, "Golden Chicken", "A shiny golden chicken", "dev_golden_chicken", "DecorationalGoldenChicken", "LevelDecorationNode");
+			AddDevItemAt(c, "Ice Block", "Breakable ice block", "item_material_ice_icon", "PsIceBlock", "LevelBlockNode", 3);
+			AddDevItem(c, "Hard Wooden Box", "A tougher box", "item_wooden_block_icon", "PsWoodenBlockHard", "LevelBlockNode");
+			AddDevItem(c, "Direction Boost", "Boosts you in a direction", "dev_direction_boost", "PsDirectionBoost", "GraphNode");
+			AddDevItem(c, "Force Field", "A barrier you can switch on and off with a trigger.", "item_forcefield", "ForceField", "GraphNode");
+			AddDevItem(c, "Earth Goal", "Goal gate", "dev_earth_goal", "EarthGoal", "GraphNode");
+			AddDevItem(c, "Metal Platform", "A metal platform", "dev_metal_platform", "PsMetalPlatform", "GraphNode");
+			AddDevItem(c, "Sensor", "Invisible trigger sensor", "dev_sensor", "Sensor", "GraphNode");
+			AddDevItem(c, "Boelb", "A boelb creature", "dev_boelb", "PsBoelb", "LevelCustomNode");
+			AddDevItem(c, "Collectible Star", "A collectible star", "item_mode_3stars", "CollectibleStar", "GraphNode");
+			AddDevItem(c, "Goal", "The goal robot", "item_mode_timeattack", "Goal", "GraphNode");
+			MakeDecorations(c);
+		}
 	}
 }

@@ -68,7 +68,7 @@ public class PsUnityUIUpgradeBars : UnityUIComponent<PsUnityUIUpgradeBarsBundle>
 		for (int i = 0; i < 3; i++)
 		{
 			int index = i;
-			m_uiBundle.m_texts[i].text = Vehicle.GetUpgradeName(m_upgrades[i].Key).ToUpper();
+			m_uiBundle.m_texts[i].text = Loc.T(Vehicle.GetUpgradeName(m_upgrades[i].Key).ToUpper());
 			if (m_uiBundle.m_buttonBundles[i].m_button.onClick != null)
 			{
 				m_uiBundle.m_buttonBundles[i].m_button.onClick.RemoveAllListeners();
@@ -97,7 +97,7 @@ public class PsUnityUIUpgradeBars : UnityUIComponent<PsUnityUIUpgradeBarsBundle>
 		SetTier();
 		SetFilling();
 		ParseCurrentPrices();
-		m_banner.m_name.text = string.Empty;
+		m_banner.m_name.text = Loc.T(string.Empty);
 		if (CanLevelUp())
 		{
 			ShowLevelUpButton();
@@ -239,7 +239,7 @@ public class PsUnityUIUpgradeBars : UnityUIComponent<PsUnityUIUpgradeBarsBundle>
 		m_selectedButtonIndex = _upgradeIndex;
 		if (m_boltPrices[_upgradeIndex] == 0 && m_coinPrices[_upgradeIndex] == 0)
 		{
-			m_uiBundle.m_buttonBundles[_upgradeIndex].m_text.text = "FREE";
+			m_uiBundle.m_buttonBundles[_upgradeIndex].m_text.text = Loc.T("FREE");
 			m_uiBundle.m_buttonBundles[_upgradeIndex].m_text.gameObject.SetActive(true);
 		}
 		else

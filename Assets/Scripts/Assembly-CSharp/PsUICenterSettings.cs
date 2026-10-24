@@ -184,6 +184,7 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
 		m_forumButton = new PsUIGenericButton(uIVerticalList6);
 		m_forumButton.SetIcon("hud_icon_publish", 0.044999998f);
 		m_forumButton.SetText("Forum");
+		m_forumButton.Destroy();
 		m_palyerNameField = new PsUIPlayerNameField(uIVerticalList);
 		m_palyerNameField.SetText(PlayerPrefsX.GetUserName());
 		m_palyerNameField.SetCallbacks(ChangeName);
@@ -197,6 +198,8 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
 		{
 			m_fbButton.SetText("Disconnect from Facebook");
 		}
+		m_fbButton.Destroy();
+		LocUI.AddSettingsButton(uIVerticalList);
 		UIText uIText5 = new UIText(this, false, string.Empty, "Client version " + TrackedBundleVersion.Current.version, "KGSecondChances_Font", 0.03f, RelativeTo.ParentHeight);
 		uIText5.SetMargins(0f, 0.05f, 0f, 0f, RelativeTo.ParentHeight);
 		uIText5.SetAlign(1f, 0f);
@@ -233,6 +236,7 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
 
 	public override void Step()
 	{
+		LocUI.StepSettings();
 		if (m_musicSwitch.m_hit)
 		{
 			PsState.m_muteMusic = !m_musicSwitch.m_enabled;

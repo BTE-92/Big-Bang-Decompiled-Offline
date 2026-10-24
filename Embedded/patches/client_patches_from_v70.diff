@@ -1,0 +1,1466 @@
+diff -ru -x 'BBRLoc*' lf_orig/Booster.cs lf_v70/Booster.cs
+--- lf_orig/Booster.cs	2026-10-24 16:22:46.155947700 +0200
++++ lf_v70/Booster.cs	2026-10-24 16:23:45.131770300 +0200
+@@ -36,6 +36,6 @@
+ 			return false;
+ 		}
+ 		PsUnlockable unlockableByIdentifier = PsMetagameData.GetUnlockableByIdentifier("Boost");
+-		return (PsState.m_activeGameLoop.m_context != PsMinigameContext.Editor && PsState.m_activeGameLoop.m_context != PsMinigameContext.Challenge && unlockableByIdentifier.m_unlocked) || PsState.m_adminMode;
++		return (PsState.m_activeGameLoop.m_context != PsMinigameContext.Editor && PsState.m_activeGameLoop.m_context != PsMinigameContext.Challenge && unlockableByIdentifier.m_unlocked) || true;
+ 	}
+ }
+diff -ru -x 'BBRLoc*' lf_orig/DefaultMinigame.cs lf_v70/DefaultMinigame.cs
+--- lf_orig/DefaultMinigame.cs	2026-10-24 16:22:48.247816000 +0200
++++ lf_v70/DefaultMinigame.cs	2026-10-24 16:23:45.706481400 +0200
+@@ -5,10 +5,10 @@
+ {
+ 	public static void ApplyWizard(Minigame _minigame = null)
+ 	{
+-		if (string.IsNullOrEmpty(PsState.m_wizardPlayer))
++		if (_minigame != null)
+ 		{
+-			PsState.m_wizardPlayer = "Motorcycle";
+-			PsState.m_wizardGameMode = "Race";
++			PsState.m_wizardPlayer = "OffroadCar";
++			PsState.m_wizardGameMode = "StarCollect";
+ 			int wizardDomeIndex = 0;
+ 			foreach (PsEditorItem item in PsMetagameData.m_gameAreas[0].m_items)
+ 			{
+@@ -16,11 +16,11 @@
+ 				{
+ 					if (item.m_identifier == "AreaMedium")
+ 					{
+-						wizardDomeIndex = 1;
++						wizardDomeIndex = 0;
+ 					}
+ 					else if (item.m_identifier == "AreaLarge")
+ 					{
+-						wizardDomeIndex = 2;
++						wizardDomeIndex = 0;
+ 					}
+ 				}
+ 			}
+@@ -76,11 +76,11 @@
+ 			{
+ 				if (item.m_identifier == "AreaMedium")
+ 				{
+-					num = 1;
++					num = 0;
+ 				}
+ 				else if (item.m_identifier == "AreaLarge")
+ 				{
+-					num = 2;
++					num = 0;
+ 				}
+ 			}
+ 		}
+diff -ru -x 'BBRLoc*' lf_orig/EditorBaseState.cs lf_v70/EditorBaseState.cs
+--- lf_orig/EditorBaseState.cs	2026-10-24 16:22:48.538386800 +0200
++++ lf_v70/EditorBaseState.cs	2026-10-24 16:23:45.755903600 +0200
+@@ -70,7 +70,7 @@
+ 		m_fullscreenTAC.m_cancelOtherTouches = false;
+ 		m_everyplayPauseTicks = 0;
+ 		m_recording = true;
+-		if (!PsState.m_adminMode)
++		if (1 == 0)
+ 		{
+ 		}
+ 	}
+diff -ru -x 'BBRLoc*' lf_orig/EditorSelectorArea.cs lf_v70/EditorSelectorArea.cs
+--- lf_orig/EditorSelectorArea.cs	2026-10-24 16:22:48.923936300 +0200
++++ lf_v70/EditorSelectorArea.cs	2026-10-24 16:23:45.824961500 +0200
+@@ -63,6 +63,10 @@
+ 			new PsUIPopupChangeAreaPrompt();
+ 			return;
+ 		}
++		if (PsState.m_activeMinigame != null)
++		{
++			PsState.m_activeMinigame.m_changed = true;
++		}
+ 		SoundS.PlaySingleShot("/UI/ItemCreate", Vector3.zero);
+ 		if (m_context == EditorSelectorContext.ITEM_SELECT || m_context == EditorSelectorContext.FREE_WIZARD)
+ 		{
+diff -ru -x 'BBRLoc*' lf_orig/EditorSelectorBase.cs lf_v70/EditorSelectorBase.cs
+--- lf_orig/EditorSelectorBase.cs	2026-10-24 16:22:48.991305500 +0200
++++ lf_v70/EditorSelectorBase.cs	2026-10-24 16:23:45.829040900 +0200
+@@ -63,7 +63,7 @@
+ 		bool flag = false;
+ 		if (_itemMetaData != null)
+ 		{
+-			if (!PsState.m_adminMode)
++			if (1 == 0)
+ 			{
+ 				flag = !_itemMetaData.m_unlocked;
+ 			}
+@@ -105,6 +105,10 @@
+ 			uIFittedSprite4.m_rogue = true;
+ 			uIFittedSprite4.SetDepthOffset(-15f);
+ 			uIFittedSprite4.SetVerticalAlign(1.05f);
++			if (_itemMetaData.m_iconImage == "_unknown")
++			{
++				uIFittedSprite4.SetVerticalAlign(0.86f);
++			}
+ 			uIFittedSprite4.SetWidth(0.6f, RelativeTo.ParentWidth);
+ 		}
+ 		UIVerticalList uIVerticalList2 = new UIVerticalList(parent, "textContainer");
+diff -ru -x 'BBRLoc*' lf_orig/EditorSelectorGameMode.cs lf_v70/EditorSelectorGameMode.cs
+--- lf_orig/EditorSelectorGameMode.cs	2026-10-24 16:22:49.043104700 +0200
++++ lf_v70/EditorSelectorGameMode.cs	2026-10-24 16:23:45.847299900 +0200
+@@ -37,6 +37,10 @@
+ 				PsState.m_wizardGameMode = text;
+ 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new EditorSelectorArea(EditorSelectorContext.START_WIZARD));
+ 			}
++			if (PsState.m_activeMinigame != null)
++			{
++				PsState.m_activeMinigame.m_changed = true;
++			}
+ 			SoundS.PlaySingleShot("/UI/ItemCreate", Vector3.zero);
+ 		}
+ 	}
+diff -ru -x 'BBRLoc*' lf_orig/EditorSelectorItem.cs lf_v70/EditorSelectorItem.cs
+--- lf_orig/EditorSelectorItem.cs	2026-10-24 16:22:49.065727200 +0200
++++ lf_v70/EditorSelectorItem.cs	2026-10-24 16:23:45.851782500 +0200
+@@ -23,6 +23,15 @@
+ 				PsColors.objectCatCardGreen,
+ 				PsColors.objectCatCardRed
+ 			};
++			cardColors = new Color[6]
++			{
++				PsColors.objectCatCardBlue,
++				PsColors.objectCatCardGreen,
++				new Color(1f, 0.72f, 0.3f),
++				PsColors.objectCatCardRed,
++				PsColors.objectCatCardGrey,
++				new Color(1f, 0.72f, 0.3f)
++			};
+ 		}
+ 		if (m_categoryName == string.Empty)
+ 		{
+diff -ru -x 'BBRLoc*' lf_orig/EditorSelectorPlayer.cs lf_v70/EditorSelectorPlayer.cs
+--- lf_orig/EditorSelectorPlayer.cs	2026-10-24 16:22:49.093472100 +0200
++++ lf_v70/EditorSelectorPlayer.cs	2026-10-24 16:23:45.855823700 +0200
+@@ -16,7 +16,7 @@
+ 			PsUnlockableCategory psUnlockableCategory = PsMetagameData.m_playerUnits[i];
+ 			for (int j = 0; j < psUnlockableCategory.m_items.Count; j++)
+ 			{
+-				if (j < psUnlockableCategory.m_items.Count || PsState.m_adminMode)
++				if (j < psUnlockableCategory.m_items.Count || true)
+ 				{
+ 					PsUpgradeableEditorItem psUpgradeableEditorItem = psUnlockableCategory.m_items[j] as PsUpgradeableEditorItem;
+ 					AddItemCard(psUpgradeableEditorItem.m_name, psUpgradeableEditorItem.m_description, PsColors.objectCatCardGrey, psUpgradeableEditorItem.m_iconImage, psUpgradeableEditorItem);
+@@ -51,6 +51,10 @@
+ 			levelPlayerNode2.Assemble();
+ 			PsState.m_editorCameraPos = vector;
+ 			CameraS.SnapMainCameraPos(PsState.m_editorCameraPos);
++			if (PsState.m_activeMinigame != null)
++			{
++				PsState.m_activeMinigame.m_changed = true;
++			}
+ 			SoundS.PlaySingleShot("/UI/ItemCreate", Vector3.zero);
+ 			if (levelPlayerNode2 != null)
+ 			{
+diff -ru -x 'BBRLoc*' lf_orig/EditorTestEndState.cs lf_v70/EditorTestEndState.cs
+--- lf_orig/EditorTestEndState.cs	2026-10-24 16:22:49.127151300 +0200
++++ lf_v70/EditorTestEndState.cs	2026-10-24 16:23:45.869838100 +0200
+@@ -61,7 +61,7 @@
+ 		EditorBaseState.RemoveTransformGizmo();
+ 		UndoManager.Purge();
+ 		PsState.m_activeGameLoop.m_minigameMetaData.creatorUpgrades = (PsState.m_activeMinigame.m_playerUnit as Vehicle).GetUpgradeValues();
+-		if (PsState.m_adminMode)
++		if (true)
+ 		{
+ 			Main.m_currentGame.m_sceneManager.m_currentScene.m_stateMachine.ChangeState(new EditorPublishHiddenPopupState());
+ 		}
+diff -ru -x 'BBRLoc*' lf_orig/GameSceneEffectManager.cs lf_v70/GameSceneEffectManager.cs
+--- lf_orig/GameSceneEffectManager.cs	2026-10-24 16:22:50.961917400 +0200
++++ lf_v70/GameSceneEffectManager.cs	2026-10-24 16:23:46.423517900 +0200
+@@ -175,26 +175,29 @@
+ 
+ 	public static void Update()
+ 	{
+-		Vector2 textureOffset = m_flickMat.GetTextureOffset("_MainTex");
+-		Vector2 textureOffset2 = m_tvTube.tvMaterialTube.GetTextureOffset("_StaticMask");
+-		if (!m_channelRoll)
++		if ((object)m_flickMat != null && (object)m_tvTube != null)
+ 		{
+-			m_channelRollSpeed = (m_channelRollStop - textureOffset.y) * 0.1f;
++			Vector2 textureOffset = m_flickMat.GetTextureOffset("_MainTex");
++			Vector2 textureOffset2 = m_tvTube.tvMaterialTube.GetTextureOffset("_StaticMask");
++			if (!m_channelRoll)
++			{
++				m_channelRollSpeed = (m_channelRollStop - textureOffset.y) * 0.1f;
++			}
++			m_flickMat.SetTextureOffset("_MainTex", new Vector2(textureOffset.x, ToolBox.getRolledValue(textureOffset.y + m_channelRollSpeed, 0f, 1f)));
++			m_staticRollSpeed = 0.005f + Mathf.Sin(Main.m_resettingGameTime * Mathf.Sin(Main.m_resettingGameTime * 0.0618f)) * 0.01f;
++			m_tvTube.tvMaterialTube.SetTextureOffset("_StaticMask", new Vector2(textureOffset2.x, ToolBox.getRolledValue(textureOffset2.y + m_staticRollSpeed, 0f, 1f)));
++			if (m_effectsOn)
++			{
++				m_effectMultipler += (1f - m_effectMultipler) * 0.05f;
++			}
++			else
++			{
++				m_effectMultipler *= 0.95f;
++			}
++			m_tvTube.noiseMagnetude = 0.1f * m_effectMultipler + 0.1f;
++			m_tvTube.chromaticAberrationMagnetude = 0.1f * m_effectMultipler + 0.025f;
++			m_tvTube.staticMagnetude = 0.125f * m_effectMultipler + 0.0125f;
+ 		}
+-		m_flickMat.SetTextureOffset("_MainTex", new Vector2(textureOffset.x, ToolBox.getRolledValue(textureOffset.y + m_channelRollSpeed, 0f, 1f)));
+-		m_staticRollSpeed = 0.005f + Mathf.Sin(Main.m_resettingGameTime * Mathf.Sin(Main.m_resettingGameTime * 0.0618f)) * 0.01f;
+-		m_tvTube.tvMaterialTube.SetTextureOffset("_StaticMask", new Vector2(textureOffset2.x, ToolBox.getRolledValue(textureOffset2.y + m_staticRollSpeed, 0f, 1f)));
+-		if (m_effectsOn)
+-		{
+-			m_effectMultipler += (1f - m_effectMultipler) * 0.05f;
+-		}
+-		else
+-		{
+-			m_effectMultipler *= 0.95f;
+-		}
+-		m_tvTube.noiseMagnetude = 0.1f * m_effectMultipler + 0.1f;
+-		m_tvTube.chromaticAberrationMagnetude = 0.1f * m_effectMultipler + 0.025f;
+-		m_tvTube.staticMagnetude = 0.125f * m_effectMultipler + 0.0125f;
+ 	}
+ 
+ 	public static void DestroyCrew()
+diff -ru -x 'BBRLoc*' lf_orig/GameSignalTuneInState.cs lf_v70/GameSignalTuneInState.cs
+--- lf_orig/GameSignalTuneInState.cs	2026-10-24 16:22:50.988691800 +0200
++++ lf_v70/GameSignalTuneInState.cs	2026-10-24 16:23:46.437948600 +0200
+@@ -114,7 +114,15 @@
+ 		}
+ 		if (m_sequenceOver)
+ 		{
+-			Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new GameStartState());
++			if (PsState.m_activeMinigame == null)
++			{
++				m_sequenceOver = false;
++				PsState.m_activeGameLoop.ExitMinigame();
++			}
++			else
++			{
++				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new GameStartState());
++			}
+ 		}
+ 	}
+ 
+diff -ru -x 'BBRLoc*' lf_orig/HelpshiftManager.cs lf_v70/HelpshiftManager.cs
+--- lf_orig/HelpshiftManager.cs	2026-10-24 16:22:52.326850700 +0200
++++ lf_v70/HelpshiftManager.cs	2026-10-24 16:23:46.732282200 +0200
+@@ -43,13 +43,6 @@
+ 
+ 	public static void ShowAlertToRate(string _appID, Action _successCallback = null, Action _feedbackCallback = null, Action _closeCallback = null)
+ 	{
+-		if (m_sdk != null)
+-		{
+-			m_rateSuccessCallback = _successCallback;
+-			m_rateFeedbackCallback = _feedbackCallback;
+-			m_rateCloceCallback = _closeCallback;
+-			m_sdk.showAlertToRateAppWithURL("market://details?id=" + _appID);
+-		}
+ 	}
+ 
+ 	public void alertToRateAppAction(string message)
+diff -ru -x 'BBRLoc*' lf_orig/IndependentChildGizmo.cs lf_v70/IndependentChildGizmo.cs
+--- lf_orig/IndependentChildGizmo.cs	2026-10-24 16:22:52.849962600 +0200
++++ lf_v70/IndependentChildGizmo.cs	2026-10-24 16:23:46.891936000 +0200
+@@ -54,7 +54,7 @@
+ 			SpriteS.SetOffset(spriteC3, new Vector3(0f, 0f, 50f), 0f);
+ 			SpriteS.ConvertSpritesToPrefabComponent(transformC2, _removeSprites: true);
+ 		}
+-		if (m_graphElements[0].m_isRemovable)
++		if (ParentGizmo.RemovableOrExtra(m_graphElements[0]))
+ 		{
+ 			float num10 = -45f;
+ 			TransformC transformC3 = TransformS.AddComponent(m_uiTC.p_entity, "GizmoRemoveTC");
+diff -ru -x 'BBRLoc*' lf_orig/Minigame.cs lf_v70/Minigame.cs
+--- lf_orig/Minigame.cs	2026-10-24 16:22:53.716245900 +0200
++++ lf_v70/Minigame.cs	2026-10-24 16:23:47.226070500 +0200
+@@ -504,7 +504,13 @@
+ 	{
+ 		for (int i = 0; i < 3; i++)
+ 		{
+-			GraphElement graphElement = new GraphNode(GraphNodeType.Normal, Type.GetType("CollectibleStar"), "CollectibleStar", Vector3.zero, Vector3.zero, Vector3.one);
++			int num = (int)m_settings["domeSizeIndex"];
++			float num2 = PsState.m_domeSizes[num].x * 2048f;
++			float num3 = PsState.m_domeSizes[num].y * 2048f;
++			float num4 = (float)LevelManager.m_currentLevel.m_currentLayer.m_layerHeight * -0.5f;
++			float x = num2 * 0.1f * (float)(i - 1);
++			float y = num4 + num3 * 0.35f;
++			GraphElement graphElement = new GraphNode(GraphNodeType.Normal, Type.GetType("CollectibleStar"), "CollectibleStar", new Vector3(x, y, 0f), Vector3.zero, Vector3.one);
+ 			LevelManager.m_currentLevel.m_currentLayer.AddElement(graphElement);
+ 			graphElement.Assemble();
+ 		}
+diff -ru -x 'BBRLoc*' lf_orig/Motorcycle.cs lf_v70/Motorcycle.cs
+--- lf_orig/Motorcycle.cs	2026-10-24 16:22:53.798539900 +0200
++++ lf_v70/Motorcycle.cs	2026-10-24 16:23:47.269393800 +0200
+@@ -391,7 +391,7 @@
+ 		}
+ 		TransformS.SetGlobalPosition(m_alienCharacter.m_mainTC, m_chassisTC.transform.position + vector5);
+ 		TransformS.ParentComponent(m_alienCharacter.m_mainTC, m_chassisTC);
+-		if (PsState.m_activeGameLoop.m_context != PsMinigameContext.Signal && !(PsState.m_activeGameLoop is PsGameLoopEditor) && !(PsState.m_activeGameLoop is PsGameLoopEditorTemplate))
++		if (PsState.m_activeGameLoop.m_context != PsMinigameContext.Signal && !(PsState.m_activeGameLoop is PsHat) && !(PsState.m_activeGameLoop is PsHat))
+ 		{
+ 			base.health = 2;
+ 			m_alienCharacter.SetRandomHat();
+diff -ru -x 'BBRLoc*' lf_orig/OffroadCar.cs lf_v70/OffroadCar.cs
+--- lf_orig/OffroadCar.cs	2026-10-24 16:22:54.012170000 +0200
++++ lf_v70/OffroadCar.cs	2026-10-24 16:23:47.380382800 +0200
+@@ -360,7 +360,7 @@
+ 		}
+ 		TransformS.SetGlobalPosition(m_alienCharacter.m_mainTC, m_chassisTC.transform.position + vector3);
+ 		TransformS.ParentComponent(m_alienCharacter.m_mainTC, m_chassisTC);
+-		if (PsState.m_activeGameLoop.m_context != PsMinigameContext.Signal && !(PsState.m_activeGameLoop is PsGameLoopEditor) && !(PsState.m_activeGameLoop is PsGameLoopEditorTemplate))
++		if (PsState.m_activeGameLoop.m_context != PsMinigameContext.Signal && !(PsState.m_activeGameLoop is PsHat) && !(PsState.m_activeGameLoop is PsHat))
+ 		{
+ 			base.health = 2;
+ 			m_alienCharacter.SetRandomHat();
+diff -ru -x 'BBRLoc*' lf_orig/ParentGizmo.cs lf_v70/ParentGizmo.cs
+--- lf_orig/ParentGizmo.cs	2026-10-24 16:22:54.041121400 +0200
++++ lf_v70/ParentGizmo.cs	2026-10-24 16:23:47.400156000 +0200
+@@ -1,4 +1,5 @@
+ using System;
++using System.Collections;
+ using System.Collections.Generic;
+ using UnityEngine;
+ 
+@@ -45,7 +46,7 @@
+ 			SpriteS.SetDimensions(c5, num7, num7);
+ 			SpriteS.ConvertSpritesToPrefabComponent(transformC2, _removeSprites: true);
+ 		}
+-		if (m_graphElements[0].m_isRemovable)
++		if (RemovableOrExtra(m_graphElements[0]))
+ 		{
+ 			float num10 = -45f;
+ 			TransformC transformC3 = TransformS.AddComponent(m_uiTC.p_entity, "GizmoRemoveTC");
+@@ -471,4 +472,42 @@
+ 			}
+ 		}
+ 	}
++
++	public static bool CanRemoveExtra(GraphElement e)
++	{
++		if (e is GraphNode { m_assembleClassType: not null } graphNode)
++		{
++			string text = graphNode.m_assembleClassType.ToString();
++			Hashtable itemCount = PsState.m_activeMinigame.m_itemCount;
++			if (itemCount != null && itemCount.ContainsKey(text))
++			{
++				int num;
++				if (text == "Goal")
++				{
++					num = 1;
++				}
++				else
++				{
++					if (!(text == "CollectibleStar"))
++					{
++						goto IL_00c4;
++					}
++					num = ((PsState.m_activeGameLoop.GetGameMode() == PsGameMode.StarCollect) ? 3 : 0);
++				}
++				return (int)itemCount[text] > num;
++			}
++		}
++		goto IL_00c4;
++		IL_00c4:
++		return false;
++	}
++
++	public static bool RemovableOrExtra(GraphElement e)
++	{
++		if (!e.m_isRemovable)
++		{
++			return CanRemoveExtra(e);
++		}
++		return true;
++	}
+ }
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoop.cs lf_v70/PsGameLoop.cs
+--- lf_orig/PsGameLoop.cs	2026-10-24 16:22:54.954545000 +0200
++++ lf_v70/PsGameLoop.cs	2026-10-24 16:23:47.791344500 +0200
+@@ -425,7 +425,7 @@
+ 	protected virtual void SaveMinigame(bool _exiting = false)
+ 	{
+ 		Debug.Log(m_autosave);
+-		if (_exiting && PsState.m_adminMode && m_autosave)
++		if (_exiting && true && m_autosave)
+ 		{
+ 			new PsUIBasePopup(typeof(PsUICenterEditorSave), null, null, null, _hideUIComponents: true, _addPopup: false);
+ 		}
+@@ -501,7 +501,7 @@
+ 		}
+ 		PsState.m_activeMinigame.SetLayerItems();
+ 		string creationTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+-		if (PsState.m_activeGameLoop.m_minigameMetaData.template && PsState.m_adminMode)
++		if (PsState.m_activeGameLoop.m_minigameMetaData.template ? true : false)
+ 		{
+ 			return Template.Save(PsState.m_activeGameLoop.m_minigameMetaData.id, LevelSendToServerOk, LevelSendToServerFailed);
+ 		}
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopBlockLevel.cs lf_v70/PsGameLoopBlockLevel.cs
+--- lf_orig/PsGameLoopBlockLevel.cs	2026-10-24 16:22:54.976643400 +0200
++++ lf_v70/PsGameLoopBlockLevel.cs	2026-10-24 16:23:47.808194700 +0200
+@@ -61,7 +61,7 @@
+ 		m_winFirtTime = false;
+ 		if (PsState.m_activeGameLoop == null)
+ 		{
+-			if (Input.GetKey(KeyCode.LeftShift) || (PsState.m_adminMode && PsState.m_adminModeSkipping))
++			if (Input.GetKey(KeyCode.LeftShift) || (true && PsState.m_adminModeSkipping))
+ 			{
+ 				m_skip = true;
+ 			}
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopBlockSignal.cs lf_v70/PsGameLoopBlockSignal.cs
+--- lf_orig/PsGameLoopBlockSignal.cs	2026-10-24 16:22:54.994436700 +0200
++++ lf_v70/PsGameLoopBlockSignal.cs	2026-10-24 16:23:47.821121700 +0200
+@@ -103,7 +103,7 @@
+ 		m_winFirtTime = false;
+ 		if (PsState.m_activeGameLoop == null)
+ 		{
+-			if (Input.GetKey(KeyCode.LeftShift) || (PsState.m_adminMode && PsState.m_adminModeSkipping))
++			if (Input.GetKey(KeyCode.LeftShift) || (true && PsState.m_adminModeSkipping))
+ 			{
+ 				m_skip = true;
+ 			}
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopEditor.cs lf_v70/PsGameLoopEditor.cs
+--- lf_orig/PsGameLoopEditor.cs	2026-10-24 16:22:55.046127300 +0200
++++ lf_v70/PsGameLoopEditor.cs	2026-10-24 16:23:47.860176200 +0200
+@@ -99,6 +99,7 @@
+ 		else
+ 		{
+ 			m_minigameMetaData = new PsMinigameMetaData();
++			m_minigameMetaData.gameMode = PsGameMode.StarCollect;
+ 			PsState.m_activeMinigame = DefaultMinigame.Assemble();
+ 			PsState.m_activeMinigame.GenerateDefaultNameAndDescription();
+ 			PsState.m_activeMinigame.m_editing = true;
+@@ -346,7 +347,7 @@
+ 		{
+ 			m_backAtMenu = true;
+ 			PsUIBaseState psUIBaseState = null;
+-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
++			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+ 			psUIBaseState.SetAction("Exit", delegate
+ 			{
+ 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new PsMainMenuState());
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopEditorPuzzle.cs lf_v70/PsGameLoopEditorPuzzle.cs
+--- lf_orig/PsGameLoopEditorPuzzle.cs	2026-10-24 16:22:55.071491900 +0200
++++ lf_v70/PsGameLoopEditorPuzzle.cs	2026-10-24 16:23:47.876337100 +0200
+@@ -52,7 +52,7 @@
+ 				PsMetagameManager.SaveProgression(progressionJSON2, _sendMetrics: false);
+ 			}
+ 		}
+-		if (m_nodeId <= m_path.m_currentNodeId && !Input.GetKey(KeyCode.LeftShift) && (!PsState.m_adminMode || !PsState.m_adminModeSkipping))
++		if (m_nodeId <= m_path.m_currentNodeId && !Input.GetKey(KeyCode.LeftShift) && (1 == 0 || !PsState.m_adminModeSkipping))
+ 		{
+ 			m_unlocked = true;
+ 			new PsMenuDialogueFlow(this, PsNodeEventTrigger.LoopStart, 0f, delegate
+@@ -72,7 +72,7 @@
+ 				}
+ 			});
+ 		}
+-		else if (Input.GetKey(KeyCode.LeftShift) || (PsState.m_adminMode && PsState.m_adminModeSkipping))
++		else if (Input.GetKey(KeyCode.LeftShift) || (true && PsState.m_adminModeSkipping))
+ 		{
+ 			m_unlocked = true;
+ 			m_backAtMenu = false;
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopEditorTemplate.cs lf_v70/PsGameLoopEditorTemplate.cs
+--- lf_orig/PsGameLoopEditorTemplate.cs	2026-10-24 16:22:55.096246200 +0200
++++ lf_v70/PsGameLoopEditorTemplate.cs	2026-10-24 16:23:47.893095400 +0200
+@@ -217,7 +217,7 @@
+ 		List<GraphElement> childElements = LevelManager.m_currentLevel.m_currentLayer.m_childElements;
+ 		for (int num5 = childElements.Count - 1; num5 > -1; num5--)
+ 		{
+-			if (!PsState.m_adminMode && (childElements[num5].m_name == "PlayerSpawnPoint" || childElements[num5].m_name == "GoalSpawnPoint" || childElements[num5].m_name == "StarSpawnPoint" || (childElements[num5].m_name == "CollectibleStar" && m_minigameMetaData.gameMode != PsGameMode.StarCollect)))
++			if (1 == 0 && (childElements[num5].m_name == "PlayerSpawnPoint" || childElements[num5].m_name == "GoalSpawnPoint" || childElements[num5].m_name == "StarSpawnPoint" || (childElements[num5].m_name == "CollectibleStar" && m_minigameMetaData.gameMode != PsGameMode.StarCollect)))
+ 			{
+ 				childElements[num5].Clear(_isReset: false);
+ 				LevelManager.m_currentLevel.m_currentLayer.RemoveElement(childElements[num5]);
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopLevel.cs lf_v70/PsGameLoopLevel.cs
+--- lf_orig/PsGameLoopLevel.cs	2026-10-24 16:22:55.182909000 +0200
++++ lf_v70/PsGameLoopLevel.cs	2026-10-24 16:23:47.943812600 +0200
+@@ -49,7 +49,7 @@
+ 				PsMetagameManager.SaveProgression(progressionJSON2, _sendMetrics: false);
+ 			}
+ 		}
+-		if (m_nodeId <= m_path.m_currentNodeId && !Input.GetKey(KeyCode.LeftShift) && (!PsState.m_adminMode || !PsState.m_adminModeSkipping))
++		if (m_nodeId <= m_path.m_currentNodeId && !Input.GetKey(KeyCode.LeftShift) && (1 == 0 || !PsState.m_adminModeSkipping))
+ 		{
+ 			m_unlocked = true;
+ 			new PsMenuDialogueFlow(this, PsNodeEventTrigger.LoopStart, 0f, delegate
+@@ -69,7 +69,7 @@
+ 				}
+ 			});
+ 		}
+-		else if (Input.GetKey(KeyCode.LeftShift) || (PsState.m_adminMode && PsState.m_adminModeSkipping))
++		else if (Input.GetKey(KeyCode.LeftShift) || (true && PsState.m_adminModeSkipping))
+ 		{
+ 			m_unlocked = true;
+ 			m_backAtMenu = false;
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopOwnPublished.cs lf_v70/PsGameLoopOwnPublished.cs
+--- lf_orig/PsGameLoopOwnPublished.cs	2026-10-24 16:22:55.203597300 +0200
++++ lf_v70/PsGameLoopOwnPublished.cs	2026-10-24 16:23:47.959236400 +0200
+@@ -253,7 +253,7 @@
+ 			m_scoreOld = m_scoreBest;
+ 			m_rewardOld = m_scoreBest;
+ 			PsUIBaseState psUIBaseState = null;
+-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
++			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+ 			psUIBaseState.SetAction("Exit", delegate
+ 			{
+ 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new PsMainMenuState());
+diff -ru -x 'BBRLoc*' lf_orig/PsGameLoopSocial.cs lf_v70/PsGameLoopSocial.cs
+--- lf_orig/PsGameLoopSocial.cs	2026-10-24 16:22:55.224123300 +0200
++++ lf_v70/PsGameLoopSocial.cs	2026-10-24 16:23:47.975110500 +0200
+@@ -250,7 +250,7 @@
+ 			m_scoreOld = m_scoreBest;
+ 			m_rewardOld = m_scoreBest;
+ 			PsUIBaseState psUIBaseState = null;
+-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
++			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+ 			psUIBaseState.SetAction("Exit", delegate
+ 			{
+ 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new PsMainMenuState());
+diff -ru -x 'BBRLoc*' lf_orig/PsGameModeBase.cs lf_v70/PsGameModeBase.cs
+--- lf_orig/PsGameModeBase.cs	2026-10-24 16:22:55.286015500 +0200
++++ lf_v70/PsGameModeBase.cs	2026-10-24 16:23:48.012783700 +0200
+@@ -153,7 +153,7 @@
+ 	public virtual bool isMaterialAvailable(int _index)
+ 	{
+ 		PsUnlockable psUnlockable = PsMetagameData.m_gameMaterials[0].m_items[_index];
+-		return psUnlockable.m_unlocked || PsState.m_adminMode;
++		return psUnlockable.m_unlocked || true;
+ 	}
+ 
+ 	public int GetUpgradeSum()
+diff -ru -x 'BBRLoc*' lf_orig/PsGameModeEditorPuzzle.cs lf_v70/PsGameModeEditorPuzzle.cs
+--- lf_orig/PsGameModeEditorPuzzle.cs	2026-10-24 16:22:55.342055800 +0200
++++ lf_v70/PsGameModeEditorPuzzle.cs	2026-10-24 16:23:48.045248800 +0200
+@@ -52,7 +52,7 @@
+ 	public override bool isMaterialAvailable(int _index)
+ 	{
+ 		PsUnlockable psUnlockable = PsMetagameData.m_gameMaterials[0].m_items[_index];
+-		return (psUnlockable.m_unlocked && (PsState.m_activeGameLoop as PsGameLoopEditorPuzzle).m_limitedItems.Contains(psUnlockable.m_identifier)) || PsState.m_adminMode;
++		return (psUnlockable.m_unlocked && (PsState.m_activeGameLoop as PsGameLoopEditorPuzzle).m_limitedItems.Contains(psUnlockable.m_identifier)) || true;
+ 	}
+ 
+ 	protected override void CreateWinUI()
+diff -ru -x 'BBRLoc*' lf_orig/PsIngameMenu.cs lf_v70/PsIngameMenu.cs
+--- lf_orig/PsIngameMenu.cs	2026-10-24 16:22:55.624409800 +0200
++++ lf_v70/PsIngameMenu.cs	2026-10-24 16:23:48.193155900 +0200
+@@ -40,19 +40,22 @@
+ 
+ 	public static void OpenController(bool _overlayCamera = false)
+ 	{
+-		if (m_controller != null)
++		if (PsState.m_activeMinigame != null)
+ 		{
+-			CloseController();
+-		}
+-		if (_overlayCamera)
+-		{
+-			m_overlayCamera = CameraS.AddCamera("ControllerCamera", _ortographic: true);
+-		}
+-		if (PsState.m_activeMinigame.m_playerControllerType != null)
+-		{
+-			object[] args = new object[1] { m_overlayCamera };
+-			m_controller = Activator.CreateInstance(PsState.m_activeMinigame.m_playerControllerType, args) as Controller;
+-			m_controller.Open();
++			if (m_controller != null)
++			{
++				CloseController();
++			}
++			if (_overlayCamera)
++			{
++				m_overlayCamera = CameraS.AddCamera("ControllerCamera", _ortographic: true);
++			}
++			if (PsState.m_activeMinigame.m_playerControllerType != null)
++			{
++				object[] args = new object[1] { m_overlayCamera };
++				m_controller = Activator.CreateInstance(PsState.m_activeMinigame.m_playerControllerType, args) as Controller;
++				m_controller.Open();
++			}
+ 		}
+ 	}
+ 
+diff -ru -x 'BBRLoc*' lf_orig/PsMainMenuState.cs lf_v70/PsMainMenuState.cs
+--- lf_orig/PsMainMenuState.cs	2026-10-24 16:22:55.694374600 +0200
++++ lf_v70/PsMainMenuState.cs	2026-10-24 16:23:48.234753300 +0200
+@@ -86,22 +86,23 @@
+ 		m_settingsList.SetSpacing(0.025f, RelativeTo.ScreenHeight);
+ 		m_settingsList.SetAlign(0f, 1f);
+ 		UIHorizontalList uIHorizontalList = new UIHorizontalList(m_settingsList, string.Empty);
+-		uIHorizontalList.SetHorizontalAlign(0.25f);
++		uIHorizontalList.SetHorizontalAlign(0f);
+ 		uIHorizontalList.SetSpacing(0.01f, RelativeTo.ScreenHeight);
+ 		uIHorizontalList.RemoveDrawHandler();
++		m_versusButton = new PsUIProfileShield(uIHorizontalList, _touchable: true, _showRank: false);
++		m_versusButton.SetDepthOffset(10f);
++		m_versusButton.SetSize(0.285f, 0.285f, RelativeTo.ScreenHeight);
+ 		m_settingsButton = new PsUIGenericButton(uIHorizontalList);
+ 		m_settingsButton.SetIcon("menu_icon_settings_small", 0.052f);
+ 		m_settingsButton.SetTealColors();
+ 		m_settingsButton.SetMargins(0.011f);
+-		m_settingsButton.SetAlign(0.1f, 0.05f);
++		m_settingsButton.SetAlign(0.1f, 1f);
+ 		m_helpButton = new PsUIGenericButton(uIHorizontalList);
+ 		m_helpButton.SetText("?", 0.055f, 0.07f);
+ 		m_helpButton.SetTealColors();
+ 		m_helpButton.SetMargins(0.001f);
+ 		m_helpButton.SetAlign(0.1f, 0.05f);
+-		m_versusButton = new PsUIProfileShield(m_settingsList, _touchable: true, _showRank: false);
+-		m_versusButton.SetDepthOffset(10f);
+-		m_versusButton.SetSize(0.285f, 0.285f, RelativeTo.ScreenHeight);
++		m_helpButton.Destroy();
+ 		m_createButton = new PsUIGenericButton(m_uiCanvas, 0.25f, 0.25f, 0.02f);
+ 		m_createButton.SetMargins(0.05f);
+ 		m_createButton.SetGlareOffset(-0.0175f);
+@@ -127,7 +128,7 @@
+ 			TweenS.SetAdditionalTweenProperties(c3, -1, _mirror: true, TweenStyle.CubicInOut);
+ 			UIFittedText uIFittedText = new UIFittedText(uICanvas2, _touchable: false, string.Empty, PsState.m_newEditorItemCount.ToString(), "KGSecondChances_Font", _fitTextToWidth: true);
+ 		}
+-		if (PsState.m_adminMode)
++		if (true)
+ 		{
+ 			UIVerticalList uIVerticalList = new UIVerticalList(m_uiCanvas, "adminButtons");
+ 			uIVerticalList.SetAlign(0f, 0f);
+@@ -209,7 +210,7 @@
+ 		{
+ 			PsPlanetManager.GetCurrentPlanet().FastForward();
+ 			PsUIBaseState psUIBaseState = null;
+-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
++			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+ 			psUIBaseState.SetAction("Exit", ExitCreate);
+ 			Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(psUIBaseState);
+ 			PsMenuScene.CreateBlur();
+@@ -239,14 +240,14 @@
+ 			PsPlanetManager.GetCurrentPlanet().FastForward();
+ 			HelpshiftManager.ShowFAQ();
+ 		}
+-		else if (PsState.m_adminMode && m_moneyButton != null && m_moneyButton.m_hit)
++		else if (true && m_moneyButton != null && m_moneyButton.m_hit)
+ 		{
+ 			PsPlanetManager.GetCurrentPlanet().FastForward();
+ 			Hashtable data = new Hashtable();
+ 			PsMetagameManager.UpdateResourceStats(10000, 1000, 100, 10);
+ 			PsMetagameManager.SetPlayerData(data, _sendMetrics: false, PsMetagameManager.PlayerDataSetSUCCEED, PsMetagameManager.PlayerDataSetFAILED);
+ 		}
+-		else if (PsState.m_adminMode && m_noMoneyButton != null && m_noMoneyButton.m_hit)
++		else if (true && m_noMoneyButton != null && m_noMoneyButton.m_hit)
+ 		{
+ 			PsPlanetManager.GetCurrentPlanet().FastForward();
+ 			Hashtable data2 = new Hashtable();
+diff -ru -x 'BBRLoc*' lf_orig/PsMetagameData.cs lf_v70/PsMetagameData.cs
+--- lf_orig/PsMetagameData.cs	2026-10-24 16:22:55.767978700 +0200
++++ lf_v70/PsMetagameData.cs	2026-10-24 16:23:48.272707400 +0200
+@@ -369,6 +369,7 @@
+ 			{
+ 				AddCategory(_helper.m_outputs[i], psUnlockableCategory);
+ 			}
++			AddDevItems(psUnlockableCategory);
+ 		}
+ 		else if (_helper.m_metagameNodeData.m_nodeDataType == MetagameNodeDataType.Unlockable)
+ 		{
+@@ -579,4 +580,107 @@
+ 		}
+ 		return false;
+ 	}
++
++	public static int DevItemDest(string s)
++	{
++		return s switch
++		{
++			"DecorationalTree" => 1, 
++			"DecorationalSign" => 1, 
++			"DecorationalPyrotechnics" => 1, 
++			"DecorationalPyroDragon" => 1, 
++			"DecorationalPyroChickoon" => 1, 
++			"DecorationalRock" => 1, 
++			"DecorationalMetalFence" => 1, 
++			"DecorationalPicketFence" => 1, 
++			"PsWoodenBlockHard" => 2, 
++			"ForceField" => 3, 
++			_ => 0, 
++		};
++	}
++
++	public static void MakeDecorations(PsUnlockableCategory c)
++	{
++		PsUnlockableCategory psUnlockableCategory = new PsUnlockableCategory("Decorations");
++		psUnlockableCategory.m_type = c.m_type;
++		int num = 0;
++		while (num < c.m_items.Count)
++		{
++			PsUnlockable psUnlockable = c.m_items[num];
++			int num2 = DevItemDest(psUnlockable.m_identifier);
++			if (num2 != 0)
++			{
++				PsUnlockableCategory psUnlockableCategory2 = num2 switch
++				{
++					1 => psUnlockableCategory, 
++					2 => m_units[0], 
++					_ => m_units[1], 
++				};
++				psUnlockableCategory2.m_items.Add(psUnlockable);
++				psUnlockable.m_container = psUnlockableCategory2;
++				c.m_items.RemoveAt(num);
++			}
++			else
++			{
++				num++;
++			}
++		}
++		m_units.Insert(m_units.Count - 2, psUnlockableCategory);
++	}
++
++	public static void AddDevItem(PsUnlockableCategory c, string name, string desc, string icon, string id, string cls)
++	{
++		PsEditorItem psEditorItem = new PsEditorItem(name);
++		psEditorItem.m_description = desc;
++		psEditorItem.m_iconImage = icon;
++		psEditorItem.m_identifier = id;
++		psEditorItem.m_graphNodeClassName = cls;
++		psEditorItem.m_maxAmount = 99;
++		psEditorItem.m_unlocked = true;
++		psEditorItem.m_container = c;
++		c.m_items.Add(psEditorItem);
++	}
++
++	public static void AddDevItemAt(PsUnlockableCategory c, string name, string desc, string icon, string id, string cls, int index)
++	{
++		PsEditorItem psEditorItem = new PsEditorItem(name);
++		psEditorItem.m_description = desc;
++		psEditorItem.m_iconImage = icon;
++		psEditorItem.m_identifier = id;
++		psEditorItem.m_graphNodeClassName = cls;
++		psEditorItem.m_maxAmount = 99;
++		psEditorItem.m_unlocked = true;
++		psEditorItem.m_container = c;
++		c.m_items.Insert(index, psEditorItem);
++	}
++
++	public static void AddToTest(PsUnlockableCategory c)
++	{
++		PsUnlockableCategory psUnlockableCategory = new PsUnlockableCategory("A tester");
++		psUnlockableCategory.m_type = c.m_type;
++		AddDevItem(psUnlockableCategory, "Collectible Star", "A collectible star", "item_mode_3stars", "CollectibleStar", "GraphNode");
++		AddDevItem(psUnlockableCategory, "Goal", "The goal robot", "item_mode_timeattack", "Goal", "GraphNode");
++		m_units.Add(psUnlockableCategory);
++	}
++
++	public static void AddDevItems(PsUnlockableCategory c)
++	{
++		if (c != null && c.m_name == "Dev Items")
++		{
++			AddDevItem(c, "Metal Fence", "Decorational metal fence", "item_deco_metalfence", "DecorationalMetalFence", "LevelDecorationNode");
++			AddDevItem(c, "Picket Fence", "Decorational picket fence", "item_deco_picketfence", "DecorationalPicketFence", "LevelDecorationNode");
++			AddDevItem(c, "Golden Chicken", "A shiny golden chicken", "_unknown", "DecorationalGoldenChicken", "LevelDecorationNode");
++			AddDevItemAt(c, "Ice Block", "Breakable ice block", "item_material_ice_icon", "PsIceBlock", "LevelBlockNode", 3);
++			AddDevItem(c, "Hard Wooden Box", "A tougher box", "item_wooden_block_icon", "PsWoodenBlockHard", "LevelBlockNode");
++			AddDevItem(c, "Direction Boost", "Boosts you in a direction", "_unknown", "PsDirectionBoost", "GraphNode");
++			AddDevItem(c, "Force Field", "Force field", "item_forcefield", "ForceField", "GraphNode");
++			AddDevItem(c, "Earth Goal", "Goal gate", "_unknown", "EarthGoal", "GraphNode");
++			AddDevItem(c, "Metal Platform", "A metal platform", "_unknown", "PsMetalPlatform", "GraphNode");
++			AddDevItem(c, "Sensor", "Invisible trigger sensor", "_unknown", "Sensor", "GraphNode");
++			AddDevItem(c, "Boelb", "A boelb creature", "_unknown", "PsBoelb", "LevelCustomNode");
++			AddDevItem(c, "Collectible Star", "A collectible star", "item_mode_3stars", "CollectibleStar", "GraphNode");
++			AddDevItem(c, "Goal", "The goal robot", "item_mode_timeattack", "Goal", "GraphNode");
++			MakeDecorations(c);
++		}
++	}
+ }
+diff -ru -x 'BBRLoc*' lf_orig/PsMetagameManager.cs lf_v70/PsMetagameManager.cs
+--- lf_orig/PsMetagameManager.cs	2026-10-24 16:22:55.794743000 +0200
++++ lf_v70/PsMetagameManager.cs	2026-10-24 16:23:48.292007400 +0200
+@@ -873,24 +873,6 @@
+ 
+ 	public static void ShowRateAppIfPossible(PsGameLoop _gameLoop)
+ 	{
+-		int rateStatus = KeyChain.GetRatingStatus();
+-		if (rateStatus > m_rateRemindTimes || rateStatus < 0 || m_rateAlertShownInThisSession)
+-		{
+-			return;
+-		}
+-		int levelNumber = PsPlanetManager.GetCurrentPlanet().m_mainPath.GetCurrentNodeInfo().m_levelNumber;
+-		if (_gameLoop != null && levelNumber >= m_rateAppNodeID && _gameLoop.m_scoreBest == 3 && _gameLoop.m_scoreOld < 3)
+-		{
+-			Action action = delegate
+-			{
+-				KeyChain.SetRatingStatus(rateStatus + 1);
+-			};
+-			HelpshiftManager.ShowAlertToRate("com.traplight.bigbangracing", delegate
+-			{
+-				KeyChain.SetRatingStatus(-1);
+-			}, action, action);
+-			m_rateAlertShownInThisSession = true;
+-		}
+ 	}
+ 
+ 	public static void UpdateResourceStats(int _coins, int _diamonds, int _stars, int _bolts)
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterCreate.cs lf_v70/PsUICenterCreate.cs
+--- lf_orig/PsUICenterCreate.cs	2026-10-24 16:22:56.651513200 +0200
++++ lf_v70/PsUICenterCreate.cs	2026-10-24 16:23:48.766045200 +0200
+@@ -74,6 +74,7 @@
+ 		m_newButton.SetGreenColors();
+ 		m_newButton.SetText("BUILD NEW!", 0.05f);
+ 		m_newButton.SetMargins(0.06f, 0.06f, 0.02f, 0.02f);
++		LevelIO.AddImportButton(uIVerticalList);
+ 		if (PsState.m_newEditorItemCount > 0)
+ 		{
+ 			UICanvas uICanvas = new UICanvas(m_newButton, _touchable: false, "notification", null, string.Empty);
+@@ -158,7 +159,7 @@
+ 				m_publishedBanners.Add(new PsUICreatePublishedBanner(uIVerticalList2, m_published[k]));
+ 			}
+ 		}
+-		if (PsState.m_adminMode && m_hiddenLoops.Count > 0)
++		if (true && m_hiddenLoops.Count > 0)
+ 		{
+ 			UIVerticalList uIVerticalList3 = new UIVerticalList(m_contentArea, string.Empty);
+ 			uIVerticalList3.SetVerticalAlign(1f);
+@@ -191,6 +192,8 @@
+ 
+ 	public override void Step()
+ 	{
++		LevelIO.Tick(this);
++		HandleDeletePublished();
+ 		if (m_newButton != null && m_newButton.m_hit)
+ 		{
+ 			PsMetagameManager.HideResources();
+@@ -252,4 +255,19 @@
+ 		}
+ 		base.Step();
+ 	}
++
++	public void HandleDeletePublished()
++	{
++		for (int i = 0; i < m_publishedBanners.Count; i++)
++		{
++			if (m_publishedBanners[i].m_bannerEndIcon.m_hit)
++			{
++				PsMetagameManager.DeleteMinigame(m_publishedBanners[i].m_loop.m_minigameId);
++				m_publishedBanners[i].Destroy();
++				m_publishedBanners.RemoveAt(i);
++				m_scrollArea.Update();
++				break;
++			}
++		}
++	}
+ }
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterEditorPublish.cs lf_v70/PsUICenterEditorPublish.cs
+--- lf_orig/PsUICenterEditorPublish.cs	2026-10-24 16:22:56.681582900 +0200
++++ lf_v70/PsUICenterEditorPublish.cs	2026-10-24 16:23:48.789578200 +0200
+@@ -82,16 +82,7 @@
+ 		m_goLiveButton.SetIcon("hud_icon_header_publish");
+ 		m_goLiveButton.SetGreenColors();
+ 		m_goLiveButton.SetAlign(0.85f, -0.25f);
+-		if (PsState.m_adminMode)
+-		{
+-			UIVerticalList uIVerticalList2 = new UIVerticalList(this, string.Empty);
+-			uIVerticalList2.SetSpacing(0.01f, RelativeTo.ScreenHeight);
+-			uIVerticalList2.SetAlign(0.5f, -0.25f);
+-			uIVerticalList2.RemoveDrawHandler();
+-			UIText uIText = new UIText(uIVerticalList2, _touchable: false, string.Empty, "Publish Hidden", "HurmeBold_Font", 0.03f, RelativeTo.ScreenHeight);
+-			uIText.SetColor("#a8e2ff");
+-			m_publishHidden = new PsUISwitch(uIVerticalList2);
+-		}
++		_ = 1;
+ 	}
+ 
+ 	public override void Step()
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterEditorSave.cs lf_v70/PsUICenterEditorSave.cs
+--- lf_orig/PsUICenterEditorSave.cs	2026-10-24 16:22:56.699357600 +0200
++++ lf_v70/PsUICenterEditorSave.cs	2026-10-24 16:23:48.793665800 +0200
+@@ -73,16 +73,7 @@
+ 		m_saveButton.SetGreenColors();
+ 		m_saveButton.SetDepthOffset(-4f);
+ 		m_saveButton.SetAlign(0.85f, -0.25f);
+-		if (PsState.m_adminMode)
+-		{
+-			UIVerticalList uIVerticalList2 = new UIVerticalList(this, string.Empty);
+-			uIVerticalList2.SetSpacing(0.01f, RelativeTo.ScreenHeight);
+-			uIVerticalList2.SetAlign(0.5f, -0.25f);
+-			uIVerticalList2.RemoveDrawHandler();
+-			UIText uIText = new UIText(uIVerticalList2, _touchable: false, string.Empty, "Save As Template", "HurmeBold_Font", 0.03f, RelativeTo.ScreenHeight);
+-			uIText.SetColor("#a8e2ff");
+-			m_saveAsTemplate = new PsUISwitch(uIVerticalList2, PsState.m_activeGameLoop.m_minigameMetaData.template);
+-		}
++		_ = 1;
+ 	}
+ 
+ 	public override void Step()
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterLevelLoading.cs lf_v70/PsUICenterLevelLoading.cs
+--- lf_orig/PsUICenterLevelLoading.cs	2026-10-24 16:22:56.820365700 +0200
++++ lf_v70/PsUICenterLevelLoading.cs	2026-10-24 16:23:48.881324500 +0200
+@@ -80,6 +80,7 @@
+ 			m_playButton = new PsUIGenericButton(this);
+ 			m_playButton.SetText("PLAY", 0.06f, 0.2f);
+ 			m_playButton.SetAlign(0.72f, 0.14f);
++			m_playButton.SetDepthOffset(-30f);
+ 			m_playButton.SetGreenColors();
+ 			m_playButton.SetSound(null);
+ 			m_loadingText.Destroy();
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterNewUser.cs lf_v70/PsUICenterNewUser.cs
+--- lf_orig/PsUICenterNewUser.cs	2026-10-24 16:22:56.882070100 +0200
++++ lf_v70/PsUICenterNewUser.cs	2026-10-24 16:23:48.917547400 +0200
+@@ -50,6 +50,8 @@
+ 		m_facebookButton.SetIcon("menu_icon_facebook");
+ 		m_facebookButton.SetText("Connect");
+ 		m_facebookButton.SetDepthOffset(-30f);
++		m_facebookInfo.Destroy();
++		m_facebookButton.Destroy();
+ 	}
+ 
+ 	private void DoneWriting(string _name)
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterSettings.cs lf_v70/PsUICenterSettings.cs
+--- lf_orig/PsUICenterSettings.cs	2026-10-24 16:22:57.106081900 +0200
++++ lf_v70/PsUICenterSettings.cs	2026-10-24 16:23:49.029596600 +0200
+@@ -184,6 +184,7 @@
+ 		m_forumButton = new PsUIGenericButton(uIVerticalList6);
+ 		m_forumButton.SetIcon("hud_icon_publish", 0.044999998f);
+ 		m_forumButton.SetText("Forum");
++		m_forumButton.Destroy();
+ 		m_palyerNameField = new PsUIPlayerNameField(uIVerticalList);
+ 		m_palyerNameField.SetText(PlayerPrefsX.GetUserName());
+ 		m_palyerNameField.SetCallbacks(ChangeName);
+@@ -197,6 +198,8 @@
+ 		{
+ 			m_fbButton.SetText("Disconnect from Facebook");
+ 		}
++		m_fbButton.Destroy();
++		LocUI.AddSettingsButton(uIVerticalList);
+ 		UIText uIText5 = new UIText(this, _touchable: false, string.Empty, "Client version " + TrackedBundleVersion.Current.version, "KGSecondChances_Font", 0.03f, RelativeTo.ParentHeight);
+ 		uIText5.SetMargins(0f, 0.05f, 0f, 0f, RelativeTo.ParentHeight);
+ 		uIText5.SetAlign(1f, 0f);
+@@ -233,6 +236,7 @@
+ 
+ 	public override void Step()
+ 	{
++		LocUI.StepSettings();
+ 		if (m_musicSwitch.m_hit)
+ 		{
+ 			PsState.m_muteMusic = !m_musicSwitch.m_enabled;
+diff -ru -x 'BBRLoc*' lf_orig/PsUICenterWinEditor.cs lf_v70/PsUICenterWinEditor.cs
+--- lf_orig/PsUICenterWinEditor.cs	2026-10-24 16:22:57.290827100 +0200
++++ lf_v70/PsUICenterWinEditor.cs	2026-10-24 16:23:49.121096800 +0200
+@@ -79,7 +79,8 @@
+ 		m_saveButton.SetText("SAVE &" + Environment.NewLine + "EXIT", 0.036f);
+ 		m_saveButton.SetSpacing(0f, RelativeTo.ScreenHeight);
+ 		m_saveButton.SetOrangeColors();
+-		m_saveButton.SetHorizontalAlign(0f);
++		m_saveButton.SetMargins(0.04f, 0.04f, 0.007f, 0.007f);
++		m_saveButton.SetHorizontalAlign(1f);
+ 	}
+ 
+ 	protected virtual void CreateStarCollectMiddleArea(UIComponent _parent)
+diff -ru -x 'BBRLoc*' lf_orig/PsUIChallengeFriendList.cs lf_v70/PsUIChallengeFriendList.cs
+--- lf_orig/PsUIChallengeFriendList.cs	2026-10-24 16:22:57.429413400 +0200
++++ lf_v70/PsUIChallengeFriendList.cs	2026-10-24 16:23:49.210437200 +0200
+@@ -32,7 +32,7 @@
+ 
+ 	public void LoadContent(bool _forceRefresh = false)
+ 	{
+-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
++		if (string.IsNullOrEmpty("x"))
+ 		{
+ 			m_fbButton = new PsUIGenericButton(m_friendList);
+ 			m_fbButton.SetIcon("menu_icon_facebook", 0.044999998f);
+@@ -99,7 +99,7 @@
+ 		}
+ 		if (_friendData.friends.Count < 1)
+ 		{
+-			string text = "No friends connected. " + ((!string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId())) ? "Invite them to play!" : "Connect to Facebook!");
++			string text = "No friends connected. " + ((!string.IsNullOrEmpty("x")) ? "Invite them to play!" : "Connect to Facebook!");
+ 			new UIText(m_friendList, _touchable: false, string.Empty, "No friends connected. Invite them to play!", "KGSecondChances_Font", 0.03f, RelativeTo.ScreenHeight);
+ 		}
+ 		else
+diff -ru -x 'BBRLoc*' lf_orig/PsUICreatePublishedBanner.cs lf_v70/PsUICreatePublishedBanner.cs
+--- lf_orig/PsUICreatePublishedBanner.cs	2026-10-24 16:22:57.543943000 +0200
++++ lf_v70/PsUICreatePublishedBanner.cs	2026-10-24 16:23:49.269493100 +0200
+@@ -14,7 +14,6 @@
+ 	public override void CreateBannerEndIcon(UIComponent _parent)
+ 	{
+ 		base.CreateBannerEndIcon(_parent);
+-		m_bannerEndIcon.RemoveTouchAreas();
+ 	}
+ 
+ 	public override void CreateButton(UIComponent _parent)
+@@ -36,6 +35,7 @@
+ 		}
+ 		m_button.SetHorizontalAlign(1f);
+ 		m_button.SetDepthOffset(-20f);
++		LevelIO.AddExportButton(this, _parent);
+ 	}
+ 
+ 	public void SwitchToPlayButton()
+@@ -69,4 +69,10 @@
+ 			m_loop.StartLoop();
+ 		}
+ 	}
++
++	public override void Initialize()
++	{
++		base.Initialize();
++		m_bannerIconName = "hud_gizmo_delete";
++	}
+ }
+diff -ru -x 'BBRLoc*' lf_orig/PsUIEditorEdit.cs lf_v70/PsUIEditorEdit.cs
+--- lf_orig/PsUIEditorEdit.cs	2026-10-24 16:22:57.638633800 +0200
++++ lf_v70/PsUIEditorEdit.cs	2026-10-24 16:23:49.328262700 +0200
+@@ -68,17 +68,6 @@
+ 
+ 	public virtual void CreateAdminInfo()
+ 	{
+-		if (PsState.m_adminMode)
+-		{
+-			UICanvas uICanvas = new UICanvas(this, _touchable: false, "EditorMenu", null, string.Empty);
+-			uICanvas.SetHeight(0.1f, RelativeTo.ScreenHeight);
+-			uICanvas.SetWidth(0.4f, RelativeTo.ScreenWidth);
+-			uICanvas.SetDrawHandler(UIDrawHandlers.EditorPopupContentArea);
+-			uICanvas.SetMargins(0.1f, 0.1f, 0.1f, 0.1f, RelativeTo.OwnHeight);
+-			uICanvas.SetVerticalAlign(1f);
+-			m_adminInfo = new UITextbox(uICanvas, _touchable: false, "AdminInfo", string.Empty, "HurmeSemiBold_Font", 0.02f, RelativeTo.ScreenShortest, _adjustWidthToTextWidth: true, Align.Center);
+-			m_adminInfo.SetVerticalAlign(1f);
+-		}
+ 	}
+ 
+ 	public virtual void CreateTopLeftArea(UIComponent _parent)
+@@ -86,7 +75,7 @@
+ 		m_exitButton = new PsUIGenericButton(_parent);
+ 		m_exitButton.SetText("SAVE &" + Environment.NewLine + "EXIT", 0.025f);
+ 		m_exitButton.SetOrangeColors();
+-		if (PsState.m_adminMode)
++		if (true)
+ 		{
+ 			m_freeWizardButton = new UIRectSpriteButton(_parent, string.Empty, PsState.m_uiSheet, PsState.m_uiSheet.m_atlas.GetFrame("hud_button_settings"), _convertToPrefab: false);
+ 			m_freeWizardButton.SetHeight(0.12f, RelativeTo.ScreenShortest);
+@@ -126,7 +115,7 @@
+ 
+ 	public override void Step()
+ 	{
+-		if (m_adminInfo != null && PsState.m_activeMinigame != null)
++		if ((object)null != null && PsState.m_activeMinigame != null)
+ 		{
+ 			m_adminInfo.SetText("Admin Mode\nLevel Requirement: " + PsState.m_activeMinigame.m_levelRequirement);
+ 		}
+diff -ru -x 'BBRLoc*' lf_orig/PsUIEditorTutorialEdit.cs lf_v70/PsUIEditorTutorialEdit.cs
+--- lf_orig/PsUIEditorTutorialEdit.cs	2026-10-24 16:22:57.676612400 +0200
++++ lf_v70/PsUIEditorTutorialEdit.cs	2026-10-24 16:23:49.339356800 +0200
+@@ -12,7 +12,7 @@
+ 		m_exitButton = new PsUIGenericButton(_parent);
+ 		m_exitButton.SetIcon("menu_icon_exit", 0.06f);
+ 		m_exitButton.SetOrangeColors();
+-		if (PsState.m_adminMode)
++		if (true)
+ 		{
+ 			m_freeWizardButton = new UIRectSpriteButton(_parent, string.Empty, PsState.m_uiSheet, PsState.m_uiSheet.m_atlas.GetFrame("hud_button_settings"), _convertToPrefab: false);
+ 			m_freeWizardButton.SetHeight(0.12f, RelativeTo.ScreenShortest);
+diff -ru -x 'BBRLoc*' lf_orig/PsUIFriendLevelList.cs lf_v70/PsUIFriendLevelList.cs
+--- lf_orig/PsUIFriendLevelList.cs	2026-10-24 16:22:57.752000200 +0200
++++ lf_v70/PsUIFriendLevelList.cs	2026-10-24 16:23:49.393697700 +0200
+@@ -34,7 +34,7 @@
+ 	private void DataSUCCEED(PsMinigameMetaData[] _data)
+ 	{
+ 		DestroyChildren();
+-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
++		if (string.IsNullOrEmpty("x"))
+ 		{
+ 			m_fbButton = new PsUIGenericButton(this);
+ 			m_fbButton.SetIcon("menu_icon_facebook", 0.045f);
+diff -ru -x 'BBRLoc*' lf_orig/PsUIFriendList.cs lf_v70/PsUIFriendList.cs
+--- lf_orig/PsUIFriendList.cs	2026-10-24 16:22:57.771691400 +0200
++++ lf_v70/PsUIFriendList.cs	2026-10-24 16:23:49.407671500 +0200
+@@ -36,7 +36,7 @@
+ 	public void GetPlayerData(bool _forceRefresh = false)
+ 	{
+ 		m_created = false;
+-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
++		if (string.IsNullOrEmpty("x"))
+ 		{
+ 			m_fbButton = new PsUIGenericButton(this);
+ 			m_fbButton.SetIcon("menu_icon_facebook", 0.045f);
+diff -ru -x 'BBRLoc*' lf_orig/PsUIInputTextField.cs lf_v70/PsUIInputTextField.cs
+--- lf_orig/PsUIInputTextField.cs	2026-10-24 16:22:57.896374100 +0200
++++ lf_v70/PsUIInputTextField.cs	2026-10-24 16:23:49.472837700 +0200
+@@ -35,7 +35,7 @@
+ 			psUIInputTextField.m_textField.RemoveTouchAreas();
+ 			psUIInputTextField.SetText(GetText());
+ 			psUIInputTextField.m_root = this;
+-			UIInputText uIInputText = ((!PsState.m_adminMode) ? new UIInputText(psUIInputTextField, '>', '<', '\\', '/') : new UIInputText(psUIInputTextField));
++			UIInputText uIInputText = ((1 == 0) ? new UIInputText(psUIInputTextField, '>', '<', '\\', '/') : new UIInputText(psUIInputTextField));
+ 			uIInputText.Update();
+ 		}
+ 		base.Step();
+diff -ru -x 'BBRLoc*' lf_orig/PsUISettingsMenuContent.cs lf_v70/PsUISettingsMenuContent.cs
+--- lf_orig/PsUISettingsMenuContent.cs	2026-10-24 16:22:58.424791000 +0200
++++ lf_v70/PsUISettingsMenuContent.cs	2026-10-24 16:23:49.739994600 +0200
+@@ -242,7 +242,7 @@
+ 		m_passwordArea.SetSpacing(0.025f, RelativeTo.ScreenShortest);
+ 		m_passwordArea.RemoveDrawHandler();
+ 		m_passwordArea.RemoveTouchAreas();
+-		if (!PsState.m_adminMode)
++		if (1 == 0)
+ 		{
+ 			m_adminPass = new UITextArea(m_passwordArea, string.Empty, PsStrings.Get(StringID.BUTTON_SETTINGS_ADMIN), string.Empty, m_camera, m_passwordModel, "m_password");
+ 			m_adminPassOK = new PsUIGenericButton(m_passwordArea);
+diff -ru -x 'BBRLoc*' lf_orig/PsUISideCreateAdmin.cs lf_v70/PsUISideCreateAdmin.cs
+--- lf_orig/PsUISideCreateAdmin.cs	2026-10-24 16:22:58.463097200 +0200
++++ lf_v70/PsUISideCreateAdmin.cs	2026-10-24 16:23:49.758765200 +0200
+@@ -137,6 +137,7 @@
+ 		m_scrollArea.DestroyChildren();
+ 		UIVerticalList uIVerticalList = new UIVerticalList(_parent, string.Empty);
+ 		uIVerticalList.RemoveDrawHandler();
++		uIVerticalList.SetSpacing(0.02f, RelativeTo.ScreenHeight);
+ 		m_saved = new PsUIGenericButton(uIVerticalList);
+ 		m_saved.SetText("Saved");
+ 		m_hiddenButton = new PsUIGenericButton(uIVerticalList);
+@@ -145,8 +146,6 @@
+ 		m_published.SetText("Published");
+ 		m_friends = new PsUIGenericButton(uIVerticalList);
+ 		m_friends.SetText("Friend Levels");
+-		m_templates = new PsUIGenericButton(uIVerticalList);
+-		m_templates.SetText("Level Templates");
+ 		m_fixlist = new PsUIGenericButton(uIVerticalList);
+ 		m_fixlist.SetText("MetalPlank & MaterialDanger");
+ 		m_fixlist2 = new PsUIGenericButton(uIVerticalList);
+diff -ru -x 'BBRLoc*' lf_orig/PsUISideCreateFriends.cs lf_v70/PsUISideCreateFriends.cs
+--- lf_orig/PsUISideCreateFriends.cs	2026-10-24 16:22:58.482365500 +0200
++++ lf_v70/PsUISideCreateFriends.cs	2026-10-24 16:23:49.763215000 +0200
+@@ -65,7 +65,7 @@
+ 	private void DataSUCCEED(PsMinigameMetaData[] _data)
+ 	{
+ 		m_contentArea.DestroyChildren();
+-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
++		if (string.IsNullOrEmpty("x"))
+ 		{
+ 			m_fbButton = new PsUIGenericButton(m_contentArea);
+ 			m_fbButton.SetIcon("menu_icon_facebook", 0.045f);
+diff -ru -x 'BBRLoc*' lf_orig/PsUISideCreatePublished.cs lf_v70/PsUISideCreatePublished.cs
+--- lf_orig/PsUISideCreatePublished.cs	2026-10-24 16:22:58.496590300 +0200
++++ lf_v70/PsUISideCreatePublished.cs	2026-10-24 16:23:49.775322600 +0200
+@@ -87,6 +87,7 @@
+ 
+ 	public override void Step()
+ 	{
++		HandleDelete();
+ 		PsUIBasePopup psUIBasePopup = GetRoot() as PsUIBasePopup;
+ 		float currentScrollX = psUIBasePopup.m_scrollableCanvas.m_currentScrollX;
+ 		if (psUIBasePopup.m_pageButtonLeft == null && psUIBasePopup.m_pageButtonRight == null && currentScrollX < 0.1f)
+@@ -109,4 +110,19 @@
+ 		}
+ 		base.Step();
+ 	}
++
++	public void HandleDelete()
++	{
++		for (int i = 0; i < m_levels.Count; i++)
++		{
++			if (m_levels[i].m_bannerEndIcon.m_hit)
++			{
++				PsMetagameManager.DeleteMinigame(m_levels[i].m_loop.m_minigameId);
++				m_levels[i].Destroy();
++				m_levels.RemoveAt(i);
++				m_scrollArea.Update();
++				break;
++			}
++		}
++	}
+ }
+diff -ru -x 'BBRLoc*' lf_orig/PsUIVersusRaceList.cs lf_v70/PsUIVersusRaceList.cs
+--- lf_orig/PsUIVersusRaceList.cs	2026-10-24 16:22:59.456782100 +0200
++++ lf_v70/PsUIVersusRaceList.cs	2026-10-24 16:23:50.222263600 +0200
+@@ -30,7 +30,7 @@
+ 		if (PsPlanetManager.m_timedEvents != null)
+ 		{
+ 			DestroyChildren();
+-			if (PsState.m_adminMode)
++			if (true)
+ 			{
+ 				m_newChallenge = new PsUIGenericButton(this, 0.25f, 0.25f, 0.008f);
+ 				m_newChallenge.SetText("New Versus");
+diff -ru -x 'BBRLoc*' lf_orig/PsUnityUIPriceBundle.cs lf_v70/PsUnityUIPriceBundle.cs
+--- lf_orig/PsUnityUIPriceBundle.cs	2026-10-24 16:22:59.564706300 +0200
++++ lf_v70/PsUnityUIPriceBundle.cs	2026-10-24 16:23:50.281882300 +0200
+@@ -11,12 +11,12 @@
+ 
+ 	public void SetPrice(int value)
+ 	{
+-		m_priceText.text = value.ToString();
++		m_priceText.text = Loc.T(value.ToString());
+ 	}
+ 
+ 	public void SetPrice(int value, Resource type)
+ 	{
+-		m_priceText.text = value.ToString();
++		m_priceText.text = Loc.T(value.ToString());
+ 		Frame frame = null;
+ 		switch (type)
+ 		{
+diff -ru -x 'BBRLoc*' lf_orig/PsUnityUIRentWindow.cs lf_v70/PsUnityUIRentWindow.cs
+--- lf_orig/PsUnityUIRentWindow.cs	2026-10-24 16:22:59.569011400 +0200
++++ lf_v70/PsUnityUIRentWindow.cs	2026-10-24 16:23:50.291835800 +0200
+@@ -18,7 +18,7 @@
+ 	{
+ 		m_hidden = true;
+ 		SetUpgradeValues(_upgradeValues, _rentUpgradeValues);
+-		m_uiBundle.m_banner.m_name.text = string.Empty;
++		m_uiBundle.m_banner.m_name.text = Loc.T(string.Empty);
+ 		m_uiBundle.m_rentButtonBundle.m_button.onClick.AddListener(delegate
+ 		{
+ 			if (PsState.m_activeGameLoop.m_freeConsumableUnlock == "Rent")
+@@ -40,16 +40,16 @@
+ 		m_rentPrice = 0;
+ 		for (int i = 0; i < 3; i++)
+ 		{
+-			m_uiBundle.m_upgradeTexts[i].text = Vehicle.GetUpgradeName(m_upgradesValues[i].Key).ToUpper();
++			m_uiBundle.m_upgradeTexts[i].text = Loc.T(Vehicle.GetUpgradeName(m_upgradesValues[i].Key).ToUpper());
+ 			int num = m_rentUpgradeValues[i] - m_upgradesValues[i].Value;
+ 			if (num < 0)
+ 			{
+-				m_uiBundle.m_upgradeValues[i].text = num.ToString();
++				m_uiBundle.m_upgradeValues[i].text = Loc.T(num.ToString());
+ 				m_uiBundle.m_upgradeValues[i].color = Color.red;
+ 			}
+ 			else
+ 			{
+-				m_uiBundle.m_upgradeValues[i].text = "+" + num;
++				m_uiBundle.m_upgradeValues[i].text = Loc.T("+" + num);
+ 				m_uiBundle.m_upgradeValues[i].color = Color.green;
+ 			}
+ 			m_rentPrice += num;
+diff -ru -x 'BBRLoc*' lf_orig/PsUnityUIUpgradeBars.cs lf_v70/PsUnityUIUpgradeBars.cs
+--- lf_orig/PsUnityUIUpgradeBars.cs	2026-10-24 16:22:59.596112700 +0200
++++ lf_v70/PsUnityUIUpgradeBars.cs	2026-10-24 16:23:50.309632700 +0200
+@@ -68,7 +68,7 @@
+ 		for (int i = 0; i < 3; i++)
+ 		{
+ 			int index = i;
+-			m_uiBundle.m_texts[i].text = Vehicle.GetUpgradeName(m_upgrades[i].Key).ToUpper();
++			m_uiBundle.m_texts[i].text = Loc.T(Vehicle.GetUpgradeName(m_upgrades[i].Key).ToUpper());
+ 			if (m_uiBundle.m_buttonBundles[i].m_button.onClick != null)
+ 			{
+ 				m_uiBundle.m_buttonBundles[i].m_button.onClick.RemoveAllListeners();
+@@ -97,7 +97,7 @@
+ 		SetTier();
+ 		SetFilling();
+ 		ParseCurrentPrices();
+-		m_banner.m_name.text = string.Empty;
++		m_banner.m_name.text = Loc.T(string.Empty);
+ 		if (CanLevelUp())
+ 		{
+ 			ShowLevelUpButton();
+@@ -239,7 +239,7 @@
+ 		m_selectedButtonIndex = _upgradeIndex;
+ 		if (m_boltPrices[_upgradeIndex] == 0 && m_coinPrices[_upgradeIndex] == 0)
+ 		{
+-			m_uiBundle.m_buttonBundles[_upgradeIndex].m_text.text = "FREE";
++			m_uiBundle.m_buttonBundles[_upgradeIndex].m_text.text = Loc.T("FREE");
+ 			m_uiBundle.m_buttonBundles[_upgradeIndex].m_text.gameObject.SetActive(value: true);
+ 		}
+ 		else
+diff -ru -x 'BBRLoc*' lf_orig/TextMeshS.cs lf_v70/TextMeshS.cs
+--- lf_orig/TextMeshS.cs	2026-10-24 16:23:00.731964600 +0200
++++ lf_v70/TextMeshS.cs	2026-10-24 16:23:50.884239600 +0200
+@@ -117,6 +117,7 @@
+ 
+ 	public static void FitTextToRect(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, string _text, bool _fitTextToWidth = true)
+ 	{
++		_text = Loc.T(_text);
+ 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+ 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+ 		int num = Mathf.FloorToInt(_tmc.m_textboxHeight);
+@@ -128,6 +129,7 @@
+ 				float num2 = textSize.x / _tmc.m_textboxWidth;
+ 				num = Mathf.FloorToInt(_tmc.m_textboxHeight / num2);
+ 			}
++			num = LocUI.ShrinkFit(num);
+ 		}
+ 		else
+ 		{
+@@ -147,6 +149,7 @@
+ 
+ 	public static void SetText(TextMeshC _tmc, string _text, bool _offsetGO = true)
+ 	{
++		_text = Loc.T(_text);
+ 		_text = ToolBox.GetUTF8String(_text);
+ 		_tmc.m_textMesh.text = _text;
+ 		_tmc.m_textWidth = _tmc.m_renderer.bounds.size.x;
+@@ -156,6 +159,7 @@
+ 
+ 	public static void SetTextOptimized(TextMeshC _tmc, string _text)
+ 	{
++		_text = Loc.T(_text);
+ 		_tmc.m_textMesh.text = _text;
+ 		_tmc.m_textWidth = _tmc.m_renderer.bounds.size.x;
+ 		_tmc.m_textHeight = _tmc.m_renderer.bounds.size.y;
+@@ -163,6 +167,7 @@
+ 
+ 	public static string CutTextToWidth(TextMeshC _tmc, string _text, float _width)
+ 	{
++		_text = Loc.T(_text);
+ 		_text = ToolBox.GetUTF8String(_text);
+ 		for (float x = GetTextSize(_tmc, _text).x; x > _width; x = GetTextSize(_tmc, _text).x)
+ 		{
+@@ -206,6 +211,7 @@
+ 
+ 	public static void SetTextToTextbox(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, string _text)
+ 	{
++		_text = Loc.T(_text);
+ 		_text = ToolBox.GetUTF8String(_text);
+ 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+ 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+@@ -217,6 +223,7 @@
+ 
+ 	public static void WrapTextToTextbox(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, string _text, int _maxRows = -1)
+ 	{
++		_text = Loc.T(_text);
+ 		_text = ToolBox.GetUTF8String(_text);
+ 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+ 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+@@ -228,6 +235,7 @@
+ 
+ 	public static void WrapTextToTextbox(TextMeshC _tmc, float _textboxWidth, float _textboxHeight, float _rowHeight, string _text, int _maxRows = -1)
+ 	{
++		_text = Loc.T(_text);
+ 		_text = ToolBox.GetUTF8String(_text);
+ 		_tmc.m_textboxWidth = _textboxWidth * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+ 		_tmc.m_textboxHeight = _textboxHeight * ((float)m_defaultCharacterSize / _tmc.m_textMesh.characterSize);
+@@ -240,22 +248,26 @@
+ 
+ 	public static float GetHeightToWidthRatio(TextMeshC _tmc, string _text)
+ 	{
++		_text = Loc.T(_text);
+ 		return GetHeightToWidthRatio(_tmc.m_textMesh.font, _tmc.m_textMesh.fontSize, _tmc.m_textMesh.lineSpacing, _text);
+ 	}
+ 
+ 	public static float GetHeightToWidthRatio(Font _font, int _fontSize, float _lineSpacing, string _text)
+ 	{
++		_text = Loc.T(_text);
+ 		Vector2 textSize = GetTextSize(_font, _fontSize, _lineSpacing, _text);
+ 		return textSize.y / textSize.x;
+ 	}
+ 
+ 	public static Vector2 GetTextSize(TextMeshC _tmc, string _text)
+ 	{
++		_text = Loc.T(_text);
+ 		return GetTextSize(_tmc.m_textMesh.font, _tmc.m_textMesh.fontSize, _tmc.m_textMesh.lineSpacing, _text);
+ 	}
+ 
+ 	public static Vector2 GetTextSize(Font _font, int _fontSize, float _lineSpacing, string _text)
+ 	{
++		_text = Loc.T(_text);
+ 		_text = ToolBox.GetUTF8String(_text);
+ 		_font.RequestCharactersInTexture(_text, _fontSize);
+ 		GUIStyle gUIStyle = new GUIStyle();
+@@ -306,11 +318,13 @@
+ 
+ 	public static string WrapText(TextMeshC _tmc, string _text, float _width, int _maxRows = -1, bool _dots = false)
+ 	{
++		_text = Loc.T(_text);
+ 		return WrapText(_tmc.m_textMesh.font, _tmc.m_textMesh.fontSize, _tmc.m_textMesh.lineSpacing, _text, _width, _maxRows, _dots);
+ 	}
+ 
+ 	public static string WrapText(Font _font, int _fontSize, float _lineSpacing, string _text, float _width, int _maxRows = -1, bool _dots = false)
+ 	{
++		_text = Loc.T(_text);
+ 		if (_width == 0f || _text.Length <= 0 || (_maxRows >= 0 && _maxRows < 2))
+ 		{
+ 			return _text;
+diff -ru -x 'BBRLoc*' lf_orig/UIEditorSelectorNavigator.cs lf_v70/UIEditorSelectorNavigator.cs
+--- lf_orig/UIEditorSelectorNavigator.cs	2026-10-24 16:23:01.576582700 +0200
++++ lf_v70/UIEditorSelectorNavigator.cs	2026-10-24 16:23:51.291186600 +0200
+@@ -28,7 +28,7 @@
+ 		{
+ 		case EditorSelectorContext.ITEM_SELECT:
+ 		{
+-			int num = ((!PsState.m_adminMode) ? (PsMetagameData.m_units.Count - 1) : PsMetagameData.m_units.Count);
++			int num = ((1 == 0) ? (PsMetagameData.m_units.Count - 1) : PsMetagameData.m_units.Count);
+ 			m_categories = new string[num];
+ 			m_buttonColors = new Color[3]
+ 			{
+@@ -36,6 +36,15 @@
+ 				PsColors.objectCatButtonGreen,
+ 				PsColors.objectCatButtonRed
+ 			};
++			m_buttonColors = new Color[6]
++			{
++				PsColors.objectCatButtonBlue,
++				PsColors.objectCatButtonGreen,
++				new Color(1f, 0.62f, 0.12f),
++				PsColors.objectCatButtonRed,
++				new Color(0.26f, 0.31f, 0.4f),
++				new Color(1f, 0.62f, 0.12f)
++			};
+ 			for (int i = 0; i < m_categories.Length; i++)
+ 			{
+ 				PsUnlockable psUnlockable = PsMetagameData.m_units[i];
+@@ -83,7 +92,7 @@
+ 		m_categoryButtons = new UICanvas[m_categories.Length];
+ 		for (int j = 0; j < m_categoryButtons.Length; j++)
+ 		{
+-			Color color = Color.white;
++			Color color = new Color(0.26f, 0.31f, 0.4f);
+ 			bool highlight = false;
+ 			if (m_context == EditorSelectorContext.ITEM_SELECT)
+ 			{
+diff -ru -x 'BBRLoc*' lf_orig/UIFittedSprite.cs lf_v70/UIFittedSprite.cs
+--- lf_orig/UIFittedSprite.cs	2026-10-24 16:23:01.604675500 +0200
++++ lf_v70/UIFittedSprite.cs	2026-10-24 16:23:51.316592500 +0200
+@@ -45,7 +45,7 @@
+ 
+ 	public override void Update()
+ 	{
+-		if (!m_hidden)
++		if (m_frame != null && m_spriteSheet != null && !m_hidden)
+ 		{
+ 			CalculateReferenceSizes();
+ 			UpdateSize();
+diff -ru -x 'BBRLoc*' lf_orig/UIText.cs lf_v70/UIText.cs
+--- lf_orig/UIText.cs	2026-10-24 16:23:02.078117900 +0200
++++ lf_v70/UIText.cs	2026-10-24 16:23:51.598139100 +0200
+@@ -99,11 +99,12 @@
+ 		CalculateReferenceSizes();
+ 		UpdateSize();
+ 		UpdateMargins();
+-		int num = Mathf.FloorToInt(m_fontSize * m_fontSizeRelative);
+-		TextMeshS.SetFontSize(m_tmc, num);
++		int size = Mathf.FloorToInt(m_fontSize * m_fontSizeRelative);
++		size = LocUI.FitFont(this, size);
++		TextMeshS.SetFontSize(m_tmc, size);
+ 		if (m_shadowtmc != null)
+ 		{
+-			TextMeshS.SetFontSize(m_shadowtmc, num);
++			TextMeshS.SetFontSize(m_shadowtmc, size);
+ 		}
+ 		Vector2 textSize = TextMeshS.GetTextSize(m_tmc, m_text);
+ 		SetWidth((textSize.x + m_actualMargins.l + m_actualMargins.r) / (float)Screen.width, RelativeTo.ScreenWidth);
+@@ -124,7 +125,7 @@
+ 		if (m_shadowtmc != null)
+ 		{
+ 			TextMeshS.SetText(m_shadowtmc, "<color=#" + m_shadowColor + ">" + m_text + "</color>");
+-			m_shadowtmc.m_go.transform.Translate(new Vector3(x, y) + (Vector3)(m_shadowDirection * num * m_shadowDistance) + Vector3.forward * 5f);
++			m_shadowtmc.m_go.transform.Translate(new Vector3(x, y) + (Vector3)(m_shadowDirection * size * m_shadowDistance) + Vector3.forward * 5f);
+ 		}
+ 		UpdateAlign();
+ 		UpdateMargins();
+diff -ru -x 'BBRLoc*' lf_orig/UITextbox.cs lf_v70/UITextbox.cs
+--- lf_orig/UITextbox.cs	2026-10-24 16:23:02.142859000 +0200
++++ lf_v70/UITextbox.cs	2026-10-24 16:23:51.642749500 +0200
+@@ -116,8 +116,9 @@
+ 		CalculateReferenceSizes();
+ 		UpdateSize();
+ 		UpdateMargins();
+-		float fontSizeINT = ((!m_intFontSize) ? (m_fontSize * m_fontSizeRelative) : ((float)Mathf.FloorToInt(m_fontSize * m_fontSizeRelative)));
+-		TextMeshS.SetFontSize(m_tmc, fontSizeINT);
++		float size = ((!m_intFontSize) ? (m_fontSize * m_fontSizeRelative) : ((float)Mathf.FloorToInt(m_fontSize * m_fontSizeRelative)));
++		size = LocUI.FitBoxFont(this, size);
++		TextMeshS.SetFontSize(m_tmc, size);
+ 		float width = (m_actualWidth - m_actualMargins.l - m_actualMargins.r) * ((float)TextMeshS.m_defaultCharacterSize / m_tmc.m_textMesh.characterSize);
+ 		string text = TextMeshS.WrapText(m_tmc, m_text, width, m_maxRows, m_dots);
+ 		Vector2 textSize = TextMeshS.GetTextSize(m_tmc, text);
+diff -ru -x 'BBRLoc*' lf_orig/UnityUIComponent.cs lf_v70/UnityUIComponent.cs
+--- lf_orig/UnityUIComponent.cs	2026-10-24 16:23:02.309947900 +0200
++++ lf_v70/UnityUIComponent.cs	2026-10-24 16:23:51.739728600 +0200
+@@ -24,6 +24,7 @@
+ 			m_canvasGroup = m_uiGameObject.AddComponent<CanvasGroup>();
+ 		}
+ 		m_uiBundle = m_uiGameObject.GetComponent<T>();
++		LocUI.TranslateUI(m_uiGameObject);
+ 	}
+ 
+ 	public virtual void Step()

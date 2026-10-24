@@ -69,6 +69,10 @@ public class EditorSelectorArea : EditorSelectorBase
 			new PsUIPopupChangeAreaPrompt();
 			return;
 		}
+		if (PsState.m_activeMinigame != null)
+		{
+			PsState.m_activeMinigame.m_changed = true;
+		}
 		SoundS.PlaySingleShot("/UI/ItemCreate", Vector3.zero);
 		if (m_context == EditorSelectorContext.ITEM_SELECT || m_context == EditorSelectorContext.FREE_WIZARD)
 		{

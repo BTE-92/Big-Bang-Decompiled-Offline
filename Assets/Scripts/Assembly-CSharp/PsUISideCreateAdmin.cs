@@ -137,6 +137,7 @@ public class PsUISideCreateAdmin : PsUIScrollableBase
 		m_scrollArea.DestroyChildren();
 		UIVerticalList uIVerticalList = new UIVerticalList(_parent, string.Empty);
 		uIVerticalList.RemoveDrawHandler();
+		uIVerticalList.SetSpacing(0.02f, RelativeTo.ScreenHeight);
 		m_saved = new PsUIGenericButton(uIVerticalList);
 		m_saved.SetText("Saved");
 		m_hiddenButton = new PsUIGenericButton(uIVerticalList);
@@ -145,8 +146,6 @@ public class PsUISideCreateAdmin : PsUIScrollableBase
 		m_published.SetText("Published");
 		m_friends = new PsUIGenericButton(uIVerticalList);
 		m_friends.SetText("Friend Levels");
-		m_templates = new PsUIGenericButton(uIVerticalList);
-		m_templates.SetText("Level Templates");
 		m_fixlist = new PsUIGenericButton(uIVerticalList);
 		m_fixlist.SetText("MetalPlank & MaterialDanger");
 		m_fixlist2 = new PsUIGenericButton(uIVerticalList);

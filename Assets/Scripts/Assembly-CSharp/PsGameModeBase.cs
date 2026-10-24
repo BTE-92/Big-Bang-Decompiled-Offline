@@ -153,7 +153,7 @@ public abstract class PsGameModeBase
 	public virtual bool isMaterialAvailable(int _index)
 	{
 		PsUnlockable psUnlockable = PsMetagameData.m_gameMaterials[0].m_items[_index];
-		return psUnlockable.m_unlocked || PsState.m_adminMode;
+		return psUnlockable.m_unlocked || true;
 	}
 
 	public int GetUpgradeSum()

@@ -73,16 +73,6 @@ public class PsUICenterEditorSave : PsUIHeaderedCanvas
 		m_saveButton.SetGreenColors();
 		m_saveButton.SetDepthOffset(-4f);
 		m_saveButton.SetAlign(0.85f, -0.25f);
-		if (PsState.m_adminMode)
-		{
-			UIVerticalList uIVerticalList2 = new UIVerticalList(this, string.Empty);
-			uIVerticalList2.SetSpacing(0.01f, RelativeTo.ScreenHeight);
-			uIVerticalList2.SetAlign(0.5f, -0.25f);
-			uIVerticalList2.RemoveDrawHandler();
-			UIText uIText = new UIText(uIVerticalList2, false, string.Empty, "Save As Template", "HurmeBold_Font", 0.03f, RelativeTo.ScreenHeight);
-			uIText.SetColor("#a8e2ff");
-			m_saveAsTemplate = new PsUISwitch(uIVerticalList2, PsState.m_activeGameLoop.m_minigameMetaData.template);
-		}
 	}
 
 	public override void Step()

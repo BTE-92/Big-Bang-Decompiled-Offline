@@ -873,24 +873,6 @@ public static class PsMetagameManager
 
 	public static void ShowRateAppIfPossible(PsGameLoop _gameLoop)
 	{
-		int rateStatus = KeyChain.GetRatingStatus();
-		if (rateStatus > m_rateRemindTimes || rateStatus < 0 || m_rateAlertShownInThisSession)
-		{
-			return;
-		}
-		int levelNumber = PsPlanetManager.GetCurrentPlanet().m_mainPath.GetCurrentNodeInfo().m_levelNumber;
-		if (_gameLoop != null && levelNumber >= m_rateAppNodeID && _gameLoop.m_scoreBest == 3 && _gameLoop.m_scoreOld < 3)
-		{
-			Action action = delegate
-			{
-				KeyChain.SetRatingStatus(rateStatus + 1);
-			};
-			HelpshiftManager.ShowAlertToRate("com.traplight.bigbangracing", delegate
-			{
-				KeyChain.SetRatingStatus(-1);
-			}, action, action);
-			m_rateAlertShownInThisSession = true;
-		}
 	}
 
 	public static void UpdateResourceStats(int _coins, int _diamonds, int _stars, int _bolts)

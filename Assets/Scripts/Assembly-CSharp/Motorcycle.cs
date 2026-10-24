@@ -391,7 +391,7 @@ public class Motorcycle : Vehicle, ISpeedBoost
 		}
 		TransformS.SetGlobalPosition(m_alienCharacter.m_mainTC, m_chassisTC.transform.position + vector5);
 		TransformS.ParentComponent(m_alienCharacter.m_mainTC, m_chassisTC);
-		if (PsState.m_activeGameLoop.m_context != PsMinigameContext.Signal && !(PsState.m_activeGameLoop is PsGameLoopEditor) && !(PsState.m_activeGameLoop is PsGameLoopEditorTemplate))
+		if (PsState.m_activeGameLoop.m_context != PsMinigameContext.Signal)
 		{
 			base.health = 2;
 			m_alienCharacter.SetRandomHat();

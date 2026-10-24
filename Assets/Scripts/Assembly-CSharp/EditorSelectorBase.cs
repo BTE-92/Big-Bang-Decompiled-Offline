@@ -63,7 +63,7 @@ public class EditorSelectorBase : BasicState
 		bool flag = false;
 		if (_itemMetaData != null)
 		{
-			if (!PsState.m_adminMode)
+			if (1 == 0)
 			{
 				flag = !_itemMetaData.m_unlocked;
 			}
@@ -105,6 +105,10 @@ public class EditorSelectorBase : BasicState
 			uIFittedSprite4.m_rogue = true;
 			uIFittedSprite4.SetDepthOffset(-15f);
 			uIFittedSprite4.SetVerticalAlign(1.05f);
+			if (_itemMetaData.m_iconImage == "_unknown")
+			{
+				uIFittedSprite4.SetVerticalAlign(0.86f);
+			}
 			uIFittedSprite4.SetWidth(0.6f, RelativeTo.ParentWidth);
 		}
 		UIVerticalList uIVerticalList2 = new UIVerticalList(parent, "textContainer");

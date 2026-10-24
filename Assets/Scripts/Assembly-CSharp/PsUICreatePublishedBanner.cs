@@ -14,7 +14,6 @@ public class PsUICreatePublishedBanner : PsUICreateLevelBanner
 	public override void CreateBannerEndIcon(UIComponent _parent)
 	{
 		base.CreateBannerEndIcon(_parent);
-		m_bannerEndIcon.RemoveTouchAreas();
 	}
 
 	public override void CreateButton(UIComponent _parent)
@@ -36,6 +35,7 @@ public class PsUICreatePublishedBanner : PsUICreateLevelBanner
 		}
 		m_button.SetHorizontalAlign(1f);
 		m_button.SetDepthOffset(-20f);
+		LevelTransfer.AddExportButton(this, _parent);
 	}
 
 	public void SwitchToPlayButton()
@@ -68,5 +68,11 @@ public class PsUICreatePublishedBanner : PsUICreateLevelBanner
 			PsMetagameManager.HideResources();
 			m_loop.StartLoop();
 		}
+	}
+
+	public override void Initialize()
+	{
+		base.Initialize();
+		m_bannerIconName = "hud_gizmo_delete";
 	}
 }

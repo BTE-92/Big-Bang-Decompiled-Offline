@@ -40,6 +40,10 @@ public static class PsIngameMenu
 
 	public static void OpenController(bool _overlayCamera = false)
 	{
+		if (PsState.m_activeMinigame == null)
+		{
+			return;
+		}
 		if (m_controller != null)
 		{
 			CloseController();

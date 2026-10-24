@@ -45,7 +45,7 @@ public class UIFittedSprite : UICanvas
 
 	public override void Update()
 	{
-		if (!m_hidden)
+		if (m_frame != null && m_spriteSheet != null && !m_hidden)
 		{
 			CalculateReferenceSizes();
 			UpdateSize();

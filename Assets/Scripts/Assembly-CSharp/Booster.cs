@@ -36,6 +36,6 @@ public class Booster
 			return false;
 		}
 		PsUnlockable unlockableByIdentifier = PsMetagameData.GetUnlockableByIdentifier("Boost");
-		return (PsState.m_activeGameLoop.m_context != PsMinigameContext.Editor && PsState.m_activeGameLoop.m_context != PsMinigameContext.Challenge && unlockableByIdentifier.m_unlocked) || PsState.m_adminMode;
+		return (PsState.m_activeGameLoop.m_context != PsMinigameContext.Editor && PsState.m_activeGameLoop.m_context != PsMinigameContext.Challenge && unlockableByIdentifier.m_unlocked) || true;
 	}
 }

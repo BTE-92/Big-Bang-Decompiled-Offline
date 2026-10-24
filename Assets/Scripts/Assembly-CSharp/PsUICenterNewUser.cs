@@ -50,6 +50,8 @@ public class PsUICenterNewUser : UICanvas
 		m_facebookButton.SetIcon("menu_icon_facebook");
 		m_facebookButton.SetText("Connect");
 		m_facebookButton.SetDepthOffset(-30f);
+		m_facebookInfo.Destroy();
+		m_facebookButton.Destroy();
 	}
 
 	private void DoneWriting(string _name)

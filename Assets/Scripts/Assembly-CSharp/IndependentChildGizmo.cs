@@ -54,7 +54,7 @@ public class IndependentChildGizmo : BasicGizmo
 			SpriteS.SetOffset(spriteC3, new Vector3(0f, 0f, 50f), 0f);
 			SpriteS.ConvertSpritesToPrefabComponent(transformC2, true);
 		}
-		if (m_graphElements[0].m_isRemovable)
+		if (ParentGizmo.RemovableOrExtra(m_graphElements[0]))
 		{
 			float num10 = -45f;
 			TransformC transformC3 = TransformS.AddComponent(m_uiTC.p_entity, "GizmoRemoveTC");

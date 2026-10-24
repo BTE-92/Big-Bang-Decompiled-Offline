@@ -68,17 +68,6 @@ public class PsUIEditorEdit : UICanvas, IPlayMenu
 
 	public virtual void CreateAdminInfo()
 	{
-		if (PsState.m_adminMode)
-		{
-			UICanvas uICanvas = new UICanvas(this, false, "EditorMenu", null, string.Empty);
-			uICanvas.SetHeight(0.1f, RelativeTo.ScreenHeight);
-			uICanvas.SetWidth(0.4f, RelativeTo.ScreenWidth);
-			uICanvas.SetDrawHandler(UIDrawHandlers.EditorPopupContentArea);
-			uICanvas.SetMargins(0.1f, 0.1f, 0.1f, 0.1f, RelativeTo.OwnHeight);
-			uICanvas.SetVerticalAlign(1f);
-			m_adminInfo = new UITextbox(uICanvas, false, "AdminInfo", string.Empty, "HurmeSemiBold_Font", 0.02f, RelativeTo.ScreenShortest, true, Align.Center);
-			m_adminInfo.SetVerticalAlign(1f);
-		}
 	}
 
 	public virtual void CreateTopLeftArea(UIComponent _parent)
@@ -86,7 +75,7 @@ public class PsUIEditorEdit : UICanvas, IPlayMenu
 		m_exitButton = new PsUIGenericButton(_parent);
 		m_exitButton.SetText("SAVE &" + Environment.NewLine + "EXIT", 0.025f);
 		m_exitButton.SetOrangeColors();
-		if (PsState.m_adminMode)
+		if (true)
 		{
 			m_freeWizardButton = new UIRectSpriteButton(_parent, string.Empty, PsState.m_uiSheet, PsState.m_uiSheet.m_atlas.GetFrame("hud_button_settings"), false);
 			m_freeWizardButton.SetHeight(0.12f, RelativeTo.ScreenShortest);
@@ -126,7 +115,7 @@ public class PsUIEditorEdit : UICanvas, IPlayMenu
 
 	public override void Step()
 	{
-		if (m_adminInfo != null && PsState.m_activeMinigame != null)
+		if ((object)null != null && PsState.m_activeMinigame != null)
 		{
 			m_adminInfo.SetText("Admin Mode\nLevel Requirement: " + PsState.m_activeMinigame.m_levelRequirement);
 		}

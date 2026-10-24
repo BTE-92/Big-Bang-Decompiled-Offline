@@ -61,7 +61,7 @@ public class EditorTestEndState : BasicState
 		EditorBaseState.RemoveTransformGizmo();
 		UndoManager.Purge();
 		PsState.m_activeGameLoop.m_minigameMetaData.creatorUpgrades = (PsState.m_activeMinigame.m_playerUnit as Vehicle).GetUpgradeValues();
-		if (PsState.m_adminMode)
+		if (true)
 		{
 			Main.m_currentGame.m_sceneManager.m_currentScene.m_stateMachine.ChangeState(new EditorPublishHiddenPopupState());
 		}

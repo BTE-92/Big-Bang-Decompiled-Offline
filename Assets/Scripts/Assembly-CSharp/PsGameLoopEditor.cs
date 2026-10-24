@@ -99,6 +99,7 @@ public class PsGameLoopEditor : PsGameLoop
 		else
 		{
 			m_minigameMetaData = new PsMinigameMetaData();
+			m_minigameMetaData.gameMode = PsGameMode.StarCollect;
 			PsState.m_activeMinigame = DefaultMinigame.Assemble();
 			PsState.m_activeMinigame.GenerateDefaultNameAndDescription();
 			PsState.m_activeMinigame.m_editing = true;
@@ -346,7 +347,7 @@ public class PsGameLoopEditor : PsGameLoop
 		{
 			m_backAtMenu = true;
 			PsUIBaseState psUIBaseState = null;
-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUITopBackButton), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
 			psUIBaseState.SetAction("Exit", delegate
 			{
 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new PsMainMenuState());

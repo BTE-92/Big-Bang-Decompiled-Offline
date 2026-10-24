@@ -80,6 +80,7 @@ public class PsUICenterLevelLoading : UICanvas
 			m_playButton = new PsUIGenericButton(this);
 			m_playButton.SetText("PLAY", 0.06f, 0.2f);
 			m_playButton.SetAlign(0.72f, 0.14f);
+			m_playButton.SetDepthOffset(-30f);
 			m_playButton.SetGreenColors();
 			m_playButton.SetSound(null);
 			m_loadingText.Destroy();

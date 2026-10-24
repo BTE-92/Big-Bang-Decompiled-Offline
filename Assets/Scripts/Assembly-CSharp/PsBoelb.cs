@@ -60,7 +60,7 @@ public class PsBoelb : Unit
 	public override void Update()
 	{
 		base.Update();
-		if (!m_playerInitialized && m_minigame.m_gameStarted && m_boelbEffects.lookAtTarget == null)
+		if (!m_playerInitialized && m_minigame.m_gameStarted && m_boelbEffects != null && m_boelbEffects.lookAtTarget == null)
 		{
 			m_boelbEffects.lookAtTarget = m_minigame.m_playerTC.transform;
 			m_playerInitialized = true;
@@ -89,7 +89,10 @@ public class PsBoelb : Unit
 	public override void Kill(DamageType _damageType, float _totalDamage)
 	{
 		base.Kill(_damageType, _totalDamage);
-		m_boelbEffects.Kill();
+		if (m_boelbEffects != null)
+		{
+			m_boelbEffects.Kill();
+		}
 		Destroy();
 	}
 

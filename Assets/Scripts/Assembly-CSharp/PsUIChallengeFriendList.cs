@@ -32,7 +32,7 @@ public class PsUIChallengeFriendList : UIScrollableCanvas
 
 	public void LoadContent(bool _forceRefresh = false)
 	{
-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
+		if (string.IsNullOrEmpty("x"))
 		{
 			m_fbButton = new PsUIGenericButton(m_friendList);
 			m_fbButton.SetIcon("menu_icon_facebook", 0.044999998f);
@@ -99,7 +99,7 @@ public class PsUIChallengeFriendList : UIScrollableCanvas
 		}
 		if (_friendData.friends.Count < 1)
 		{
-			string text = "No friends connected. " + ((!string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId())) ? "Invite them to play!" : "Connect to Facebook!");
+			string text = "No friends connected. " + ((!string.IsNullOrEmpty("x")) ? "Invite them to play!" : "Connect to Facebook!");
 			new UIText(m_friendList, false, string.Empty, "No friends connected. Invite them to play!", "KGSecondChances_Font", 0.03f, RelativeTo.ScreenHeight);
 		}
 		else

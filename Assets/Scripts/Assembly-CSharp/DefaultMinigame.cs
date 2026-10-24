@@ -5,10 +5,10 @@ public static class DefaultMinigame
 {
 	public static void ApplyWizard(Minigame _minigame = null)
 	{
-		if (string.IsNullOrEmpty(PsState.m_wizardPlayer))
+		if (_minigame != null)
 		{
-			PsState.m_wizardPlayer = "Motorcycle";
-			PsState.m_wizardGameMode = "Race";
+			PsState.m_wizardPlayer = "OffroadCar";
+			PsState.m_wizardGameMode = "StarCollect";
 			int wizardDomeIndex = 0;
 			foreach (PsEditorItem item in PsMetagameData.m_gameAreas[0].m_items)
 			{
@@ -16,11 +16,11 @@ public static class DefaultMinigame
 				{
 					if (item.m_identifier == "AreaMedium")
 					{
-						wizardDomeIndex = 1;
+						wizardDomeIndex = 0;
 					}
 					else if (item.m_identifier == "AreaLarge")
 					{
-						wizardDomeIndex = 2;
+						wizardDomeIndex = 0;
 					}
 				}
 			}
@@ -76,11 +76,11 @@ public static class DefaultMinigame
 			{
 				if (item.m_identifier == "AreaMedium")
 				{
-					num = 1;
+					num = 0;
 				}
 				else if (item.m_identifier == "AreaLarge")
 				{
-					num = 2;
+					num = 0;
 				}
 			}
 		}

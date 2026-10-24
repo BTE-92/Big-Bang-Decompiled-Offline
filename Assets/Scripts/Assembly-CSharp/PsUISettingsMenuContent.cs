@@ -242,7 +242,7 @@ public class PsUISettingsMenuContent : UIScrollableCanvas
 		m_passwordArea.SetSpacing(0.025f, RelativeTo.ScreenShortest);
 		m_passwordArea.RemoveDrawHandler();
 		m_passwordArea.RemoveTouchAreas();
-		if (!PsState.m_adminMode)
+		if (1 == 0)
 		{
 			m_adminPass = new UITextArea(m_passwordArea, string.Empty, PsStrings.Get(StringID.BUTTON_SETTINGS_ADMIN), string.Empty, m_camera, m_passwordModel, "m_password");
 			m_adminPassOK = new PsUIGenericButton(m_passwordArea);

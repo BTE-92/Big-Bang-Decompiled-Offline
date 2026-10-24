@@ -16,7 +16,7 @@ public class EditorSelectorPlayer : EditorSelectorBase
 			PsUnlockableCategory psUnlockableCategory = PsMetagameData.m_playerUnits[i];
 			for (int j = 0; j < psUnlockableCategory.m_items.Count; j++)
 			{
-				if (j < psUnlockableCategory.m_items.Count || PsState.m_adminMode)
+				if (j < psUnlockableCategory.m_items.Count || true)
 				{
 					PsUpgradeableEditorItem psUpgradeableEditorItem = psUnlockableCategory.m_items[j] as PsUpgradeableEditorItem;
 					AddItemCard(psUpgradeableEditorItem.m_name, psUpgradeableEditorItem.m_description, PsColors.objectCatCardGrey, psUpgradeableEditorItem.m_iconImage, psUpgradeableEditorItem);
@@ -52,6 +52,10 @@ public class EditorSelectorPlayer : EditorSelectorBase
 			levelPlayerNode.Assemble();
 			PsState.m_editorCameraPos = vector;
 			CameraS.SnapMainCameraPos(PsState.m_editorCameraPos);
+			if (PsState.m_activeMinigame != null)
+			{
+				PsState.m_activeMinigame.m_changed = true;
+			}
 			SoundS.PlaySingleShot("/UI/ItemCreate", Vector3.zero);
 			if (levelPlayerNode != null)
 			{

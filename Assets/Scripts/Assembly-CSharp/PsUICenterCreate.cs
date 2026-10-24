@@ -74,6 +74,7 @@ public class PsUICenterCreate : UICanvas
 		m_newButton.SetGreenColors();
 		m_newButton.SetText("BUILD NEW!", 0.05f);
 		m_newButton.SetMargins(0.06f, 0.06f, 0.02f, 0.02f);
+		LevelTransfer.AddImportButton(uIVerticalList);
 		if (PsState.m_newEditorItemCount > 0)
 		{
 			UICanvas uICanvas = new UICanvas(m_newButton, false, "notification", null, string.Empty);
@@ -158,7 +159,7 @@ public class PsUICenterCreate : UICanvas
 				m_publishedBanners.Add(new PsUICreatePublishedBanner(uIVerticalList2, m_published[k]));
 			}
 		}
-		if (PsState.m_adminMode && m_hiddenLoops.Count > 0)
+		if (true && m_hiddenLoops.Count > 0)
 		{
 			UIVerticalList uIVerticalList3 = new UIVerticalList(m_contentArea, string.Empty);
 			uIVerticalList3.SetVerticalAlign(1f);
@@ -191,6 +192,8 @@ public class PsUICenterCreate : UICanvas
 
 	public override void Step()
 	{
+		LevelTransfer.Tick(this);
+		HandleDeletePublished();
 		if (m_newButton != null && m_newButton.m_hit)
 		{
 			PsMetagameManager.HideResources();
@@ -251,5 +254,20 @@ public class PsUICenterCreate : UICanvas
 			}
 		}
 		base.Step();
+	}
+
+	public void HandleDeletePublished()
+	{
+		for (int i = 0; i < m_publishedBanners.Count; i++)
+		{
+			if (m_publishedBanners[i].m_bannerEndIcon.m_hit)
+			{
+				PsMetagameManager.DeleteMinigame(m_publishedBanners[i].m_loop.m_minigameId);
+				m_publishedBanners[i].Destroy();
+				m_publishedBanners.RemoveAt(i);
+				m_scrollArea.Update();
+				break;
+			}
+		}
 	}
 }

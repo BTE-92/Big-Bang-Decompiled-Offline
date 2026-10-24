@@ -79,7 +79,7 @@ public static class ServerManager
 		});
 	}
 
-	public static void ThrowServerErrorException(string _title, WWW _www, Func<HttpC> _httpcCallBack = null, Action _actionCallBack = null)
+	public static void ThrowServerErrorException(string _title, GameWWW _www, Func<HttpC> _httpcCallBack = null, Action _actionCallBack = null)
 	{
 		ThrowServerErrorException(_title, ServerErrors.GetNetworkError(_www.error), _httpcCallBack, _actionCallBack);
 	}

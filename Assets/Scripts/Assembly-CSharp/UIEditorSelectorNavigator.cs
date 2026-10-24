@@ -28,13 +28,22 @@ public class UIEditorSelectorNavigator : UIHorizontalList
 		{
 		case EditorSelectorContext.ITEM_SELECT:
 		{
-			int num = ((!PsState.m_adminMode) ? (PsMetagameData.m_units.Count - 1) : PsMetagameData.m_units.Count);
+			int num = ((1 == 0) ? (PsMetagameData.m_units.Count - 1) : PsMetagameData.m_units.Count);
 			m_categories = new string[num];
 			m_buttonColors = new Color[3]
 			{
 				PsColors.objectCatButtonBlue,
 				PsColors.objectCatButtonGreen,
 				PsColors.objectCatButtonRed
+			};
+			m_buttonColors = new Color[6]
+			{
+				PsColors.objectCatButtonBlue,
+				PsColors.objectCatButtonGreen,
+				new Color(1f, 0.62f, 0.12f),
+				PsColors.objectCatButtonRed,
+				new Color(0.26f, 0.31f, 0.4f),
+				new Color(1f, 0.62f, 0.12f)
 			};
 			for (int i = 0; i < m_categories.Length; i++)
 			{
@@ -83,7 +92,7 @@ public class UIEditorSelectorNavigator : UIHorizontalList
 		m_categoryButtons = new UICanvas[m_categories.Length];
 		for (int j = 0; j < m_categoryButtons.Length; j++)
 		{
-			Color color = Color.white;
+			Color color = new Color(0.26f, 0.31f, 0.4f);
 			bool highlight = false;
 			if (m_context == EditorSelectorContext.ITEM_SELECT)
 			{

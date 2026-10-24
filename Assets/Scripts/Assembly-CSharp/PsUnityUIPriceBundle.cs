@@ -11,12 +11,12 @@ public class PsUnityUIPriceBundle : UnityUIBundle
 
 	public void SetPrice(int value)
 	{
-		m_priceText.text = value.ToString();
+		m_priceText.text = Loc.T(value.ToString());
 	}
 
 	public void SetPrice(int value, Resource type)
 	{
-		m_priceText.text = value.ToString();
+		m_priceText.text = Loc.T(value.ToString());
 		Frame frame = null;
 		switch (type)
 		{

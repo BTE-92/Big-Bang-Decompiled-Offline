@@ -12,9 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d32cf7c32a3ed8347bac48ef5ed56d82, type: 3}
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
-  EditorBanks: []
+  EditorBanks:
+  - {fileID: 114305284721102474}
   EditorEvents: []
   MasterBanks: []
-  StringsBanks: []
-  stringsBankWriteTime: 0
+  StringsBanks:
+  - {fileID: 114305284721102474}
+  stringsBankWriteTime: 639284111100000000
   cacheVersion: 3
+--- !u!114 &114305284721102474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master Bank.strings.bank
+  m_EditorClassIdentifier: 
+  Path: Assets\StreamingAssets\Master Bank.strings.bank
+  lastModified: 639284111100000000
+  LoadResult: 0
+  FileSizes:
+  - Name: 
+    Value: 7790
+  Exists: 1

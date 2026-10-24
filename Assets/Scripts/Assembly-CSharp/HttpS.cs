@@ -76,11 +76,11 @@ public static class HttpS
 		}
 		if (_postData == null)
 		{
-			httpC.www = new WWW(_url, null, httpC.wwwHeaders);
+			httpC.www = new GameWWW(_url, null, httpC.wwwHeaders);
 		}
 		else
 		{
-			httpC.www = new WWW(_url, _postData, httpC.wwwHeaders);
+			httpC.www = new GameWWW(_url, _postData, httpC.wwwHeaders);
 		}
 		if (_entity != null)
 		{

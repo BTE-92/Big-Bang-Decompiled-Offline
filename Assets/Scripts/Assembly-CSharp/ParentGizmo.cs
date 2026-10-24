@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ public class ParentGizmo : BasicGizmo
 			SpriteS.SetDimensions(c5, num7, num7);
 			SpriteS.ConvertSpritesToPrefabComponent(transformC2, true);
 		}
-		if (m_graphElements[0].m_isRemovable)
+		if (RemovableOrExtra(m_graphElements[0]))
 		{
 			float num10 = -45f;
 			TransformC transformC3 = TransformS.AddComponent(m_uiTC.p_entity, "GizmoRemoveTC");
@@ -469,5 +470,44 @@ public class ParentGizmo : BasicGizmo
 				new RotateUndoAction(m_graphElements, m_startRotations);
 			}
 		}
+	}
+
+	public static bool CanRemoveExtra(GraphElement e)
+	{
+		GraphNode graphNode = e as GraphNode;
+		if (graphNode != null && graphNode.m_assembleClassType != null)
+		{
+			string text = graphNode.m_assembleClassType.ToString();
+			Hashtable itemCount = PsState.m_activeMinigame.m_itemCount;
+			if (itemCount != null && itemCount.ContainsKey(text))
+			{
+				int num;
+				if (text == "Goal")
+				{
+					num = 1;
+				}
+				else
+				{
+					if (!(text == "CollectibleStar"))
+					{
+						goto IL_00c4;
+					}
+					num = ((PsState.m_activeGameLoop.GetGameMode() == PsGameMode.StarCollect) ? 3 : 0);
+				}
+				return (int)itemCount[text] > num;
+			}
+		}
+		goto IL_00c4;
+		IL_00c4:
+		return false;
+	}
+
+	public static bool RemovableOrExtra(GraphElement e)
+	{
+		if (!e.m_isRemovable)
+		{
+			return CanRemoveExtra(e);
+		}
+		return true;
 	}
 }

@@ -9,7 +9,7 @@ public static class IpConfig
     private const string SUB_FOLDER_NAME = "BigBang249_ipConfig";
 
     private const string DEFAULT_SERVER_URL =
-        "https://woeprod.traplightgames.com";
+        OfflineServer.BaseUrl;
 
     private const int MAX_FILE_LENGTH = 2048;
 

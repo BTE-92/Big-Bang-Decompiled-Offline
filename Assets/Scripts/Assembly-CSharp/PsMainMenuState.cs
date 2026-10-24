@@ -21,6 +21,8 @@ public class PsMainMenuState : BasicState, IStatedObject
 
 	private bool m_released;
 
+	private PsUIGenericButton m_hatButton;
+
 	private PsUIGenericButton m_moneyButton;
 
 	private PsUIGenericButton m_noMoneyButton;
@@ -86,22 +88,23 @@ public class PsMainMenuState : BasicState, IStatedObject
 		m_settingsList.SetSpacing(0.025f, RelativeTo.ScreenHeight);
 		m_settingsList.SetAlign(0f, 1f);
 		UIHorizontalList uIHorizontalList = new UIHorizontalList(m_settingsList, string.Empty);
-		uIHorizontalList.SetHorizontalAlign(0.25f);
+		uIHorizontalList.SetHorizontalAlign(0f);
 		uIHorizontalList.SetSpacing(0.01f, RelativeTo.ScreenHeight);
 		uIHorizontalList.RemoveDrawHandler();
+		m_versusButton = new PsUIProfileShield(uIHorizontalList, true, false);
+		m_versusButton.SetDepthOffset(10f);
+		m_versusButton.SetSize(0.285f, 0.285f, RelativeTo.ScreenHeight);
 		m_settingsButton = new PsUIGenericButton(uIHorizontalList);
 		m_settingsButton.SetIcon("menu_icon_settings_small", 0.052f);
 		m_settingsButton.SetTealColors();
 		m_settingsButton.SetMargins(0.011f);
-		m_settingsButton.SetAlign(0.1f, 0.05f);
+		m_settingsButton.SetAlign(0.1f, 1f);
 		m_helpButton = new PsUIGenericButton(uIHorizontalList);
 		m_helpButton.SetText("?", 0.055f, 0.07f);
 		m_helpButton.SetTealColors();
 		m_helpButton.SetMargins(0.001f);
 		m_helpButton.SetAlign(0.1f, 0.05f);
-		m_versusButton = new PsUIProfileShield(m_settingsList, true, false);
-		m_versusButton.SetDepthOffset(10f);
-		m_versusButton.SetSize(0.285f, 0.285f, RelativeTo.ScreenHeight);
+		m_helpButton.Destroy();
 		m_createButton = new PsUIGenericButton(m_uiCanvas, 0.25f, 0.25f, 0.02f);
 		m_createButton.SetMargins(0.05f);
 		m_createButton.SetGlareOffset(-0.0175f);
@@ -127,12 +130,15 @@ public class PsMainMenuState : BasicState, IStatedObject
 			TweenS.SetAdditionalTweenProperties(c3, -1, true, TweenStyle.CubicInOut);
 			UIFittedText uIFittedText = new UIFittedText(uICanvas2, false, string.Empty, PsState.m_newEditorItemCount.ToString(), "KGSecondChances_Font", true);
 		}
-		if (PsState.m_adminMode)
+		if (true)
 		{
 			UIVerticalList uIVerticalList = new UIVerticalList(m_uiCanvas, "adminButtons");
 			uIVerticalList.SetAlign(0f, 0f);
 			uIVerticalList.SetSpacing(0.015f, RelativeTo.ScreenHeight);
 			uIVerticalList.RemoveDrawHandler();
+			m_hatButton = new PsUIGenericButton(uIVerticalList);
+			m_hatButton.SetBlueColors();
+			m_hatButton.SetText("HATS");
 			m_moneyButton = new PsUIGenericButton(uIVerticalList);
 			m_moneyButton.SetGreenColors();
 			m_moneyButton.SetText("MONEY!");
@@ -209,7 +215,7 @@ public class PsMainMenuState : BasicState, IStatedObject
 		{
 			PsPlanetManager.GetCurrentPlanet().FastForward();
 			PsUIBaseState psUIBaseState = null;
-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
 			psUIBaseState.SetAction("Exit", ExitCreate);
 			Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(psUIBaseState);
 			PsMenuScene.CreateBlur();
@@ -239,14 +245,19 @@ public class PsMainMenuState : BasicState, IStatedObject
 			PsPlanetManager.GetCurrentPlanet().FastForward();
 			HelpshiftManager.ShowFAQ();
 		}
-		else if (PsState.m_adminMode && m_moneyButton != null && m_moneyButton.m_hit)
+		else if (m_hatButton != null && m_hatButton.m_hit)
+		{
+			PsPlanetManager.GetCurrentPlanet().FastForward();
+			new PsUIBasePopup(typeof(HatSelect), null, null, null, false);
+		}
+		else if (true && m_moneyButton != null && m_moneyButton.m_hit)
 		{
 			PsPlanetManager.GetCurrentPlanet().FastForward();
 			Hashtable data = new Hashtable();
 			PsMetagameManager.UpdateResourceStats(10000, 1000, 100, 10);
 			PsMetagameManager.SetPlayerData(data, false, PsMetagameManager.PlayerDataSetSUCCEED, PsMetagameManager.PlayerDataSetFAILED);
 		}
-		else if (PsState.m_adminMode && m_noMoneyButton != null && m_noMoneyButton.m_hit)
+		else if (true && m_noMoneyButton != null && m_noMoneyButton.m_hit)
 		{
 			PsPlanetManager.GetCurrentPlanet().FastForward();
 			Hashtable data2 = new Hashtable();

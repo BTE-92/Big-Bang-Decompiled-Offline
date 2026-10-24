@@ -253,7 +253,7 @@ public class PsGameLoopOwnPublished : PsGameLoop
 			m_scoreOld = m_scoreBest;
 			m_rewardOld = m_scoreBest;
 			PsUIBaseState psUIBaseState = null;
-			psUIBaseState = ((!PsState.m_adminMode) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
+			psUIBaseState = ((1 == 0) ? new PsUIBaseState(typeof(PsUITabbedProfile), typeof(PsUIVersusTopBack)) : new PsUIBaseState(typeof(PsUICenterCreate), typeof(PsUIVersusTopBack), typeof(PsUITabbedProfile), typeof(PsUISideCreateAdmin)));
 			psUIBaseState.SetAction("Exit", delegate
 			{
 				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new PsMainMenuState());

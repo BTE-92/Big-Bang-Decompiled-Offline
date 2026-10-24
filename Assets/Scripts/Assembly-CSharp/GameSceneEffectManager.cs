@@ -175,26 +175,29 @@ public static class GameSceneEffectManager
 
 	public static void Update()
 	{
-		Vector2 textureOffset = m_flickMat.GetTextureOffset("_MainTex");
-		Vector2 textureOffset2 = m_tvTube.tvMaterialTube.GetTextureOffset("_StaticMask");
-		if (!m_channelRoll)
+		if ((object)m_flickMat != null && (object)m_tvTube != null)
 		{
-			m_channelRollSpeed = (m_channelRollStop - textureOffset.y) * 0.1f;
+			Vector2 textureOffset = m_flickMat.GetTextureOffset("_MainTex");
+			Vector2 textureOffset2 = m_tvTube.tvMaterialTube.GetTextureOffset("_StaticMask");
+			if (!m_channelRoll)
+			{
+				m_channelRollSpeed = (m_channelRollStop - textureOffset.y) * 0.1f;
+			}
+			m_flickMat.SetTextureOffset("_MainTex", new Vector2(textureOffset.x, ToolBox.getRolledValue(textureOffset.y + m_channelRollSpeed, 0f, 1f)));
+			m_staticRollSpeed = 0.005f + Mathf.Sin(Main.m_resettingGameTime * Mathf.Sin(Main.m_resettingGameTime * 0.0618f)) * 0.01f;
+			m_tvTube.tvMaterialTube.SetTextureOffset("_StaticMask", new Vector2(textureOffset2.x, ToolBox.getRolledValue(textureOffset2.y + m_staticRollSpeed, 0f, 1f)));
+			if (m_effectsOn)
+			{
+				m_effectMultipler += (1f - m_effectMultipler) * 0.05f;
+			}
+			else
+			{
+				m_effectMultipler *= 0.95f;
+			}
+			m_tvTube.noiseMagnetude = 0.1f * m_effectMultipler + 0.1f;
+			m_tvTube.chromaticAberrationMagnetude = 0.1f * m_effectMultipler + 0.025f;
+			m_tvTube.staticMagnetude = 0.125f * m_effectMultipler + 0.0125f;
 		}
-		m_flickMat.SetTextureOffset("_MainTex", new Vector2(textureOffset.x, ToolBox.getRolledValue(textureOffset.y + m_channelRollSpeed, 0f, 1f)));
-		m_staticRollSpeed = 0.005f + Mathf.Sin(Main.m_resettingGameTime * Mathf.Sin(Main.m_resettingGameTime * 0.0618f)) * 0.01f;
-		m_tvTube.tvMaterialTube.SetTextureOffset("_StaticMask", new Vector2(textureOffset2.x, ToolBox.getRolledValue(textureOffset2.y + m_staticRollSpeed, 0f, 1f)));
-		if (m_effectsOn)
-		{
-			m_effectMultipler += (1f - m_effectMultipler) * 0.05f;
-		}
-		else
-		{
-			m_effectMultipler *= 0.95f;
-		}
-		m_tvTube.noiseMagnetude = 0.1f * m_effectMultipler + 0.1f;
-		m_tvTube.chromaticAberrationMagnetude = 0.1f * m_effectMultipler + 0.025f;
-		m_tvTube.staticMagnetude = 0.125f * m_effectMultipler + 0.0125f;
 	}
 
 	public static void DestroyCrew()

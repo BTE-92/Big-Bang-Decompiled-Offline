@@ -79,7 +79,8 @@ public class PsUICenterWinEditor : UICanvas
 		m_saveButton.SetText("SAVE &" + Environment.NewLine + "EXIT", 0.036f);
 		m_saveButton.SetSpacing(0f, RelativeTo.ScreenHeight);
 		m_saveButton.SetOrangeColors();
-		m_saveButton.SetHorizontalAlign(0f);
+		m_saveButton.SetMargins(0.04f, 0.04f, 0.007f, 0.007f);
+		m_saveButton.SetHorizontalAlign(1f);
 	}
 
 	protected virtual void CreateStarCollectMiddleArea(UIComponent _parent)

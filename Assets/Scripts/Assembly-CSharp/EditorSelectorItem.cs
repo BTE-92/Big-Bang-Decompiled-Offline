@@ -23,6 +23,15 @@ public class EditorSelectorItem : EditorSelectorBase
 				PsColors.objectCatCardGreen,
 				PsColors.objectCatCardRed
 			};
+			cardColors = new Color[6]
+			{
+				PsColors.objectCatCardBlue,
+				PsColors.objectCatCardGreen,
+				new Color(1f, 0.72f, 0.3f),
+				PsColors.objectCatCardRed,
+				PsColors.objectCatCardGrey,
+				new Color(1f, 0.72f, 0.3f)
+			};
 		}
 		if (m_categoryName == string.Empty)
 		{

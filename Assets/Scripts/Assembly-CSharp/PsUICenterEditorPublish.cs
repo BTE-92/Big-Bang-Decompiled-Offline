@@ -82,16 +82,6 @@ public class PsUICenterEditorPublish : PsUIHeaderedCanvas
 		m_goLiveButton.SetIcon("hud_icon_header_publish");
 		m_goLiveButton.SetGreenColors();
 		m_goLiveButton.SetAlign(0.85f, -0.25f);
-		if (PsState.m_adminMode)
-		{
-			UIVerticalList uIVerticalList2 = new UIVerticalList(this, string.Empty);
-			uIVerticalList2.SetSpacing(0.01f, RelativeTo.ScreenHeight);
-			uIVerticalList2.SetAlign(0.5f, -0.25f);
-			uIVerticalList2.RemoveDrawHandler();
-			UIText uIText = new UIText(uIVerticalList2, false, string.Empty, "Publish Hidden", "HurmeBold_Font", 0.03f, RelativeTo.ScreenHeight);
-			uIText.SetColor("#a8e2ff");
-			m_publishHidden = new PsUISwitch(uIVerticalList2);
-		}
 	}
 
 	public override void Step()

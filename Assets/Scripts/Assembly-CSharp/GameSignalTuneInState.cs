@@ -114,7 +114,15 @@ public class GameSignalTuneInState : BasicState
 		}
 		if (m_sequenceOver)
 		{
-			Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new GameStartState());
+			if (PsState.m_activeMinigame == null)
+			{
+				m_sequenceOver = false;
+				PsState.m_activeGameLoop.ExitMinigame();
+			}
+			else
+			{
+				Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(new GameStartState());
+			}
 		}
 	}
 

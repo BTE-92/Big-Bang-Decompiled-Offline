@@ -35,7 +35,7 @@ public abstract class PsUIInputTextField : UIHorizontalList
 			psUIInputTextField.m_textField.RemoveTouchAreas();
 			psUIInputTextField.SetText(GetText());
 			psUIInputTextField.m_root = this;
-			UIInputText uIInputText = ((!PsState.m_adminMode) ? new UIInputText(psUIInputTextField, '>', '<', '\\', '/') : new UIInputText(psUIInputTextField));
+			UIInputText uIInputText = ((1 == 0) ? new UIInputText(psUIInputTextField, '>', '<', '\\', '/') : new UIInputText(psUIInputTextField));
 			uIInputText.Update();
 		}
 		base.Step();

@@ -99,11 +99,12 @@ public class UIText : UIComponent
 		CalculateReferenceSizes();
 		UpdateSize();
 		UpdateMargins();
-		int num = Mathf.FloorToInt(m_fontSize * m_fontSizeRelative);
-		TextMeshS.SetFontSize(m_tmc, num);
+		int size = Mathf.FloorToInt(m_fontSize * m_fontSizeRelative);
+		size = LocUI.FitFont(this, size);
+		TextMeshS.SetFontSize(m_tmc, size);
 		if (m_shadowtmc != null)
 		{
-			TextMeshS.SetFontSize(m_shadowtmc, num);
+			TextMeshS.SetFontSize(m_shadowtmc, size);
 		}
 		Vector2 textSize = TextMeshS.GetTextSize(m_tmc, m_text);
 		SetWidth((textSize.x + m_actualMargins.l + m_actualMargins.r) / (float)Screen.width, RelativeTo.ScreenWidth);
@@ -124,7 +125,7 @@ public class UIText : UIComponent
 		if (m_shadowtmc != null)
 		{
 			TextMeshS.SetText(m_shadowtmc, "<color=#" + m_shadowColor + ">" + m_text + "</color>");
-			m_shadowtmc.m_go.transform.Translate(new Vector3(x, y) + (Vector3)(m_shadowDirection * num * m_shadowDistance) + Vector3.forward * 5f);
+			m_shadowtmc.m_go.transform.Translate(new Vector3(x, y) + (Vector3)(m_shadowDirection * size * m_shadowDistance) + Vector3.forward * 5f);
 		}
 		UpdateAlign();
 		UpdateMargins();

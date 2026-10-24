@@ -34,7 +34,7 @@ public class PsUIFriendLevelList : UIVerticalList
 	private void DataSUCCEED(PsMinigameMetaData[] _data)
 	{
 		DestroyChildren();
-		if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
+		if (string.IsNullOrEmpty("x"))
 		{
 			m_fbButton = new PsUIGenericButton(this);
 			m_fbButton.SetIcon("menu_icon_facebook", 0.045f);

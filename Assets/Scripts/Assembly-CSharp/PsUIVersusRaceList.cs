@@ -30,7 +30,7 @@ public class PsUIVersusRaceList : UIVerticalList
 		if (PsPlanetManager.m_timedEvents != null)
 		{
 			DestroyChildren();
-			if (PsState.m_adminMode)
+			if (true)
 			{
 				m_newChallenge = new PsUIGenericButton(this, 0.25f, 0.25f, 0.008f);
 				m_newChallenge.SetText("New Versus");
