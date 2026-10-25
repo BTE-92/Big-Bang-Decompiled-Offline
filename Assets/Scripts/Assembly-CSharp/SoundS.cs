@@ -143,6 +143,10 @@ public static class SoundS
 
     private static void UpdatePosition(SoundC _c, Vector3 _pos)
     {
+        if (!_c.eventInstance.isValid())
+        {
+            return;
+        }
         FMOD.ATTRIBUTES_3D attributes = _pos.to3DAttributes();
         FMODManager.ERRCHECK(_c.eventInstance.set3DAttributes(attributes));
     }

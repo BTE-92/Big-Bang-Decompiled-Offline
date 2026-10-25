@@ -37,7 +37,19 @@ public class FMOD_Listener : MonoBehaviour
         string bankPath = getStreamingAsset(fileName);
 
         FMOD.Studio.Bank bank = default(FMOD.Studio.Bank);
+#if UNITY_WEBGL && !UNITY_EDITOR
+        // WebGL: StreamingAssets is an HTTP URL, so FMOD can't open it. PsWebGLBankLoader already
+        // downloaded the bytes; load from memory (FMOD copies them, so the buffer can be freed).
+        byte[] bankBytes = PsWebGLBankLoader.GetBankBytes(fileName);
+        if (bankBytes == null)
+        {
+            FMOD.Studio.UnityUtil.LogError("Bank " + fileName + " was not downloaded");
+            return;
+        }
+        FMOD.RESULT result = FMOD_StudioSystem.instance.System.loadBankMemory(bankBytes, LOAD_BANK_FLAGS.NORMAL, out bank);
+#else
         FMOD.RESULT result = FMOD_StudioSystem.instance.System.loadBankFile(bankPath, LOAD_BANK_FLAGS.NORMAL, out bank);
+#endif
         if (result == FMOD.RESULT.ERR_VERSION)
         {
             FMOD.Studio.UnityUtil.LogError(String.Format("Bank {0} built with an incompatible version of FMOD Studio.", fileName));
@@ -124,6 +136,8 @@ public class FMOD_Listener : MonoBehaviour
             }
             var bankList = reader.text.Split(new Char[] { '\n' });
             reader.Dispose();
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            var bankList = PsWebGLBankLoader.BankList;
 #else
             var bankList = System.IO.File.ReadAllLines(bankListPath);
 #endif

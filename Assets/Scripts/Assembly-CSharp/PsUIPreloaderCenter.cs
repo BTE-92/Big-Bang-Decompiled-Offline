@@ -33,6 +33,9 @@ public class PsUIPreloaderCenter : UICanvas
 		: base(_parent, false, "PreloaderCenter", null, string.Empty)
 	{
 		PsBackgroundDownloader.Initialize();
+#if UNITY_WEBGL && !UNITY_EDITOR
+		PsWebGLBankLoader.Begin();
+#endif
 		if (m_loaderEntity == null)
 		{
 			m_loaderEntity = EntityManager.AddEntity();
@@ -101,7 +104,11 @@ public class PsUIPreloaderCenter : UICanvas
 				}
 				m_loadingBar.d_Draw(m_loadingBar);
 			}
+#if UNITY_WEBGL && !UNITY_EDITOR
+			if (PsBackgroundDownloader.m_checksDone && PsWebGLBankLoader.IsReady)
+#else
 			if (PsBackgroundDownloader.m_checksDone)
+#endif
 			{
 				ChangeScene();
 			}

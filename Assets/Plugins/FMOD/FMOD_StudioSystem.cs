@@ -139,8 +139,12 @@ public class FMOD_StudioSystem : MonoBehaviour
 	FMOD.Studio.System system;
 	Dictionary<string, FMOD.Studio.EventDescription> eventDescriptions = new Dictionary<string, FMOD.Studio.EventDescription>();
 	bool isInitialized = false;
-	
-	static FMOD_StudioSystem sInstance;
+#if UNITY_WEBGL && !UNITY_EDITOR
+	const uint WebGLDspBufferLength = 2048; // FMOD default here was 1024
+	const int WebGLDspNumBuffers = 4;
+#endif
+
+    static FMOD_StudioSystem sInstance;
 	public static FMOD_StudioSystem instance
 	{
 		get
