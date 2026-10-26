@@ -73,64 +73,43 @@ public class UIInputText : UIScrollableCanvas
 
     protected virtual void OpenKeyboard()
     {
-#if UNITY_EDITOR || UNITY_STANDALONE
-        // Standalone / Editor: Do not open TouchScreenKeyboard
-        return;
-#elif UNITY_WEBGL
-		// WebGL: Open TouchScreenKeyboard only if the device/browser supports it (e.g. mobile browser)
-		if (!TouchScreenKeyboard.isSupported)
-		{
-			return;
-		}
-
-		if (m_keyboard == null)
-		{
-			if (m_placeholderText != string.Empty)
-			{
-				m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true, m_placeholderText);
-				return;
-			}
-			m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true);
-			m_keyboard.text = m_text;
-		}
-		else
-		{
-			m_keyboard.active = true;
-		}
-#else
-		// Mobile platforms: Exact original code
-		if (m_keyboard == null)
-		{
-			if (m_placeholderText != string.Empty)
-			{
-				m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true, m_placeholderText);
-				return;
-			}
-			m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true);
-			m_keyboard.text = m_text;
-		}
-		else
-		{
-			m_keyboard.active = true;
-		}
-#endif
+        // Editor / Standalone: hardware keyboard only.
+        // WebGL: only open the touch keyboard if the browser/device supports it.
+        // Native mobile: always (original behaviour).
+        if (!HardwareKeyboardInput.ShouldOpenTouchKeyboard)
+        {
+            return;
+        }
+        if (m_keyboard == null)
+        {
+            if (m_placeholderText != string.Empty)
+            {
+                m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true, m_placeholderText);
+                return;
+            }
+            m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true);
+            m_keyboard.text = m_text;
+        }
+        else
+        {
+            m_keyboard.active = true;
+        }
     }
 
     protected virtual void UpdateKeyboard()
     {
-#if UNITY_EDITOR || UNITY_STANDALONE
-        UpdateHardwareKeyboard();
-#elif UNITY_WEBGL
-		// WebGL: Process TouchScreenKeyboard if active, as well as hardware input
-		if (m_keyboard != null)
-		{
-			UpdateTouchKeyboard();
-		}
-		UpdateHardwareKeyboard();
-#else
-		// Mobile platforms: Exact original code
-		UpdateTouchKeyboard();
-#endif
+        // One input source at a time. If a touch keyboard is open it owns the text
+        // (on WebGL mobile a connected hardware keyboard types into it as well);
+        // otherwise read the hardware keyboard. Reading both would let the touch
+        // keyboard's text overwrite what was typed on the hardware keyboard.
+        if (m_keyboard != null)
+        {
+            UpdateTouchKeyboard();
+        }
+        else
+        {
+            UpdateHardwareKeyboard();
+        }
     }
 
     private void UpdateTouchKeyboard()
@@ -170,7 +149,6 @@ public class UIInputText : UIScrollableCanvas
         }
     }
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
     private void UpdateHardwareKeyboard()
     {
         if (m_errorPopup != null)
@@ -178,68 +156,11 @@ public class UIInputText : UIScrollableCanvas
             return;
         }
 
-        // Submit on Enter
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-        {
-            CloseKeyboard(false);
-            return;
-        }
-
-        // Cancel on Escape
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            CloseKeyboard(true);
-            return;
-        }
-
         string text = m_text;
-        bool textChanged = false;
+        bool changed;
+        HardwareKeyAction action = HardwareKeyboardInput.Poll(ref text, m_content.m_maxCharacterCount, m_content.m_keyboardType, m_ignoreCharacters, out changed);
 
-        for (int i = 0; i < Input.inputString.Length; i++)
-        {
-            char c = Input.inputString[i];
-
-            if (c == '\b') // Backspace
-            {
-                if (text.Length > 0)
-                {
-                    text = text.Substring(0, text.Length - 1);
-                    textChanged = true;
-                }
-            }
-            else if (c == '\n' || c == '\r')
-            {
-                continue;
-            }
-            else
-            {
-                // Filter ignoreCharacters
-                if (m_ignoreCharacters != null && Array.IndexOf(m_ignoreCharacters, c) >= 0)
-                {
-                    continue;
-                }
-
-                // ASCIICapable filter
-                if (m_content != null && m_content.m_keyboardType == TouchScreenKeyboardType.ASCIICapable)
-                {
-                    if (c < 32 || c > 126)
-                    {
-                        continue;
-                    }
-                }
-
-                // Character Limit check
-                if (m_content != null && m_content.m_maxCharacterCount > -1 && text.Length >= m_content.m_maxCharacterCount)
-                {
-                    continue;
-                }
-
-                text += c;
-                textChanged = true;
-            }
-        }
-
-        if (textChanged)
+        if (changed)
         {
             m_text = ToolBox.GetUTF8String(text);
             if (m_text.IndexOf(" ", StringComparison.CurrentCultureIgnoreCase) == 0)
@@ -248,8 +169,16 @@ public class UIInputText : UIScrollableCanvas
             }
             UpdateView();
         }
+
+        if (action == HardwareKeyAction.Submit)
+        {
+            CloseKeyboard(false);
+        }
+        else if (action == HardwareKeyAction.Cancel)
+        {
+            CloseKeyboard(true);
+        }
     }
-#endif
 
     public void CloseKeyboard(bool _cancel = false)
     {
@@ -259,29 +188,18 @@ public class UIInputText : UIScrollableCanvas
         }
         if (m_text.Length >= m_content.m_minCharacterCount || _cancel)
         {
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-            bool isCanceled = _cancel || (m_keyboard != null && m_keyboard.wasCanceled);
-            if (isCanceled)
+            if (m_keyboard != null || HardwareKeyboardInput.IsSupported)
             {
-                m_content.Cancel();
+                bool isCanceled = _cancel || (m_keyboard != null && m_keyboard.wasCanceled);
+                if (isCanceled)
+                {
+                    m_content.Cancel();
+                }
+                else
+                {
+                    m_content.Done();
+                }
             }
-            else
-            {
-                m_content.Done();
-            }
-#else
-			if (m_keyboard != null)
-			{
-				if (m_keyboard.wasCanceled || _cancel)
-				{
-					m_content.Cancel();
-				}
-				else
-				{
-					m_content.Done();
-				}
-			}
-#endif
             Destroy();
         }
         else if (m_errorPopup == null)
@@ -293,17 +211,10 @@ public class UIInputText : UIScrollableCanvas
     private void ErrorPopupClosed()
     {
         m_errorPopup = null;
-#if UNITY_EDITOR || UNITY_STANDALONE
-        // No touch keyboard reopen needed
-#elif UNITY_WEBGL
-		if (TouchScreenKeyboard.isSupported)
-		{
-			m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true);
-			m_keyboard.text = m_text;
-		}
-#else
-		m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true);
-		m_keyboard.text = m_text;
-#endif
+        if (HardwareKeyboardInput.ShouldOpenTouchKeyboard)
+        {
+            m_keyboard = TouchScreenKeyboard.Open(m_text, m_content.m_keyboardType, false, m_multiline, false, true);
+            m_keyboard.text = m_text;
+        }
     }
 }
