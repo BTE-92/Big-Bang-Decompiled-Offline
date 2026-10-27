@@ -29,6 +29,13 @@ public static class LevelTransfer
     private static extern void BBR_DownloadFile(string fileName, string base64);
 #endif
 
+#if UNITY_IOS && !UNITY_EDITOR
+    // Apple's Files browser on top of the game (Plugins/iOS/BBRFilePicker.mm). It writes picked.zip / picked.name / picked.done in the given
+    // folder, like the Android picker does.
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    private static extern int BBR_IOS_PickFile(string dir);
+#endif
+
     // result of the browser picker (filled by WebPickReceiver)
     private static byte[] s_webData;
     private static string s_webStatus;
@@ -319,6 +326,32 @@ public static class LevelTransfer
 #else
             return false;
 #endif
+        }
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            try
+            {
+                string iosDir = Application.temporaryCachePath;
+                if (!System.IO.Directory.Exists(iosDir)) System.IO.Directory.CreateDirectory(iosDir);
+                string[] iosOld = new string[] { "picked.zip", "picked.tmp", "picked.name", "picked.done" };
+                for (int i = 0; i < iosOld.Length; i++)
+                {
+                    string f = System.IO.Path.Combine(iosDir, iosOld[i]);
+                    if (System.IO.File.Exists(f)) System.IO.File.Delete(f);
+                }
+                if (BBR_IOS_PickFile(iosDir) == 1)
+                {
+                    s_waitingPick = true;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("iOS picker failed: " + e.Message);
+            }
+#endif
+            return false;
         }
         if (Application.platform != RuntimePlatform.Android) return false;
         try

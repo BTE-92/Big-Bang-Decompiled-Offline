@@ -751,7 +751,7 @@ public static class PlayerApi
 		Router.Map("/v1/player/changeName", async delegate(Ctx c)
 		{
 			string text = (c.BodyJson() as JsonObject)?["name"]?.ToString() ?? "";
-			if (text != "")
+			if (text != "" && c.PlayerId != "")
 			{
 				Db.Exec("UPDATE players SET name=$0 WHERE id=$1", text, c.PlayerId);
 				// le nom est aussi recopie sur les niveaux et les scores du joueur : on les met a jour pour que tout le monde voie le nouveau nom

@@ -91,24 +91,16 @@ public static class KeyChain
 
 	private static void SaveString(string name, string value)
 	{
-		if (Application.platform == RuntimePlatform.IPhonePlayer)
-		{
-			if (!IOSKeyChain.SetData("WhatOnEarth", name, value))
-			{
-				Debug.LogError("Saving string to keychain failed!");
-			}
-		}
-		else
-		{
-			PlayerPrefs.SetString(name, value);
-			PlayerPrefs.Save();
-		}
+		// The iOS keychain plugin (IOSKeyChain) is an empty stub in this version: it stores nothing and always reads back "". Going through it on
+		// iPhone / iPad lost the player's name (PlayerPrefsX.GetUserName wiped it) and the other saved values, so every platform uses PlayerPrefs.
+		PlayerPrefs.SetString(name, value);
+		PlayerPrefs.Save();
 	}
 
 	private static string GetString(string key)
 	{
 		string empty = string.Empty;
-		empty = ((Application.platform != RuntimePlatform.IPhonePlayer) ? PlayerPrefs.GetString(key) : IOSKeyChain.GetData("WhatOnEarth", key));
+		empty = PlayerPrefs.GetString(key);
 		if (empty != null && empty.Equals(string.Empty))
 		{
 			return null;

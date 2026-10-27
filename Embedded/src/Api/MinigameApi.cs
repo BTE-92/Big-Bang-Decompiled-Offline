@@ -168,6 +168,11 @@ public static class MinigameApi
 
 	private static Task ListBy(Ctx c, string where, params object?[] args)
 	{
+		// The starter levels belong to nobody (empty creatorId): a request with no player id must not get them as "its" levels.
+		if (where.StartsWith("creatorId=$0") && (args.Length == 0 || string.IsNullOrEmpty(args[0]?.ToString())))
+		{
+			return c.Json(DataList(Db.Query("SELECT * FROM minigames WHERE 0=1"), c.PlayerId));
+		}
 		string sql = "SELECT * FROM minigames WHERE template=0 AND " + where + " ORDER BY createdAt DESC LIMIT " + Limit(c);
 		return c.Json(DataList(Db.Query(sql, args), c.PlayerId));
 	}
@@ -487,13 +492,19 @@ public static class MinigameApi
 		Router.Map("/v1/minigame/claim", async delegate(Ctx c)
 		{
 			PlayerApi.ApplyResources(c.PlayerId, c.BodyJson());
-			Db.Exec("UPDATE minigames SET rewardCoins=0 WHERE id=$0 AND creatorId=$1", c.Q("gameId"), c.PlayerId);
+			if (c.PlayerId != "")
+			{
+				Db.Exec("UPDATE minigames SET rewardCoins=0 WHERE id=$0 AND creatorId=$1", c.Q("gameId"), c.PlayerId);
+			}
 			await c.Json(new JsonObject());
 		});
 		Router.Map("/v1/minigame/claimAll", async delegate(Ctx c)
 		{
 			PlayerApi.ApplyResources(c.PlayerId, c.BodyJson());
-			Db.Exec("UPDATE minigames SET rewardCoins=0 WHERE creatorId=$0", c.PlayerId);
+			if (c.PlayerId != "")
+			{
+				Db.Exec("UPDATE minigames SET rewardCoins=0 WHERE creatorId=$0", c.PlayerId);
+			}
 			await c.Json(new JsonObject());
 		});
 		Router.Map("/v1/minigame/getRewards", (Ctx c) => c.Json(new JsonObject { ["coins"] = Db.One("SELECT COALESCE(SUM(rewardCoins),0) AS n FROM minigames WHERE creatorId=$0", c.PlayerId)?.L("n", 0L) ?? 0 }));
