@@ -12,6 +12,31 @@ using Server;
 public static class LevelTransfer
 {
     private const string Perm = "android.permission.WRITE_EXTERNAL_STORAGE";
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    // browser file picker / download (Plugins/WebGL/BBRWebGL.jslib). BBR_PickFile returns 1 when the browser will only open the picker on
+    // the player's next tap (a file dialog needs a fresh user gesture), 0 when it was opened right away.
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    private static extern int BBR_PickFile(string gameObjectName, string okMethod, string failMethod, string accept);
+
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    private static extern void BBR_DownloadFile(string fileName, string base64);
+#endif
+
+    // result of the browser picker (filled by WebPickReceiver)
+    private static byte[] s_webData;
+    private static string s_webStatus;
+
+    public static void WebPicked(byte[] data)
+    {
+        s_webData = data;
+        s_webStatus = "ok";
+    }
+
+    public static void WebPickFailed(string why)
+    {
+        s_webStatus = why == "cancel" ? "cancel" : "error";
+    }
     // Android: shared storage; Windows: Documents; iOS: the app's Documents folder (visible in the Files app)
     public static string ExportDir
     {
@@ -229,6 +254,13 @@ public static class LevelTransfer
                 LevelMsg.Show("Export Failed", "Failed to export level. Did you allow file permissions?");
                 return;
             }
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // in a browser the file goes to the Downloads folder like any other download
+            string webName = SafeName(s_expName) + "_" + s_expId + ".zip";
+            BBR_DownloadFile(webName, Convert.ToBase64String(data));
+            LevelMsg.Show("Export Succeeded", "Your browser downloaded: " + webName);
+            return;
+#endif
             string dir = ExportDir;
             if (!System.IO.Directory.Exists(dir)) System.IO.Directory.CreateDirectory(dir);
             string path = System.IO.Path.Combine(dir, SafeName(s_expName) + "_" + s_expId + ".zip");
@@ -260,6 +292,28 @@ public static class LevelTransfer
             }
             return false;
         }
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            try
+            {
+                WebPickReceiver.Ensure();
+                s_webData = null;
+                s_webStatus = null;
+                int deferred = BBR_PickFile(WebPickReceiver.ObjectName, "OnPicked", "OnPickFailed", ".zip,application/zip");
+                s_waitingPick = true;
+                if (deferred == 1) LevelMsg.Show("Import level", "Tap OK, then choose the level file (.zip) in the window that opens.");
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Browser picker failed: " + e.Message);
+                return false;
+            }
+#else
+            return false;
+#endif
+        }
         if (Application.platform != RuntimePlatform.Android) return false;
         try
         {
@@ -288,6 +342,18 @@ public static class LevelTransfer
 
     private static void PollPicker()
     {
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+        {
+            if (s_webStatus == null) return;
+            s_waitingPick = false;
+            string st = s_webStatus;
+            byte[] picked = s_webData;
+            s_webStatus = null;
+            s_webData = null;
+            if (st == "ok") StartImportBytes(picked);
+            else if (st == "error") LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+            return;
+        }
         try
         {
             string dir = Application.temporaryCachePath;
@@ -608,5 +674,38 @@ public class ImportSelect : PsUIHeaderedCanvas
             }
         }
         base.Step();
+    }
+}
+
+// receives the result of the browser's file picker (called from BBRWebGL.jslib through SendMessage)
+public class WebPickReceiver : MonoBehaviour
+{
+    public const string ObjectName = "BBRLevelPick";
+
+    public static void Ensure()
+    {
+        if (GameObject.Find(ObjectName) != null) return;
+        GameObject go = new GameObject(ObjectName);
+        DontDestroyOnLoad(go);
+        go.AddComponent<WebPickReceiver>();
+    }
+
+    // payload: "<file name>|<base64 of the file>"
+    public void OnPicked(string payload)
+    {
+        try
+        {
+            int bar = payload.IndexOf('|');
+            LevelTransfer.WebPicked(Convert.FromBase64String(bar >= 0 ? payload.Substring(bar + 1) : payload));
+        }
+        catch (Exception)
+        {
+            LevelTransfer.WebPickFailed("error");
+        }
+    }
+
+    public void OnPickFailed(string why)
+    {
+        LevelTransfer.WebPickFailed(why);
     }
 }
