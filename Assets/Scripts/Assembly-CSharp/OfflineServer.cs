@@ -56,9 +56,19 @@ public static class OfflineServer
 		try
 		{
 			Directory.CreateDirectory(DataRoot);
-#if UNITY_IOS && !UNITY_EDITOR
-			// on iOS sqlite is compiled into the app (Plugins/iOS/sqlite); everywhere else it is a shared library
+#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+			// on iOS and WebGL sqlite is compiled into the app (Plugins/iOS/sqlite); everywhere else it is a shared library
 			Db.NativeApi = new IosSqliteApi();
+#endif
+#if UNITY_WEBGL && !UNITY_EDITOR
+			// WebGL: no threads, no shared memory (so no WAL); the file system is in memory and written to IndexedDB by SyncToBrowser
+			// the assembly's embedded resources are not available in the WebGL build: the files come from Resources/BBR/server (name with . replaced by _, *.bytes)
+			BBR249Server.Core.EmbeddedResources.Provider = delegate(string name)
+			{
+				TextAsset asset = Resources.Load<TextAsset>("BBR/server/" + name.Replace('.', '_'));
+				return asset != null ? asset.bytes : null;
+			};
+			Db.StartupPragmas = "PRAGMA journal_mode=MEMORY; PRAGMA locking_mode=EXCLUSIVE; PRAGMA foreign_keys=OFF; PRAGMA synchronous=OFF;";
 #endif
 			EmbeddedServer.Initialize(DataRoot, delegate(string line) { Debug.Log(line); });
 			s_started = true;
@@ -70,6 +80,30 @@ public static class OfflineServer
 			Debug.LogError("[OfflineServer] could not start: " + e);
 			return false;
 		}
+	}
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+	[System.Runtime.InteropServices.DllImport("__Internal")]
+	private static extern void BBR_SyncFileSystem();
+
+	private static float s_lastSync;
+
+	private static bool s_dirty;
+#endif
+
+	// WebGL only: the database sits in the browser's in-memory file system, so every change has to be written to IndexedDB
+	// (at most every few seconds) or it is lost when the page is closed. Does nothing on the other platforms.
+	public static void SyncToBrowser(bool _force = false)
+	{
+#if UNITY_WEBGL && !UNITY_EDITOR
+		s_dirty = true;
+		if (_force || Time.realtimeSinceStartup - s_lastSync > 5f)
+		{
+			s_lastSync = Time.realtimeSinceStartup;
+			s_dirty = false;
+			BBR_SyncFileSystem();
+		}
+#endif
 	}
 
 	public static void Shutdown()

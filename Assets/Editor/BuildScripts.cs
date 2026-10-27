@@ -155,4 +155,18 @@ public static class BuildScripts
 		options.options = BuildOptions.None;
 		Finish(BuildPipeline.BuildPlayer(options));
 	}
+
+	// Needs the native physics (chipmunk) and geometry (auto geometry, libtess) libraries for WebGL, see Embedded/README.md.
+	public static void WebGL()
+	{
+		PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
+		PlayerSettings.WebGL.memorySize = 512;
+		PlayerSettings.WebGL.dataCaching = true;
+		BuildPlayerOptions options = new BuildPlayerOptions();
+		options.scenes = Scenes;
+		options.target = BuildTarget.WebGL;
+		options.locationPathName = Path.Combine(OutDir, "WebGL");
+		options.options = BuildOptions.None;
+		Finish(BuildPipeline.BuildPlayer(options));
+	}
 }

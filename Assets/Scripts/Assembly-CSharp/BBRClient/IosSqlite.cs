@@ -1,9 +1,9 @@
-#if UNITY_IOS && !UNITY_EDITOR
+#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
 using System;
 using System.Runtime.InteropServices;
 using BBR249Server.Data;
 
-// On iOS the sqlite3 library is compiled into the app (Assets/Plugins/iOS/sqlite/sqlite3.c), so it is reached through "__Internal".
+// On iOS and WebGL the sqlite3 library is compiled into the app (Assets/Plugins/iOS/sqlite/sqlite3.c), so it is reached through "__Internal".
 // Used by OfflineServer (Db.NativeApi). Not compiled on the other platforms, where "__Internal" would not link.
 public sealed class IosSqliteApi : SqliteApi
 {

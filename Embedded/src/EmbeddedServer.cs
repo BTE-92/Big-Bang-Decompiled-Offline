@@ -56,7 +56,7 @@ public static class EmbeddedServer
 	private static void EnsureServerData()
 	{
 		if (File.Exists(Settings.InitialDataFile)) return;
-		using Stream? res = typeof(EmbeddedServer).Assembly.GetManifestResourceStream("LocalInitialData.txt");
+		using Stream? res = EmbeddedResources.Open("LocalInitialData.txt");
 		if (res == null) return;
 		Directory.CreateDirectory(Path.GetDirectoryName(Settings.InitialDataFile)!);
 		using FileStream fs = File.Create(Settings.InitialDataFile);

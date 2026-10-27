@@ -1,3 +1,11 @@
+#ifdef __EMSCRIPTEN__
+/* WebGL build: single thread, no extension loading, temp files in memory (the database lives in the browser's IndexedDB file system) */
+#define SQLITE_THREADSAFE 0
+#define SQLITE_OMIT_LOAD_EXTENSION 1
+#define SQLITE_OMIT_SHARED_CACHE 1
+#define SQLITE_TEMP_STORE 3
+#define SQLITE_DEFAULT_MEMSTATUS 0
+#endif
 /******************************************************************************
 ** This file is an amalgamation of many separate C source files from SQLite
 ** version 3.54.1.  By combining all the individual C code files into this

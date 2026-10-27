@@ -53,6 +53,10 @@ public class GameWWW
 		try
 		{
 			m_response = EmbeddedServer.Handle(request);
+			if (request.Method == "POST")
+			{
+				OfflineServer.SyncToBrowser();
+			}
 		}
 		catch (Exception e)
 		{

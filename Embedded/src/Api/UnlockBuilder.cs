@@ -504,6 +504,12 @@ public static class UnlockBuilder
 				d["itemIcon"] = "item_carboardbox_icon";
 				num++;
 			}
+			// the atlas has a picture of its own for the rolling boulder; the recreated data gave it the rock's
+			if (cls == "PsRollingBoulder" && d["itemIcon"]?.ToString() != "item_boulder_icon")
+			{
+				d["itemIcon"] = "item_boulder_icon";
+				num++;
+			}
 			// Un objet sans icone fait planter l'ecran "New items" (le jeu cherche une image au nom vide) : il lui faut toujours une icone
 			// qui existe dans l'atlas du jeu d'origine. "Desert" (classe vide) et le capteur d'objectif n'en avaient pas.
 			string nodeType = d["nodeType"]?.ToString() ?? "";

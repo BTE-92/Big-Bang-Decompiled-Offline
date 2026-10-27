@@ -24,17 +24,75 @@ public static class MiscApi
 		}
 	}
 
+	// The adventure map: the copy in the data folder when it is valid, otherwise the one built into the assembly (the data folder
+	// can be empty or unwritable, e.g. in a browser). A usable copy is written back to the data folder when possible.
+	private static string? ReadInitialData()
+	{
+		try
+		{
+			if (File.Exists(Settings.InitialDataFile))
+			{
+				string fromFile = File.ReadAllText(Settings.InitialDataFile, Encoding.UTF8);
+				if (fromFile.TrimStart('\ufeff', ' ', '\r', '\n', '\t').StartsWith("{"))
+				{
+					return fromFile;
+				}
+				Console.WriteLine("[Path] " + Settings.InitialDataFile + " is not valid (" + fromFile.Length + " chars), using the built-in map.");
+			}
+			else
+			{
+				Console.WriteLine("[Path] " + Settings.InitialDataFile + " does not exist, using the built-in map.");
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("[Path] Could not read " + Settings.InitialDataFile + ": " + ex.Message + ", using the built-in map.");
+		}
+		string? builtIn = null;
+		try
+		{
+			using (System.IO.Stream? res = EmbeddedResources.Open("LocalInitialData.txt"))
+			{
+				if (res == null)
+				{
+					Console.WriteLine("[Path] Built-in map missing. Resources in the assembly: " + string.Join(", ", typeof(MiscApi).Assembly.GetManifestResourceNames()));
+					return null;
+				}
+				using (StreamReader reader = new StreamReader(res, Encoding.UTF8))
+				{
+					builtIn = reader.ReadToEnd();
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("[Path] Could not read the built-in map: " + ex.Message);
+			return null;
+		}
+		try
+		{
+			Directory.CreateDirectory(Path.GetDirectoryName(Settings.InitialDataFile)!);
+			File.WriteAllText(Settings.InitialDataFile, builtIn, new UTF8Encoding(false));
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("[Path] Could not write " + Settings.InitialDataFile + ": " + ex.Message);
+		}
+		return builtIn;
+	}
+
 	private static byte[]? LoadPathBlob()
 	{
 		if (_pathBlob != null)
 		{
 			return _pathBlob;
 		}
-		if (!File.Exists(Settings.InitialDataFile))
+		string? raw = ReadInitialData();
+		if (raw == null)
 		{
 			return null;
 		}
-		string text = File.ReadAllText(Settings.InitialDataFile, Encoding.UTF8).TrimStart('\ufeff', ' ', '\r', '\n', '\t');
+		string text = raw.TrimStart('\ufeff', ' ', '\r', '\n', '\t');
 		if (!text.StartsWith("{"))
 		{
 			return null;

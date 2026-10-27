@@ -21,6 +21,9 @@ public static class Db
 		set { SqliteNative.Api = value; }
 	}
 
+	// PRAGMAs run when the database is opened. WebGL (no shared memory, no threads) replaces them from the game.
+	public static string StartupPragmas = "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=OFF; PRAGMA synchronous=NORMAL;";
+
 	private static readonly object Lock = new object();
 	private static IntPtr _db = IntPtr.Zero;
 
@@ -41,7 +44,7 @@ public static class Db
 		int rc = SqliteNative.sqlite3_open_v2(SqliteNative.Z(Settings.DbFile), out h, SqliteNative.OPEN_READWRITE | SqliteNative.OPEN_CREATE | SqliteNative.OPEN_FULLMUTEX, IntPtr.Zero);
 		_db = h;
 		Check(rc, "open " + Settings.DbFile);
-		RunSimple("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=OFF; PRAGMA synchronous=NORMAL;");
+		RunSimple(StartupPragmas);
 	}
 
 	public static void Close()

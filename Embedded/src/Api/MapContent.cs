@@ -43,7 +43,7 @@ public static class MapContent
 			{
 				return;
 			}
-			using Stream? res = typeof(MapContent).Assembly.GetManifestResourceStream("builder_template.bin");
+			using Stream? res = EmbeddedResources.Open("builder_template.bin");
 			if (res == null)
 			{
 				return;
@@ -71,7 +71,7 @@ public static class MapContent
 			{
 				return;
 			}
-			using Stream? res = typeof(MapContent).Assembly.GetManifestResourceStream("seed_levels.json");
+			using Stream? res = EmbeddedResources.Open("seed_levels.json");
 			if (res == null)
 			{
 				return;
@@ -108,7 +108,7 @@ public static class MapContent
 	{
 		try
 		{
-			using Stream? res = typeof(MapContent).Assembly.GetManifestResourceStream("puzzle_level.bin");
+			using Stream? res = EmbeddedResources.Open("puzzle_level.bin");
 			if (res == null)
 			{
 				return;
@@ -116,7 +116,7 @@ public static class MapContent
 			using MemoryStream ms = new MemoryStream();
 			res.CopyTo(ms);
 			byte[]? shot = null;
-			using (Stream? img = typeof(MapContent).Assembly.GetManifestResourceStream("puzzle_screenshot.jpg"))
+			using (Stream? img = EmbeddedResources.Open("puzzle_screenshot.jpg"))
 			{
 				if (img != null)
 				{
