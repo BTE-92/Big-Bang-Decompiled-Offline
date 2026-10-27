@@ -298,9 +298,11 @@ public class PsGame : IGame
 		GizmoManager.UpdatePosition();
 		EveryplayManager.Update();
 		UpdateSystemInfo();
+		/*
 		if (Input.GetKey(KeyCode.B))
 		{
 			OnApplicationPause(false);
 		}
+		*/
 	}
 }

@@ -600,6 +600,69 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
         }
     }
 
+    // "Credits" popup: role (translated through Loc like every other text) above the name (names are not in the table, so they stay as written)
+    private class PsUICenterCredits : PsUIHeaderedCanvas
+    {
+        private PsUIGenericButton m_okButton;
+
+        public PsUICenterCredits(UIComponent _parent)
+            : base(_parent, string.Empty)
+        {
+            (GetRoot() as PsUIBasePopup).m_scrollableCanvas.SetDrawHandler(UIDrawHandlers.MenuPopupBackground);
+            SetWidth(0.65f, RelativeTo.ScreenWidth);
+            SetHeight(0.65f, RelativeTo.ScreenHeight);
+            SetVerticalAlign(0.4f);
+            SetMargins(0.0125f, 0.0125f, 0f, 0.0125f);
+            SetDrawHandler(PsUIDrawHandlers.ScrollingUIBackground);
+            m_header.SetDrawHandler(PsUIDrawHandlers.ScrollingUIHeader);
+            m_header.SetMargins(0.0125f, 0.0125f, 0.0125f, 0f);
+            UIHorizontalList headerRow = new UIHorizontalList(m_header, string.Empty);
+            headerRow.RemoveDrawHandler();
+            headerRow.SetSpacing(0.02f, RelativeTo.ScreenHeight);
+            headerRow.SetMargins(0.025f, 0.025f, 0f, 0f);
+            headerRow.SetHorizontalAlign(0.5f);
+            new UIText(headerRow, false, string.Empty, "Credits", "KGSecondChances_Font", 0.055f, RelativeTo.ScreenHeight, "#95e5ff");
+            UIVerticalList list = new UIVerticalList(this, string.Empty);
+            list.RemoveDrawHandler();
+            list.SetWidth(1f, RelativeTo.ParentWidth);
+            list.SetSpacing(0.035f, RelativeTo.ScreenHeight);
+            list.SetVerticalAlign(0.5f);
+            AddCredit(list, "Decompilation by", "DodoNickey");
+            AddCredit(list, "Offline Build and ports by", "BTE");
+            // U+2122 (trademark sign) exists in the Hurme fonts but not in KGSecondChances, so the names are set in HurmeBold
+            AddCredit(list, "Original game by", "Traplight\u2122");
+            UIHorizontalList buttons = new UIHorizontalList(this, string.Empty);
+            buttons.SetHeight(0.1f, RelativeTo.ScreenHeight);
+            buttons.RemoveDrawHandler();
+            buttons.SetVerticalAlign(0f);
+            buttons.SetMargins(0f, 0f, 0.075f, -0.075f);
+            m_okButton = new PsUIGenericButton(buttons);
+            m_okButton.SetText("Ok");
+            m_okButton.SetGreenColors();
+        }
+
+        private static void AddCredit(UIComponent _list, string _role, string _name)
+        {
+            UIVerticalList entry = new UIVerticalList(_list, string.Empty);
+            entry.RemoveDrawHandler();
+            entry.SetSpacing(0.008f, RelativeTo.ScreenHeight);
+            entry.SetHorizontalAlign(0.5f);
+            UIText role = new UIText(entry, false, string.Empty, _role, "KGSecondChances_Font", 0.032f, RelativeTo.ScreenHeight, "#a8e2ff");
+            role.SetHorizontalAlign(0.5f);
+            UIText name = new UIText(entry, false, string.Empty, _name, "HurmeBold_Font", 0.045f, RelativeTo.ScreenHeight, "#ffffff");
+            name.SetHorizontalAlign(0.5f);
+        }
+
+        public override void Step()
+        {
+            if (m_okButton.m_hit || m_exitButton.m_hit)
+            {
+                (GetRoot() as PsUIBasePopup).Destroy();
+            }
+            base.Step();
+        }
+    }
+
     private const string m_font = "KGSecondChances_Font";
 
     private const float m_smallTextSize = 0.03f;
@@ -611,7 +674,7 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
 
     private PsUIBasePopup m_waitingPopup;
 
-    private PsUIGenericButton m_fbButton;
+    private PsUIGenericButton m_creditsButton;
 
     private PsUIGenericButton m_forumButton;
 
@@ -727,16 +790,6 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
         m_palyerNameField = new PsUIPlayerNameField(uIVerticalList);
         m_palyerNameField.SetText(PlayerPrefsX.GetUserName());
         m_palyerNameField.SetCallbacks(ChangeName);
-        m_fbButton = new PsUIGenericButton(uIVerticalList);
-        m_fbButton.SetIcon("menu_icon_facebook", 0.044999998f);
-        if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
-        {
-            m_fbButton.SetText("Connect to Facebook");
-        }
-        else
-        {
-            m_fbButton.SetText("Disconnect from Facebook");
-        }
         UIText uIText5 = new UIText(this, false, string.Empty, "Client version " + TrackedBundleVersion.Current.version, "KGSecondChances_Font", 0.03f, RelativeTo.ParentHeight);
         uIText5.SetMargins(0f, 0.05f, 0f, 0f, RelativeTo.ParentHeight);
         uIText5.SetAlign(1f, 0f);
@@ -749,6 +802,18 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
             m_adminButton.SetAlign(0.015f, 0.05f);
             m_adminButton.SetMargins(0.05f, 0.05f, 0.05f, 0.05f, RelativeTo.ScreenHeight);
         }
+        // same place as the Admin button, on the opposite side
+        m_creditsButton = new PsUIGenericButton(this);
+        m_creditsButton.SetText("Credits", 0.035f);
+        m_creditsButton.SetBlueColors();
+        m_creditsButton.SetHeight(0.075f, RelativeTo.ScreenHeight);
+        m_creditsButton.SetAlign(0.985f, 0.05f);
+        m_creditsButton.SetMargins(0.05f, 0.05f, 0.05f, 0.05f, RelativeTo.ScreenHeight);
+    }
+
+    private void OpenCredits()
+    {
+        new PsUIBasePopup(typeof(PsUICenterCredits), null, null, null, false);
     }
 
     private void OpenAdminPanel()
@@ -814,18 +879,6 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
             PlayerPrefsX.SetEveryplayEnabled(PsState.m_everyplayEnabled);
             EveryplayManager.SetEnabled(PsState.m_everyplayEnabled);
         }
-        else if (m_fbButton.m_hit)
-        {
-            m_waitingPopup = new PsUIBasePopup(typeof(PsUIPopupFacebookWaiting), null, null, null, false);
-            if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
-            {
-                FacebookManager.Login(FacebookLoginDone);
-            }
-            else
-            {
-                FacebookManager.Logout(FacebookLogoutDone, true);
-            }
-        }
         else if (m_forumButton.m_hit)
         {
             Application.OpenURL("http://forum.whatonearthgame.com/");
@@ -834,51 +887,15 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
         {
             OpenAdminPanel();
         }
+        else if (m_creditsButton != null && m_creditsButton.m_hit)
+        {
+            OpenCredits();
+        }
         base.Step();
     }
 
     private void Reset()
     {
         ResetFlow.Start();
-    }
-
-    private void FacebookLoginDone()
-    {
-        Debug.Log("Facebook login done");
-        if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
-        {
-            m_fbButton.SetText("Connect to Facebook");
-        }
-        else
-        {
-            m_fbButton.SetText("Disconnect from Facebook");
-        }
-        m_palyerNameField.UpdateProfileImage();
-        m_fbButton.m_parent.Update();
-        if (m_waitingPopup != null)
-        {
-            m_waitingPopup.Destroy();
-            m_waitingPopup = null;
-        }
-    }
-
-    private void FacebookLogoutDone()
-    {
-        Debug.Log("Facebook logout done");
-        if (string.IsNullOrEmpty(PlayerPrefsX.GetFacebookId()))
-        {
-            m_fbButton.SetText("Connect to Facebook");
-        }
-        else
-        {
-            m_fbButton.SetText("Disconnect from Facebook");
-        }
-        m_palyerNameField.UpdateProfileImage();
-        m_fbButton.m_parent.Update();
-        if (m_waitingPopup != null)
-        {
-            m_waitingPopup.Destroy();
-            m_waitingPopup = null;
-        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TutorialSign : Unit
@@ -50,7 +51,7 @@ public class TutorialSign : Unit
 				}
 				PsState.m_activeMinigame.m_currentSign = this;
 				Debug.Log("START");
-				string text = (m_graphElement as LevelTextNode).m_text;
+				string text = ColorMarkup((m_graphElement as LevelTextNode).m_text);
 				m_bubbleUI = new UIVerticalList(null, "ArrowSign Bubble");
 				m_bubbleUI.SetDrawHandler(BubbleDrawHandler);
 				m_bubbleUI.SetMargins(0.05f, 0.05f, 0.025f, 0.025f);
@@ -68,6 +69,96 @@ public class TutorialSign : Unit
 			}
 			m_collidingCount--;
 			break;
+		}
+	}
+
+	// Colours for the text of a sign. Besides the <color=#rrggbb>...</color> tags the text boxes already understand, a sign can use
+	//   [red]text[/red]   [#ff8800]text[/]   [green]text[/]
+	// (names: red, orange, yellow, green, cyan, blue, purple, pink, white, grey). "[/]" or "[/name]" ends the colour.
+	private static string ColorMarkup(string _text)
+	{
+		if (string.IsNullOrEmpty(_text) || _text.IndexOf('[') < 0)
+		{
+			return _text;
+		}
+		System.Text.StringBuilder sb = new System.Text.StringBuilder(_text.Length + 32);
+		int open = 0;
+		int i = 0;
+		while (i < _text.Length)
+		{
+			char c = _text[i];
+			if (c == '[')
+			{
+				int end = _text.IndexOf(']', i + 1);
+				if (end > i)
+				{
+					string tag = _text.Substring(i + 1, end - i - 1);
+					if (tag.StartsWith("/") && (tag.Length == 1 || SignColor(tag.Substring(1)) != null) && open > 0)
+					{
+						sb.Append("</color>");
+						open--;
+						i = end + 1;
+						continue;
+					}
+					string hex = SignColor(tag);
+					if (hex != null)
+					{
+						sb.Append("<color=#").Append(hex).Append('>');
+						open++;
+						i = end + 1;
+						continue;
+					}
+				}
+			}
+			sb.Append(c);
+			i++;
+		}
+		while (open-- > 0)
+		{
+			sb.Append("</color>");
+		}
+		return sb.ToString();
+	}
+
+	private static string SignColor(string _name)
+	{
+		string n = _name.Trim().ToLower();
+		if (n.StartsWith("#") && (n.Length == 7 || n.Length == 4))
+		{
+			for (int k = 1; k < n.Length; k++)
+			{
+				if (!Uri.IsHexDigit(n[k]))
+				{
+					return null;
+				}
+			}
+			return n.Substring(1);
+		}
+		switch (n)
+		{
+		case "red":
+			return "ff4d4d";
+		case "orange":
+			return "ffa11a";
+		case "yellow":
+			return "fbdd28";
+		case "green":
+			return "2efe9a";
+		case "cyan":
+			return "46fff1";
+		case "blue":
+			return "2aaded";
+		case "purple":
+			return "a56bff";
+		case "pink":
+			return "f15bfb";
+		case "white":
+			return "ffffff";
+		case "grey":
+		case "gray":
+			return "a8a8a8";
+		default:
+			return null;
 		}
 	}
 
