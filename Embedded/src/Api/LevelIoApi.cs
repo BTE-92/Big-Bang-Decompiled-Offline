@@ -15,7 +15,18 @@ namespace BBR249Server.Api;
 // Contenu du zip : <id>/metadata (JSON), <id>/levelData (octets du niveau), <id>/screenshot, <id>/ghost (facultatifs).
 public static class LevelIoApi
 {
-	private const int MaxZipBytes = 32 * 1024 * 1024;
+	// A level with its screenshot and ghost is well under a megabyte. The limits below keep a wrong or hostile file from using up memory:
+	// the whole zip, the number of entries, and what each entry may decompress to (checked while reading, not only from the size the
+	// zip claims, since a zip can lie about it).
+	private const int MaxZipBytes = 8 * 1024 * 1024;
+
+	private const int MaxEntries = 16;
+
+	private const int MaxMetaBytes = 256 * 1024;
+
+	private const int MaxLevelBytes = 6 * 1024 * 1024;
+
+	private const int MaxImageBytes = 3 * 1024 * 1024;
 
 	private static JsonNode ParseOr(string json, JsonNode fallback)
 	{
@@ -40,17 +51,30 @@ public static class LevelIoApi
 		stream.Write(data, 0, data.Length);
 	}
 
-	private static byte[]? ReadEntry(ZipArchive zip, string name)
+	private static byte[]? ReadEntry(ZipArchive zip, string name, int maxBytes)
 	{
 		foreach (ZipArchiveEntry entry in zip.Entries)
 		{
-			if (!string.Equals(entry.Name, name, StringComparison.Ordinal) || entry.Length > MaxZipBytes)
+			if (!string.Equals(entry.Name, name, StringComparison.Ordinal))
 			{
 				continue;
 			}
+			if (entry.Length > maxBytes)
+			{
+				throw new InvalidDataException("entry too large: " + name);
+			}
 			using Stream stream = entry.Open();
 			using MemoryStream ms = new MemoryStream();
-			stream.CopyTo(ms);
+			byte[] buffer = new byte[64 * 1024];
+			int read;
+			while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+			{
+				if (ms.Length + read > maxBytes)
+				{
+					throw new InvalidDataException("entry too large: " + name);
+				}
+				ms.Write(buffer, 0, read);
+			}
 			return ms.ToArray();
 		}
 		return null;
@@ -101,9 +125,15 @@ public static class LevelIoApi
 		});
 		Router.Map("/v1/minigame/import", async delegate(Ctx c)
 		{
-			if (c.PlayerId == "" || c.Body.Length < 22 || c.Body.Length > MaxZipBytes)
+			if (c.PlayerId == "" || c.Body.Length < 22)
 			{
 				await c.JsonText("{\"ok\":false,\"reason\":\"invalid\"}");
+				return;
+			}
+			if (c.Body.Length > MaxZipBytes)
+			{
+				Console.WriteLine($"[Import] refused: {c.Body.Length} bytes is too big for a level");
+				await c.JsonText("{\"ok\":false,\"reason\":\"toolarge\"}");
 				return;
 			}
 			byte[]? metaBytes;
@@ -113,13 +143,18 @@ public static class LevelIoApi
 			try
 			{
 				using ZipArchive zip = new ZipArchive(new MemoryStream(c.Body), ZipArchiveMode.Read);
-				metaBytes = ReadEntry(zip, "metadata");
-				levelData = ReadEntry(zip, "levelData");
-				screenshot = ReadEntry(zip, "screenshot");
-				ghost = ReadEntry(zip, "ghost");
+				if (zip.Entries.Count > MaxEntries)
+				{
+					throw new InvalidDataException("too many entries");
+				}
+				metaBytes = ReadEntry(zip, "metadata", MaxMetaBytes);
+				levelData = ReadEntry(zip, "levelData", MaxLevelBytes);
+				screenshot = ReadEntry(zip, "screenshot", MaxImageBytes);
+				ghost = ReadEntry(zip, "ghost", MaxImageBytes);
 			}
-			catch
+			catch (Exception ex)
 			{
+				Console.WriteLine("[Import] refused: " + ex.Message);
 				await c.JsonText("{\"ok\":false,\"reason\":\"invalid\"}");
 				return;
 			}

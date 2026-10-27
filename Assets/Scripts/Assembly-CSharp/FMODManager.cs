@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using FMOD;
 using FMOD.Studio;
 using UnityEngine;
@@ -10,8 +11,17 @@ public static class FMODManager
 
     public static Bus m_bus;
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+    // Resumes FMOD's browser AudioContext from the first user gesture (Assets/Plugins/WebGL/BBRWebGL.jslib).
+    [DllImport("__Internal")]
+    private static extern void FMOD_InstallAudioUnlock();
+#endif
+
     public static void Initialize()
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        FMOD_InstallAudioUnlock();
+#endif
         m_system = FMOD_StudioSystem.instance;
         ERRCHECK(m_system.System.getBus("bus:/", out m_bus));
         ERRCHECK(m_system.System.getLowLevelSystem(out m_lowLevelSystem));

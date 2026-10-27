@@ -92,7 +92,11 @@ public static class WindowsPicker
             {
                 string path = Marshal.PtrToStringUni(file);
                 FileInfo info = new FileInfo(path);
-                if (info.Exists && info.Length > 0 && info.Length <= 32L * 1024L * 1024L)
+                if (info.Exists && info.Length > LevelTransfer.MaxImportBytes)
+                {
+                    status = "toolarge";
+                }
+                else if (info.Exists && info.Length > 0)
                 {
                     File.Copy(path, Path.Combine(cacheDir, "picked.tmp"), true);
                     string zip = Path.Combine(cacheDir, "picked.zip");

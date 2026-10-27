@@ -19,6 +19,9 @@ public static class Settings
 	// niveau puzzle sur la carte (--no-puzzle pour le retirer)
 	public static bool PuzzleMission = true;
 
+	// courses "Versus" contre BTE sur la carte (--no-versus-nodes pour les retirer)
+	public static bool VersusNodes = true;
+
 	// section de la carte qui recoit le puzzle ("" = automatique : voir MapContent ; --puzzle-section=NOM pour en imposer une)
 	public static string PuzzleSection = "";
 

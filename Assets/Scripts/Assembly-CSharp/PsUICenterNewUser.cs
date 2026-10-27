@@ -156,6 +156,9 @@ public class PsUICenterNewUser : UICanvas
 		}
 		if (_name.Equals(PlayerPrefsX.GetUserName()))
 		{
+			// same name as the one already stored (the field starts with it): nothing to send, but the caller still has to go on
+			// (Done! used to do nothing here, which left the player stuck on the name screen)
+			customCallBack();
 			return;
 		}
 		PlayerPrefsX.SetUserName(_name);

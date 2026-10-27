@@ -1,4 +1,36 @@
 mergeInto(LibraryManager.library, {
+    // Browsers keep an AudioContext "suspended" until it is resumed from a user gesture. FMOD's WebGL runtime creates its own context
+    // (window.context) at start-up, before any click, and never resumes it, so the game is silent. FMODManager.Initialize() calls this
+    // once; it resumes FMOD's context from the first click / touch / key press, with no button or prompt (same fix as WhatOnEarth).
+    FMOD_InstallAudioUnlock: function () {
+        if (window.__fmodAudioUnlockInstalled) {
+            return;
+        }
+        window.__fmodAudioUnlockInstalled = true;
+        var events = ['pointerdown', 'pointerup', 'mousedown', 'touchstart', 'touchend', 'click', 'keydown'];
+        var unlock = function () {
+            var ctx = window.context;
+            if (!ctx) {
+                return;
+            }
+            if (ctx.state === 'suspended') {
+                try {
+                    var p = ctx.resume();
+                    if (p && p.catch) {
+                        p.catch(function () {});
+                    }
+                } catch (e) {}
+            } else if (ctx.state === 'running') {
+                events.forEach(function (name) {
+                    document.removeEventListener(name, unlock, true);
+                });
+            }
+        };
+        events.forEach(function (name) {
+            document.addEventListener(name, unlock, true);
+        });
+    },
+
     // Writes the in-memory file system (the offline server's database under persistentDataPath) to IndexedDB.
     BBR_SyncFileSystem: function () {
         try {
@@ -13,7 +45,7 @@ mergeInto(LibraryManager.library, {
     // Opens the browser's file picker and hands the chosen file back to Unity as "<name>|<base64>" with SendMessage(go, okMethod, ...).
     // A file dialog needs a fresh user gesture: when Unity asks for it a few frames after the tap, browsers that expose
     // navigator.userActivation tell whether the tap is still fresh; if not, the picker opens on the player's next tap/key and 1 is returned.
-    BBR_PickFile: function (goPtr, okPtr, failPtr, acceptPtr) {
+    BBR_PickFile: function (goPtr, okPtr, failPtr, acceptPtr, maxBytes) {
         var str = (typeof UTF8ToString !== 'undefined') ? UTF8ToString : Pointer_stringify;
         var go = str(goPtr), ok = str(okPtr), fail = str(failPtr), accept = str(acceptPtr);
         var send = function (method, value) {
@@ -29,6 +61,8 @@ mergeInto(LibraryManager.library, {
             input.addEventListener('change', function () {
                 var f = input.files && input.files[0];
                 if (!f) { send(fail, 'cancel'); cleanup(); return; }
+                // too big to be a level: never read it into memory (a 100 MB file would be encoded as a 130 MB string)
+                if (maxBytes > 0 && f.size > maxBytes) { send(fail, 'toolarge'); cleanup(); return; }
                 var reader = new FileReader();
                 reader.onload = function () {
                     var bytes = new Uint8Array(reader.result);

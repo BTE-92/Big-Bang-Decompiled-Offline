@@ -318,7 +318,7 @@ public static class UnlockBuilder
 		}
 	}
 
-	public static int FixStoredSignalNodes(JsonArray? nodes)
+	public static int FixStoredSignalNodes(JsonArray? nodes, long currentNode = 1)
 	{
 		if (nodes == null)
 		{
@@ -340,50 +340,39 @@ public static class UnlockBuilder
 				continue;
 			}
 			string pName = any["unlockedProgression"]?.ToString() ?? "";
-			bool isSignal = (any["context"]?.ToString() ?? "") == "Signal";
-			if (TvSequenceNames.TryGetValue(pName, out string? renamed) && (pName != "unlock_begin" || isSignal))
+			if (TvSequenceNames.TryGetValue(pName, out string? renamed))
 			{
 				any["unlockedProgression"] = renamed;
 				num++;
 			}
 			string wName = any["willUnlockProgression"]?.ToString() ?? "";
-			if (wName != "unlock_begin" && TvSequenceNames.TryGetValue(wName, out string? wRenamed))
+			if (TvSequenceNames.TryGetValue(wName, out string? wRenamed))
 			{
 				any["willUnlockProgression"] = wRenamed;
 			}
 		}
-		// L'introduction (noeud Signal "unlock_start") ne marque plus la section "unlock_begin" comme passee : c'est le coffre de depart
-		// (juste avant) qui doit porter ce nom, sinon le jeu repartirait du debut au bout du chemin.
-		int introId = int.MaxValue;
-		bool hasBegin = false;
+		// The first section is called "unlock_start" again: the game plays the introduction by itself when a player has no path, and
+		// treats a player as new when no checkpoint at or before their current block carries that name. An old starter path (levels,
+		// chest, introduction last) names its chest after the next section: its chest, the first checkpoint, takes the name.
+		JsonNode? firstCheckpoint = null;
 		foreach (JsonNode item in nodes)
 		{
-			string nm = item?["data"]?["unlockedProgression"]?.ToString() ?? "";
-			int nid = (int)AsLongLocal(item?["id"]);
-			if (nm == "unlock_begin")
+			string c = item?["data"]?["context"]?.ToString() ?? "";
+			if ((c == "Block" || c == "Signal") && (firstCheckpoint == null || AsLongLocal(item["id"]) < AsLongLocal(firstCheckpoint["id"])))
 			{
-				hasBegin = true;
-			}
-			else if (nm == "unlock_start" && (item?["data"]?["context"]?.ToString() ?? "") == "Signal" && nid < introId)
-			{
-				introId = nid;
+				firstCheckpoint = item;
 			}
 		}
-		if (!hasBegin && introId != int.MaxValue)
+		if (firstCheckpoint?["data"] is JsonObject firstData && (firstData["context"]?.ToString() ?? "") == "Block" && (firstData["unlockedProgression"]?.ToString() ?? "") == "unlock_car")
 		{
-			JsonNode? chest = null;
 			foreach (JsonNode item in nodes)
 			{
-				int nid = (int)AsLongLocal(item?["id"]);
-				if (nid < introId && (item?["data"]?["context"]?.ToString() ?? "") == "Block" && (item["data"]["unlockedProgression"]?.ToString() ?? "") == "unlock_car" && (chest == null || nid > (int)AsLongLocal(chest["id"])))
+				if ((item?["data"]?["context"]?.ToString() ?? "") == "Signal" && (item["data"]["unlockedProgression"]?.ToString() ?? "") == "unlock_start" && AsLongLocal(item["id"]) > AsLongLocal(firstCheckpoint["id"]))
 				{
-					chest = item;
+					firstData["unlockedProgression"] = "unlock_start";
+					num++;
+					break;
 				}
-			}
-			if (chest?["data"] is JsonObject chestData)
-			{
-				chestData["unlockedProgression"] = "unlock_begin";
-				num++;
 			}
 		}
 		foreach (JsonNode item in nodes)
@@ -420,6 +409,62 @@ public static class UnlockBuilder
 						}
 						num++;
 					}
+				}
+			}
+		}
+		// Cases deja enregistrees (le client ne les relit pas dans le graphe) : silhouette de l'objet debloque par une case
+		// television, et dialogue de debut de section sur la case qui ferme la section precedente (tant qu'elle n'est pas passee).
+		foreach (JsonNode item in nodes)
+		{
+			if (!(item?["data"] is JsonObject d))
+			{
+				continue;
+			}
+			string ctx = d["context"]?.ToString() ?? "";
+			if (ctx != "Block" && ctx != "Signal")
+			{
+				continue;
+			}
+			string section = d["unlockedProgression"]?.ToString() ?? "";
+			if ((d["blockType"]?.ToString() ?? "") == "Antenna" && (d["blockRewardCue"]?.ToString() ?? "") == "")
+			{
+				d["blockRewardCue"] = NewItemTitle;
+				num++;
+			}
+			if (ctx == "Signal" && (d["blockType"]?.ToString() ?? "") == "Antenna" && (d["willUnlockProgression"]?.ToString() ?? "") == "")
+			{
+				string will = WillUnlockOf(section);
+				if (will != "")
+				{
+					d["willUnlockProgression"] = will;
+					num++;
+				}
+			}
+			string claim = (section == "unlock_begin" || section == "unlock_start") ? "" : ClaimDialogueOf(section);
+			if (claim != "" && AsLongLocal(item["id"]) >= currentNode)
+			{
+				JsonArray idents = d["dialogueIdentifiers"] as JsonArray;
+				JsonArray trigs = d["dialogueTriggers"] as JsonArray;
+				if (idents == null || trigs == null || idents.Count != trigs.Count)
+				{
+					idents = new JsonArray();
+					trigs = new JsonArray();
+					d["dialogueIdentifiers"] = idents;
+					d["dialogueTriggers"] = trigs;
+				}
+				bool has = false;
+				foreach (JsonNode? t in trigs)
+				{
+					if (t?.ToString() == "LoopClaimed")
+					{
+						has = true;
+					}
+				}
+				if (!has)
+				{
+					idents.Add(claim);
+					trigs.Add("LoopClaimed");
+					num++;
 				}
 			}
 		}
@@ -559,16 +604,30 @@ public static class UnlockBuilder
 			return 0;
 		}
 		int? num = null;
+		// The very first section ("unlock_start", the introduction) is flagged when the game generates a new path, before the
+		// first "new items" screen: linking the items there makes them all available without cluttering that screen with them.
 		foreach (JsonNode item in jsonArray)
 		{
-			if (!(item?["data"]?["nodeType"]?.ToString() != "Unlock"))
+			if ((item?["data"]?["nodeType"]?.ToString() ?? "") == "Unlock" && (item["data"]["itemClass"]?.ToString() ?? "") == "unlock_start")
 			{
-				string text = item["data"]["itemClass"]?.ToString() ?? "";
-				if (!(text == ""))
+				num = item["id"].GetValue<int>();
+				_firstUnlockName = "unlock_start";
+				break;
+			}
+		}
+		if (!num.HasValue)
+		{
+			foreach (JsonNode item in jsonArray)
+			{
+				if (!(item?["data"]?["nodeType"]?.ToString() != "Unlock"))
 				{
-					num = item["id"].GetValue<int>();
-					_firstUnlockName = text;
-					break;
+					string text = item["data"]["itemClass"]?.ToString() ?? "";
+					if (!(text == ""))
+					{
+						num = item["id"].GetValue<int>();
+						_firstUnlockName = text;
+						break;
+					}
 				}
 			}
 		}
@@ -605,6 +664,432 @@ public static class UnlockBuilder
 		return num2;
 	}
 
+	// ---- Silhouette des cases "antenne / television" et dialogues de section ------------------------------------------------
+	// Le client 2.4.9 affiche sur chaque case television de la carte (PsUICheckpointBanner) l'objet que la case va debloquer, en
+	// silhouette noire sur le disque vert ("menu_cp_image_signal"). Il le lit dans l'Unlock vers lequel la case a un lien SORTANT
+	// dans le graphe (PsMetagameData.AddUnlocks : sortie de type Unlock = "blockWillUnlock") : on prend la premiere icone de cet
+	// Unlock (PsUnlock.m_unlockables). Les donnees recreees n'ont aucun de ces liens : le disque vert restait vide.
+	// title shown on the sign of a television checkpoint (blockRewardCue)
+	public const string NewItemTitle = "New item";
+
+	private static readonly Dictionary<string, string> WillUnlockBySection = new Dictionary<string, string>();
+
+	// Dialogues de debut de section : dans les donnees recreees ils sont branches sur le bloc "Unlock" avec le declencheur "Manual",
+	// que le client 2.4.9 ne joue jamais (seuls LoopStart, LoopClaimed... d'un noeud du chemin declenchent un dialogue).
+	private static readonly Dictionary<string, string> ClaimDialogueBySection = new Dictionary<string, string>();
+
+	public static string WillUnlockOf(string section)
+	{
+		return WillUnlockBySection.TryGetValue(section ?? "", out string? v) ? v : "";
+	}
+
+	public static string ClaimDialogueOf(string section)
+	{
+		return ClaimDialogueBySection.TryGetValue(section ?? "", out string? v) ? v : "";
+	}
+
+	private sealed class GraphIndex
+	{
+		public readonly Dictionary<int, JsonNode> ById = new Dictionary<int, JsonNode>();
+		public readonly Dictionary<int, List<int>> Out = new Dictionary<int, List<int>>();
+		public readonly Dictionary<int, List<int>> In = new Dictionary<int, List<int>>();
+
+		public GraphIndex(JsonArray nodes, JsonArray edges)
+		{
+			foreach (JsonNode n in nodes)
+			{
+				int id = n["id"].GetValue<int>();
+				ById[id] = n;
+				Out[id] = new List<int>();
+				In[id] = new List<int>();
+			}
+			foreach (JsonNode e in edges)
+			{
+				int s = e["source"].GetValue<int>();
+				int t = e["target"].GetValue<int>();
+				if (ById.ContainsKey(s) && ById.ContainsKey(t))
+				{
+					Out[s].Add(t);
+					In[t].Add(s);
+				}
+			}
+		}
+
+		public string Type(int id)
+		{
+			return ById[id]["data"]?["nodeType"]?.ToString() ?? "";
+		}
+
+		public string Text(int id, string key)
+		{
+			return ById[id]["data"]?[key]?.ToString() ?? "";
+		}
+	}
+
+	// Noeuds d'une section dans l'ordre du chemin, comme le client les lit (PsMetagameData.AddUnlocks) : chaque sortie Level /
+	// EditorPuzzle / Signal du bloc Unlock demarre une chaine, la derniere sortie de chemin de chaque noeud donne le suivant.
+	private static List<int> SectionNodes(GraphIndex g, int unlockId)
+	{
+		List<int> chain = new List<int>();
+		foreach (int o in g.Out[unlockId])
+		{
+			string t = g.Type(o);
+			if (t != "Level" && t != "EditorPuzzle" && t != "Signal")
+			{
+				continue;
+			}
+			int cur = o;
+			for (int guard = 0; cur >= 0 && guard < 500; guard++)
+			{
+				chain.Add(cur);
+				int next = -1;
+				foreach (int o2 in g.Out[cur])
+				{
+					string t2 = g.Type(o2);
+					if (t2 == "Level" || t2 == "EditorPuzzle" || t2 == "VersusRace" || t2 == "LevelTemplate" || t2 == "Block" || t2 == "Signal")
+					{
+						next = o2;
+					}
+				}
+				cur = next;
+			}
+		}
+		return chain;
+	}
+
+	private static int NextUnlockOf(GraphIndex g, int unlockId)
+	{
+		int next = -1;
+		foreach (int o in g.Out[unlockId])
+		{
+			if (g.Type(o) == "Unlock")
+			{
+				next = o;
+			}
+		}
+		return next;
+	}
+
+	// Premiere icone d'objet de l'Unlock, dans l'ordre des liens entrants (c'est celle que le client affiche).
+	private static string FirstUnlockableIcon(GraphIndex g, int unlockId)
+	{
+		foreach (int i in g.In[unlockId])
+		{
+			if (ItemTypes.Contains(g.Type(i)))
+			{
+				string icon = g.Text(i, "itemIcon");
+				if (icon != "")
+				{
+					return icon;
+				}
+			}
+		}
+		return "";
+	}
+
+	// "item_dome_empty_icon" est l'icone de secours donnee aux objets sans image (FixDevItemData) : en silhouette elle ne montre rien.
+	private static bool IsRealIcon(string icon)
+	{
+		return icon != "" && icon != "item_dome_empty_icon";
+	}
+
+	public static int AddWillUnlockEdges(JsonObject graph)
+	{
+		WillUnlockBySection.Clear();
+		if (!(graph["nodes"] is JsonArray nodes) || !(graph["edges"] is JsonArray edges))
+		{
+			return 0;
+		}
+		GraphIndex g = new GraphIndex(nodes, edges);
+		int added = 0;
+		foreach (int unlockId in g.ById.Keys.ToList())
+		{
+			if (g.Type(unlockId) != "Unlock")
+			{
+				continue;
+			}
+			string section = g.Text(unlockId, "itemClass");
+			foreach (int nodeId in SectionNodes(g, unlockId))
+			{
+				bool antenna = g.Type(nodeId) == "Signal" || (g.Type(nodeId) == "Block" && g.Text(nodeId, "blockType") == "Antenna");
+				if (!antenna)
+				{
+					continue;
+				}
+				// the title of the sign (the game upper-cases it): "NEW ITEM". Only a "Block" node can carry it in the graph; television checkpoints
+				// of type "Signal" get it in the saved path (FixStoredSignalNodes)
+				if (g.Type(nodeId) == "Block" && g.ById[nodeId]["data"] is JsonObject antennaData && (antennaData["blockRewardCue"]?.ToString() ?? "") == "")
+				{
+					antennaData["blockRewardCue"] = NewItemTitle;
+				}
+				// l'objet debloque = premier Unlock suivant (dans l'ordre du chemin) dont la premiere icone est une vraie image
+				int target = NextUnlockOf(g, unlockId);
+				for (int guard = 0; target >= 0 && guard < 60 && !IsRealIcon(FirstUnlockableIcon(g, target)); guard++)
+				{
+					target = NextUnlockOf(g, target);
+				}
+				if (target < 0 || !IsRealIcon(FirstUnlockableIcon(g, target)))
+				{
+					continue;
+				}
+				if (!g.Out[nodeId].Contains(target))
+				{
+					edges.Add(new JsonObject { ["target"] = target, ["source"] = nodeId });
+					g.Out[nodeId].Add(target);
+					g.In[target].Add(nodeId);
+					added++;
+				}
+				string targetName = g.Text(target, "itemClass");
+				if (section != "" && !WillUnlockBySection.ContainsKey(section))
+				{
+					WillUnlockBySection[section] = targetName;
+					// la premiere section porte le nom "unlock_begin" quand l'introduction est desactivee, mais ses noeuds television
+					// s'appellent "unlock_start" dans le chemin enregistre
+					if (section == "unlock_begin" && !WillUnlockBySection.ContainsKey("unlock_start"))
+					{
+						WillUnlockBySection["unlock_start"] = targetName;
+					}
+				}
+			}
+		}
+		return added;
+	}
+
+	// Texte de travail laisse par les auteurs ("WIP: ...", "NOTE: ...") : pas pour les joueurs.
+	private static bool IsPlaceholderText(string text)
+	{
+		string t = (text ?? "").TrimStart();
+		return t.StartsWith("WIP", System.StringComparison.OrdinalIgnoreCase) || t.StartsWith("NOTE", System.StringComparison.OrdinalIgnoreCase);
+	}
+
+	// Les dialogues "Manual" branches sur un bloc Unlock sont rejoues par le client quand la case qui FERME la section precedente
+	// est reclamee (declencheur LoopClaimed), comme la chaine "unlock_garage_tease_dialogue" / "unlock_editor_signal_1" du graphe.
+	public static int WireSectionDialogues(JsonObject graph)
+	{
+		ClaimDialogueBySection.Clear();
+		if (!(graph["nodes"] is JsonArray nodes) || !(graph["edges"] is JsonArray edges))
+		{
+			return 0;
+		}
+		GraphIndex g = new GraphIndex(nodes, edges);
+		int wired = 0;
+		foreach (int unlockId in g.ById.Keys.ToList())
+		{
+			if (g.Type(unlockId) != "Unlock")
+			{
+				continue;
+			}
+			int prev = -1;
+			foreach (int i in g.In[unlockId])
+			{
+				if (g.Type(i) == "Unlock")
+				{
+					prev = i;
+					break;
+				}
+			}
+			if (prev < 0)
+			{
+				continue;
+			}
+			List<int> chain = SectionNodes(g, prev);
+			if (chain.Count == 0)
+			{
+				continue;
+			}
+			int last = chain[chain.Count - 1];
+			if (g.Type(last) != "Block" && g.Type(last) != "Signal")
+			{
+				continue;
+			}
+			foreach (int d in g.In[unlockId].ToList())
+			{
+				// seules les tetes de chaine de dialogue (les suites sont lues avec elle)
+				if (g.Type(d) != "Dialogue" || g.In[d].Count > 0 || g.Text(d, "dialogueTrigger") != "Manual" || !(g.ById[d]["data"] is JsonObject data))
+				{
+					continue;
+				}
+				if (IsPlaceholderText(g.Text(d, "dialogueText")))
+				{
+					continue;
+				}
+				bool taken = false;
+				foreach (int x in g.In[last])
+				{
+					if (g.Type(x) == "Dialogue" && g.Text(x, "dialogueTrigger") == "LoopClaimed")
+					{
+						taken = true;
+					}
+				}
+				if (taken || g.Out[d].Contains(last))
+				{
+					continue;
+				}
+				data["dialogueTrigger"] = "LoopClaimed";
+				edges.Add(new JsonObject { ["target"] = last, ["source"] = d });
+				g.Out[d].Add(last);
+				g.In[last].Add(d);
+				// les suites "WIP" / "NOTE" d'une chaine ne sont pas jouees : on coupe la chaine avant elles
+				int cur = d;
+				for (int guard = 0; guard < 50; guard++)
+				{
+					int step = -1;
+					foreach (int o in g.Out[cur])
+					{
+						if (g.Type(o) == "Dialogue")
+						{
+							step = o;
+							break;
+						}
+					}
+					if (step < 0)
+					{
+						break;
+					}
+					if (IsPlaceholderText(g.Text(step, "dialogueText")))
+					{
+						for (int k = edges.Count - 1; k >= 0; k--)
+						{
+							if (edges[k]["source"].GetValue<int>() == cur && edges[k]["target"].GetValue<int>() == step)
+							{
+								edges.RemoveAt(k);
+							}
+						}
+						g.Out[cur].Remove(step);
+						g.In[step].Remove(cur);
+						break;
+					}
+					cur = step;
+				}
+				string section = g.Text(prev, "itemClass");
+				if (section != "" && !ClaimDialogueBySection.ContainsKey(section))
+				{
+					ClaimDialogueBySection[section] = g.Text(d, "dialogueIdentifier");
+				}
+				wired++;
+			}
+		}
+		return wired;
+	}
+
+	// The recreated map has some televisions twice: an "Antenna" checkpoint with stars (0 / 6) followed, with no level in between, by a "Signal"
+	// checkpoint of its own section with no star requirement (0 / 0) that shows the same item. The real game has one television per item.
+	// The lone one is dropped from the map (the section stays, empty, so the chain of sections is unchanged); the dialogue that was hooked
+	// on it continues the dialogue of the checkpoint before it, so nothing is lost. Run after WireSectionDialogues.
+	public static int RemoveLoneTvSections(JsonObject graph)
+	{
+		if (!(graph["nodes"] is JsonArray nodes) || !(graph["edges"] is JsonArray edges))
+		{
+			return 0;
+		}
+		GraphIndex g = new GraphIndex(nodes, edges);
+		HashSet<int> drop = new HashSet<int>();
+		foreach (int unlockId in g.ById.Keys.ToList())
+		{
+			if (g.Type(unlockId) != "Unlock")
+			{
+				continue;
+			}
+			List<int> chain = SectionNodes(g, unlockId);
+			if (chain.Count != 1 || g.Type(chain[0]) != "Signal")
+			{
+				continue;
+			}
+			int prev = -1;
+			foreach (int i in g.In[unlockId])
+			{
+				if (g.Type(i) == "Unlock")
+				{
+					prev = i;
+					break;
+				}
+			}
+			if (prev < 0)
+			{
+				continue;
+			}
+			List<int> before = SectionNodes(g, prev);
+			if (before.Count == 0)
+			{
+				continue;
+			}
+			int last = before[before.Count - 1];
+			if (!(g.Type(last) == "Signal" || (g.Type(last) == "Block" && g.Text(last, "blockType") == "Antenna")))
+			{
+				continue;
+			}
+			int lone = chain[0];
+			foreach (int d in g.In[lone].ToList())
+			{
+				if (g.Type(d) != "Dialogue" || g.Text(d, "dialogueTrigger") != "LoopClaimed" || !(g.ById[d]["data"] is JsonObject dData))
+				{
+					continue;
+				}
+				int head = -1;
+				foreach (int x in g.In[last])
+				{
+					if (g.Type(x) == "Dialogue" && g.Text(x, "dialogueTrigger") == "LoopClaimed")
+					{
+						head = x;
+					}
+				}
+				if (head < 0)
+				{
+					edges.Add(new JsonObject { ["target"] = last, ["source"] = d });
+					g.Out[d].Add(last);
+					g.In[last].Add(d);
+					continue;
+				}
+				int tail = head;
+				for (int guard = 0; guard < 50; guard++)
+				{
+					int next = -1;
+					foreach (int o in g.Out[tail])
+					{
+						if (g.Type(o) == "Dialogue")
+						{
+							next = o;
+							break;
+						}
+					}
+					if (next < 0 || next == d)
+					{
+						break;
+					}
+					tail = next;
+				}
+				if (tail == d)
+				{
+					continue;
+				}
+				dData["dialogueTrigger"] = "Manual";
+				edges.Add(new JsonObject { ["target"] = d, ["source"] = tail });
+				g.Out[tail].Add(d);
+				g.In[d].Add(tail);
+			}
+			drop.Add(lone);
+		}
+		if (drop.Count == 0)
+		{
+			return 0;
+		}
+		for (int i = edges.Count - 1; i >= 0; i--)
+		{
+			if (drop.Contains(edges[i]["source"].GetValue<int>()) || drop.Contains(edges[i]["target"].GetValue<int>()))
+			{
+				edges.RemoveAt(i);
+			}
+		}
+		for (int i = nodes.Count - 1; i >= 0; i--)
+		{
+			if (drop.Contains(nodes[i]["id"].GetValue<int>()))
+			{
+				nodes.RemoveAt(i);
+			}
+		}
+		return drop.Count;
+	}
+
 	private static JsonObject LevelNode(int id, int levelNumber)
 	{
 		return new JsonObject
@@ -627,45 +1112,73 @@ public static class UnlockBuilder
 	public static JsonObject SyntheticMainPath()
 	{
 		JsonObject path = SyntheticMainPathBase();
-		// joueur neuf : le puzzle est le 2e noeud (niveau 1, puzzle, niveau 2, niveau 3, coffre) ; les numeros de niveau suivent
-		if (Settings.PuzzleMission && Settings.PuzzleSection == "" && path["nodes"] is JsonArray nodes && nodes.Count == 4)
+		if (!(path["nodes"] is JsonArray nodes) || nodes.Count != 4)
 		{
-			nodes.Insert(1, MapContent.PuzzleNode(2, 2));
-			nodes[2]["id"] = 3;
-			nodes[2]["levelNumber"] = 3;
-			nodes[3]["id"] = 4;
-			nodes[3]["levelNumber"] = 4;
-			nodes[4]["id"] = 5;
+			return path;
 		}
-		// Le premier noeud television (l'introduction) est fourni DEJA enregistre sous son nom de sequence ("unlock_start") :
-		// si le jeu le creait lui-meme, il lui donnerait le nom de la section ("unlock_begin") et la sequence serait un ecran gris.
-		if (path["nodes"] is JsonArray all && all.Count >= 4)
+		// Comme dans le jeu d'origine, la premiere case d'un nouveau chemin est la television d'introduction ("Big Bang Racing TV",
+		// section "unlock_start") : les niveaux et le coffre de depart viennent apres.
+		nodes.Insert(0, IntroNode());
+		// joueur neuf : le puzzle suit le premier niveau (introduction, niveau 1, puzzle, niveau 2, niveau 3, coffre)
+		if (Settings.PuzzleMission && Settings.PuzzleSection == "")
 		{
-			all.Add(new JsonObject
-			{
-				["id"] = all.Count + 1,
-				["levelNumber"] = -1,
-				["score"] = 0,
-				["rented"] = true,
-				["data"] = new JsonObject
-				{
-					["context"] = "Signal",
-					["requiredStars"] = 0,
-					["unlocked"] = false,
-					["minigameId"] = "5549c475310000f82c7490fb",
-					["unlockedProgression"] = "unlock_start",
-					["willUnlockProgression"] = "",
-					["blockCoins"] = 0,
-					["blockDiamonds"] = 0,
-					["blockKeys"] = 0,
-					["blockBolts"] = 0,
-					["blockType"] = "Antenna",
-					["dialogueIdentifiers"] = new JsonArray("unlock_1_quest_2"),
-					["dialogueTriggers"] = new JsonArray("LoopClaimed")
-				}
-			});
+			nodes.Insert(2, MapContent.PuzzleNode(0, 0));
 		}
+		RenumberPath(nodes);
 		return path;
+	}
+
+	// Le noeud television d'introduction est fourni DEJA enregistre sous son nom de sequence ("unlock_start") : si le jeu le creait
+	// lui-meme, il lui donnerait le nom de la section ("unlock_begin") et la sequence serait un ecran gris. Il porte aussi le lien
+	// "va debloquer" vers l'objet de la section suivante (le vehicule, en silhouette noire sur le disque vert de la case).
+	private static JsonObject IntroNode()
+	{
+		string will = WillUnlockOf("unlock_start");
+		return new JsonObject
+		{
+			["id"] = 1,
+			["levelNumber"] = -1,
+			["score"] = 0,
+			["rented"] = true,
+			["data"] = new JsonObject
+			{
+				["context"] = "Signal",
+				["requiredStars"] = 0,
+				["unlocked"] = false,
+				["minigameId"] = "5549c475310000f82c7490fb",
+				["unlockedProgression"] = "unlock_start",
+				["willUnlockProgression"] = will != "" ? will : FallbackUnlockName,
+				["blockRewardCue"] = NewItemTitle,
+				["blockCoins"] = 0,
+				["blockDiamonds"] = 0,
+				["blockKeys"] = 0,
+				["blockBolts"] = 0,
+				["blockType"] = "Antenna",
+				["dialogueIdentifiers"] = new JsonArray("unlock_1_quest_2"),
+				["dialogueTriggers"] = new JsonArray("LoopClaimed")
+			}
+		};
+	}
+
+	// numeros des cases (le client retrouve une case par son rang) et numeros de niveau : 1, 2, 3... pour les niveaux et le puzzle,
+	// 0 pour les coffres, -1 pour les cases television
+	private static void RenumberPath(JsonArray nodes)
+	{
+		int level = 0;
+		for (int i = 0; i < nodes.Count; i++)
+		{
+			string ctx = nodes[i]["data"]?["context"]?.ToString() ?? "";
+			nodes[i]["id"] = i + 1;
+			if (ctx == "Level" || ctx == "EditorPuzzle")
+			{
+				level++;
+				nodes[i]["levelNumber"] = level;
+			}
+			else
+			{
+				nodes[i]["levelNumber"] = ctx == "Signal" ? -1 : 0;
+			}
+		}
 	}
 
 	private static JsonObject SyntheticMainPathBase()

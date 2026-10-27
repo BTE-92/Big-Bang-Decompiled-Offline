@@ -6,7 +6,8 @@ using UnityEngine;
 
 // Command line builds:
 //   Unity.exe -batchmode -nographics -quit -projectPath <p> -executeMethod BuildScripts.Android -logFile <log>
-//   Unity.exe ... -executeMethod BuildScripts.Windows
+//   Unity.exe ... -executeMethod BuildScripts.Windows64   (Windows/64 bits, -> Builds/Windows64)
+//   Unity.exe ... -executeMethod BuildScripts.Windows32   (Windows/32 bits, -> Builds/Windows32)
 //   Unity.exe ... -executeMethod BuildScripts.IOS        (exports the Xcode project, which has to be built on a Mac)
 // Output goes to <project>/../Builds (override with the BBR_BUILD_DIR environment variable).
 public static class BuildScripts
@@ -110,7 +111,23 @@ public static class BuildScripts
 		}
 	}
 
+	// kept for the old command line: 64-bit
 	public static void Windows()
+	{
+		Windows64();
+	}
+
+	public static void Windows64()
+	{
+		WindowsBuild(BuildTarget.StandaloneWindows64, "Windows64");
+	}
+
+	public static void Windows32()
+	{
+		WindowsBuild(BuildTarget.StandaloneWindows, "Windows32");
+	}
+
+	private static void WindowsBuild(BuildTarget target, string folder)
 	{
 		FixWindowsPlugins();
 		// Unity's "Big Bang Configuration" window at launch (resolution, quality, monitor, controls), with the game's banner
@@ -136,14 +153,21 @@ public static class BuildScripts
 		}
 		BuildPlayerOptions options = new BuildPlayerOptions();
 		options.scenes = Scenes;
-		options.target = BuildTarget.StandaloneWindows64;
-		options.locationPathName = Path.Combine(OutDir, "Windows/BBR 2.4.9.exe");
+		options.target = target;
+		options.locationPathName = Path.Combine(OutDir, folder + "/BBR 2.4.9.exe");
 		options.options = BuildOptions.None;
 		Finish(BuildPipeline.BuildPlayer(options));
 	}
 
 	public static void IOS()
 	{
+		// 32-bit (armv7) and 64-bit (arm64) in the same app: needs IL2CPP (Mono only does armv7). 0 = ARMv7, 1 = ARM64, 2 = Universal
+		PlayerSettings.SetScriptingBackend(BuildTargetGroup.iOS, ScriptingImplementation.IL2CPP);
+		PlayerSettings.SetArchitecture(BuildTargetGroup.iOS, 2);
+		// iPad: the status bar (clock) stayed on screen in the game. It has to be hidden in the player settings AND the app must be
+		// full screen (an iPad app that allows Split View / Slide Over cannot hide the status bar); IosPostProcess also fixes Info.plist.
+		PlayerSettings.statusBarHidden = true;
+		PlayerSettings.iOS.requiresFullScreen = true;
 		if (string.IsNullOrEmpty(PlayerSettings.iOS.buildNumber) || !System.Text.RegularExpressions.Regex.IsMatch(PlayerSettings.iOS.buildNumber, @"^[0-9]+(\.[0-9]+)*$"))
 		{
 			PlayerSettings.iOS.buildNumber = "1";

@@ -653,6 +653,11 @@ public static class ToolBox
 
     public static RenderTextureFormat GetSupportedRenderTextureFormat(RenderTextureFormat _preferred)//This has been added to support devices that specifically dont support RGB565 lol.
     {
+        // Desktop GPUs report RGB565 as supported but render nothing into it (a flat grey: level screenshots, portals...). Only phones use it.
+        if (_preferred == RenderTextureFormat.RGB565 && Application.platform != RuntimePlatform.Android && Application.platform != RuntimePlatform.IPhonePlayer)
+        {
+            _preferred = RenderTextureFormat.ARGB32;
+        }
         if (SystemInfo.SupportsRenderTextureFormat(_preferred))
         {
             return _preferred;

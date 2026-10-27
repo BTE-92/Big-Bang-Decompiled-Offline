@@ -145,16 +145,37 @@ public static class MiscApi
 			{
 				if (JsonNode.Parse(text) is JsonObject jsonObject)
 				{
-					int value = UnlockBuilder.DisableTutorialStart(jsonObject);
+					// the first-launch tutorial (intro TV, new items, name) is no longer disabled here: see PlayerApi.StoredPaths
 					int value2 = UnlockBuilder.LinkAllItemsToFirstUnlock(jsonObject);
 					text = jsonObject.ToJsonString();
-					Console.WriteLine($"[Path] Unlock-everything: linked {value2} editor items to '{UnlockBuilder.FirstUnlockName}', disabled the first-launch tutorial ({value} references).");
+					Console.WriteLine($"[Path] Unlock-everything: linked {value2} editor items to '{UnlockBuilder.FirstUnlockName}'.");
 				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine("[Path] Could not patch the graph: " + ex.Message);
 			}
+		}
+		// Dernieres etapes, apres tous les renommages : les noms de sections sont alors definitifs.
+		try
+		{
+			if (JsonNode.Parse(text) is JsonObject finalGraph)
+			{
+				int willEdges = UnlockBuilder.AddWillUnlockEdges(finalGraph);
+				int wiredDialogues = UnlockBuilder.WireSectionDialogues(finalGraph);
+				int loneTv = UnlockBuilder.RemoveLoneTvSections(finalGraph);
+				int sidePaths = MapContent.AddSidePaths(finalGraph);
+				if (willEdges + wiredDialogues + loneTv + sidePaths > 0)
+				{
+					text = finalGraph.ToJsonString();
+				}
+				Console.WriteLine($"[Path] Signal checkpoints: {willEdges} 'will unlock' link(s) (silhouette), {wiredDialogues} section dialogue(s) wired to a checkpoint, {loneTv} duplicate TV(s) removed.");
+				Console.WriteLine($"[Path] {sidePaths} side path(s) in the map (Impossible branch, Versus races).");
+			}
+		}
+		catch (Exception ex3)
+		{
+			Console.WriteLine("[Path] Could not add the signal silhouettes / section dialogues: " + ex3.Message);
 		}
 		byte[] bytes = Encoding.UTF8.GetBytes(text);
 		byte[] value3 = Sha.Hash256(bytes);

@@ -147,7 +147,7 @@ public static class PlayerApi
 	private static JsonObject MainPathWithProgress(JsonArray stored)
 	{
 		JsonObject result = MainPathWithProgressCore(stored);
-		UnlockBuilder.FixStoredSignalNodes(result["nodes"] as JsonArray);
+		UnlockBuilder.FixStoredSignalNodes(result["nodes"] as JsonArray, AsLong(result["currentNode"], 1L));
 		MapContent.RemoveDuplicateTv(result);
 		MapContent.InjectPuzzle(result);
 		return result;
@@ -328,6 +328,20 @@ public static class PlayerApi
 		if (Settings.UnlockEverything)
 		{
 			_ = MiscApi.PathVersion;
+			// A player with no main path yet gets none: the game then starts its own introduction (the "unlock_start" TV signal, the
+			// new items, the name) and builds the first stretch of the path itself, which the server stores from then on.
+			bool hasMainPath = false;
+			foreach (JsonNode? p0 in jsonArray)
+			{
+				if (p0 is JsonObject po0 && po0["name"]?.ToString() == "MainPath" && po0["nodes"] is JsonArray pn0 && pn0.Count > 0)
+				{
+					hasMainPath = true;
+				}
+			}
+			if (!hasMainPath)
+			{
+				return jsonArray;
+			}
 			JsonArray jsonArray3 = new JsonArray { MainPathWithProgress(jsonArray) };
 			{
 				foreach (JsonNode item in jsonArray)
@@ -337,7 +351,9 @@ public static class PlayerApi
 						jsonArray3.Add(jsonObject2.DeepClone());
 					}
 				}
+				MapContent.RemoveLoneTv(jsonArray3);
 				MapContent.InjectInsaneBranch(jsonArray3);
+				MapContent.InjectVersus(jsonArray3);
 				EnsureDailyDiamondNode(jsonArray3, p.S("id"));
 				return jsonArray3;
 			}

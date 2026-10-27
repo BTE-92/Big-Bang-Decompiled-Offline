@@ -182,8 +182,8 @@ PlayerSettings:
   tvOSTargetOSVersionString: 9.0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
-  uIRequiresFullScreen: 0
-  uIStatusBarHidden: 0
+  uIRequiresFullScreen: 1
+  uIStatusBarHidden: 1
   uIExitOnSuspend: 0
   uIStatusBarStyle: 0
   iPhoneSplashScreen: {fileID: 0}
@@ -659,11 +659,13 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   scriptingDefineSymbols: {}
-  platformArchitecture: {}
+  platformArchitecture:
+    iOS: 2
   scriptingBackend:
     Android: 1
     Standalone: 0
     WebGL: 1
+    iOS: 1
   il2cppCompilerConfiguration:
     WebGL: 1
   managedStrippingLevel: {}

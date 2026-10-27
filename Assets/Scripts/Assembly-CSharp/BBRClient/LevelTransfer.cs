@@ -13,11 +13,17 @@ public static class LevelTransfer
 {
     private const string Perm = "android.permission.WRITE_EXTERNAL_STORAGE";
 
+    // A level with its screenshot and ghost is well under a megabyte: anything bigger is not a level (and would only waste memory, or
+    // crash the game, to read, encode and post it). The server applies its own limits as well.
+    public const int MaxImportBytes = 8 * 1024 * 1024;
+    private const string TooBigMsg = "That file is too big to be a level (the limit is 8 MB).";
+    private const string NotZipMsg = "That is not a level file. Pick the .zip you exported.";
+
 #if UNITY_WEBGL && !UNITY_EDITOR
     // browser file picker / download (Plugins/WebGL/BBRWebGL.jslib). BBR_PickFile returns 1 when the browser will only open the picker on
     // the player's next tap (a file dialog needs a fresh user gesture), 0 when it was opened right away.
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    private static extern int BBR_PickFile(string gameObjectName, string okMethod, string failMethod, string accept);
+    private static extern int BBR_PickFile(string gameObjectName, string okMethod, string failMethod, string accept, int maxBytes);
 
     [System.Runtime.InteropServices.DllImport("__Internal")]
     private static extern void BBR_DownloadFile(string fileName, string base64);
@@ -35,7 +41,7 @@ public static class LevelTransfer
 
     public static void WebPickFailed(string why)
     {
-        s_webStatus = why == "cancel" ? "cancel" : "error";
+        s_webStatus = (why == "cancel" || why == "toolarge") ? why : "error";
     }
     // Android: shared storage; Windows: Documents; iOS: the app's Documents folder (visible in the Files app)
     public static string ExportDir
@@ -300,7 +306,7 @@ public static class LevelTransfer
                 WebPickReceiver.Ensure();
                 s_webData = null;
                 s_webStatus = null;
-                int deferred = BBR_PickFile(WebPickReceiver.ObjectName, "OnPicked", "OnPickFailed", ".zip,application/zip");
+                int deferred = BBR_PickFile(WebPickReceiver.ObjectName, "OnPicked", "OnPickFailed", ".zip,application/zip", MaxImportBytes);
                 s_waitingPick = true;
                 if (deferred == 1) LevelMsg.Show("Import level", "Tap OK, then choose the level file (.zip) in the window that opens.");
                 return true;
@@ -351,6 +357,7 @@ public static class LevelTransfer
             s_webStatus = null;
             s_webData = null;
             if (st == "ok") StartImportBytes(picked);
+            else if (st == "toolarge") LevelMsg.Show("Import Failed", TooBigMsg);
             else if (st == "error") LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
             return;
         }
@@ -363,8 +370,17 @@ public static class LevelTransfer
             string status = ReadText(done);
             if (status == "ok")
             {
-                byte[] data = ReadBytes(System.IO.Path.Combine(dir, "picked.zip"));
-                StartImportBytes(data);
+                string pickedPath = System.IO.Path.Combine(dir, "picked.zip");
+                if (FileTooBig(pickedPath))
+                {
+                    LevelMsg.Show("Import Failed", TooBigMsg);
+                    return;
+                }
+                StartImportBytes(ReadBytes(pickedPath));
+            }
+            else if (status == "toolarge")
+            {
+                LevelMsg.Show("Import Failed", TooBigMsg);
             }
             else if (status == "error")
             {
@@ -473,8 +489,25 @@ public static class LevelTransfer
         return EnsureStorage(out settingsOpened);
     }
 
+    private static bool FileTooBig(string path)
+    {
+        try
+        {
+            return new System.IO.FileInfo(path).Length > MaxImportBytes;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     public static void StartImport(string path)
     {
+        if (FileTooBig(path))
+        {
+            LevelMsg.Show("Import Failed", TooBigMsg);
+            return;
+        }
         StartImportBytes(ReadBytes(path));
     }
 
@@ -483,6 +516,18 @@ public static class LevelTransfer
         if (data == null || data.Length < 22)
         {
             LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+            return;
+        }
+        if (data.Length > MaxImportBytes)
+        {
+            LevelMsg.Show("Import Failed", TooBigMsg);
+            return;
+        }
+        // a zip starts with "PK" (local file header, or the end record of an empty one)
+        bool isZip = data[0] == (byte)'P' && data[1] == (byte)'K' && ((data[2] == 3 && data[3] == 4) || (data[2] == 5 && data[3] == 6));
+        if (!isZip)
+        {
+            LevelMsg.Show("Import Failed", NotZipMsg);
             return;
         }
         WOEURL url = new WOEURL("/v1/minigame/import");

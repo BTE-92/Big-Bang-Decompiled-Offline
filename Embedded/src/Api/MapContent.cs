@@ -319,7 +319,7 @@ public static class MapContent
 			{
 				main = po;
 			}
-			else if (p is JsonObject so && (so["name"]?.ToString() ?? "").EndsWith("_SidePath"))
+			else if (p is JsonObject so && (so["name"]?.ToString() ?? "").EndsWith("_SidePath") && !IsVersusSidePath(so))
 			{
 				return false;
 			}
@@ -333,7 +333,7 @@ public static class MapContent
 		foreach (JsonNode? n in nodes)
 		{
 			long id = long.TryParse(n?["id"]?.ToString(), out long iv) ? iv : -1L;
-			if (id >= Math.Max(current, 4L) && (n?["data"]?["context"]?.ToString() ?? "") == "Level")
+			if (id >= Math.Max(current, 4L) && (n?["data"]?["context"]?.ToString() ?? "") == "Level" && !paths.Any((JsonNode? sp) => sp is JsonObject spo && (spo["name"]?.ToString() ?? "").EndsWith("_SidePath") && NumOf(spo["startNode"], -1L) == id))
 			{
 				attach = n;
 				break;
@@ -458,6 +458,170 @@ public static class MapContent
 		return failures;
 	}
 
+	// Courses "Versus" sur la carte. Le noeud "Versus" du jeu (PsPlanetVersusNode) est prevu pour un CHEMIN SECONDAIRE : le premier noeud d'un
+	// chemin secondaire s'ouvre quand le niveau auquel il est accroche est gagne. Un toucher cree une course contre un adversaire sur le niveau
+	// donne (/v4/versus/create : ici BTE, qui court avec le meilleur temps du niveau), puis le noeud s'envole vers les bulles flottantes.
+	// Place dans le chemin PRINCIPAL il bloquait la progression (rien ne fait avancer le chemin apres lui) : on les ajoute donc en chemin
+	// secondaire, accroche au deuxieme niveau de quelques sections, comme la branche "Impossible".
+	private static readonly string[][] VersusSections =
+	{
+		new[] { "unlock_treadmill", "5b1d0c7e7501000000000001" },
+		new[] { "unlock_platforms", "5b1d0c7e7502000000000002" },
+		new[] { "unlock_gears", "5b1d0c7e7503000000000003" }
+	};
+
+	private static long NumOf(JsonNode? n, long def)
+	{
+		return long.TryParse(n?.ToString(), out long v) ? v : def;
+	}
+
+	private static string CtxOf(JsonNode? n)
+	{
+		return n?["data"]?["context"]?.ToString() ?? "";
+	}
+
+	private static bool IsVersusSidePath(JsonNode? path)
+	{
+		return path is JsonObject po && (po["name"]?.ToString() ?? "").EndsWith("_SidePath") && po["nodes"] is JsonArray pn && pn.Count > 0 && (CtxOf(pn[0]) == "Versus" || CtxOf(pn[0]) == "VersusPath");
+	}
+
+	// A side path with a Versus race for the sections above. Also turns the Versus nodes of the main path (an earlier version of this
+	// content put them there) into ordinary levels, so a path that was blocked by one can go on.
+	public static int InjectVersus(JsonArray paths)
+	{
+		JsonObject? main = null;
+		foreach (JsonNode? p in paths)
+		{
+			if (p is JsonObject po && po["name"]?.ToString() == "MainPath")
+			{
+				main = po;
+			}
+		}
+		if (main == null || !(main["nodes"] is JsonArray nodes) || nodes.Count < 4)
+		{
+			return 0;
+		}
+		int changed = 0;
+		for (int i = 0; i < nodes.Count; i++)
+		{
+			if ((CtxOf(nodes[i]) == "Versus" || CtxOf(nodes[i]) == "VersusPath") && nodes[i]["data"] is JsonObject vd)
+			{
+				nodes[i]["data"] = new JsonObject
+				{
+					["context"] = "Level",
+					["minigameId"] = "",
+					["unlocked"] = true,
+					["levelGameMode"] = "Race",
+					["levelPlayerUnit"] = "Any"
+				};
+				changed++;
+			}
+		}
+		if (!Settings.VersusNodes)
+		{
+			return changed;
+		}
+		long current = NumOf(main["currentNode"], 1L);
+		HashSet<long> used = new HashSet<long>();
+		foreach (JsonNode? p in paths)
+		{
+			if (p is JsonObject so && (so["name"]?.ToString() ?? "").EndsWith("_SidePath"))
+			{
+				used.Add(NumOf(so["startNode"], -1L));
+			}
+		}
+		foreach (string[] section in VersusSections)
+		{
+			int block = -1;
+			for (int i = 0; i < nodes.Count; i++)
+			{
+				if (CtxOf(nodes[i]) == "Block" && (nodes[i]["data"]?["unlockedProgression"]?.ToString() ?? "") == section[0])
+				{
+					block = i;
+					break;
+				}
+			}
+			if (block < 0)
+			{
+				continue;
+			}
+			int start = block;
+			while (start - 1 >= 0 && CtxOf(nodes[start - 1]) == "Level")
+			{
+				start--;
+			}
+			if (block - start < 3)
+			{
+				continue;
+			}
+			long firstId = NumOf(nodes[start]["id"], -1L);
+			long blockId = NumOf(nodes[block]["id"], -1L);
+			// already added for this section (started or not): its side path hangs off a level of the section
+			bool there = false;
+			foreach (JsonNode? p in paths)
+			{
+				if (IsVersusSidePath(p) && NumOf(p!["startNode"], -1L) >= firstId && NumOf(p["startNode"], -1L) < blockId)
+				{
+					there = true;
+				}
+			}
+			if (there)
+			{
+				continue;
+			}
+			// the second level of the section, or the next one when that one already carries a side path
+			int at = -1;
+			for (int i = start + 1; i < block; i++)
+			{
+				if (!used.Contains(NumOf(nodes[i]["id"], -1L)))
+				{
+					at = i;
+					break;
+				}
+			}
+			if (at < 0)
+			{
+				continue;
+			}
+			long startNode = NumOf(nodes[at]["id"], -1L);
+			used.Add(startNode);
+			paths.Add(new JsonObject
+			{
+				["name"] = startNode + "_SidePath",
+				// open at once when the player is already past its level, otherwise the game opens it when that level is won
+				["currentNode"] = startNode < current ? 1 : 0,
+				["lane"] = -1,
+				["startNode"] = startNode,
+				["parent"] = "MainPath",
+				["nodes"] = new JsonArray
+				{
+					new JsonObject
+					{
+						["id"] = 1,
+						["levelNumber"] = 1,
+						["score"] = 0,
+						["rented"] = false,
+						["data"] = new JsonObject
+						{
+							["context"] = "Versus",
+							["minigameId"] = section[1],
+							["unlocked"] = true,
+							["removedFromPath"] = false,
+							["duration"] = -1,
+							["timeleft"] = -1,
+							["endTime"] = DateTime.UtcNow.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
+							["eventOver"] = false,
+							["domeDestroyed"] = false
+						}
+					}
+				}
+			});
+			Console.WriteLine("[Path] Versus race (side path) added after node " + startNode + " in " + section[0] + ".");
+			changed++;
+		}
+		return changed;
+	}
+
 	// Le jeu genere parfois deux fois le meme noeud television de suite (meme nom de section) : on retire le doublon qui n'a pas encore
 	// ete atteint, puis on renumerote les noeuds suivants.
 	public static int RemoveDuplicateTv(JsonObject mainPath)
@@ -496,6 +660,119 @@ public static class MapContent
 			Console.WriteLine("[Path] Removed " + removed + " duplicate TV node(s) from the player's path.");
 		}
 		return removed;
+	}
+
+	// Same clean-up as UnlockBuilder.RemoveLoneTvSections, for a path the player already has: a "Signal" checkpoint with no star requirement
+	// that directly follows another television is removed (not before the player's current node), the following nodes are renumbered and the
+	// side paths that hang off them follow.
+	public static int RemoveLoneTv(JsonArray paths)
+	{
+		JsonObject? main = null;
+		foreach (JsonNode? p in paths)
+		{
+			if (p is JsonObject po && po["name"]?.ToString() == "MainPath")
+			{
+				main = po;
+			}
+		}
+		if (main == null || !(main["nodes"] is JsonArray nodes) || nodes.Count < 2)
+		{
+			return 0;
+		}
+		long current = NumOf(main["currentNode"], 1L);
+		int removed = 0;
+		for (int i = nodes.Count - 1; i >= 1; i--)
+		{
+			JsonNode? data = nodes[i]?["data"];
+			JsonNode? before = nodes[i - 1]?["data"];
+			bool lone = CtxOf(nodes[i]) == "Signal" && NumOf(data?["requiredStars"], 0L) == 0 && (data?["unlockedProgression"]?.ToString() ?? "") != "unlock_start";
+			bool tv = (CtxOf(nodes[i - 1]) == "Signal" || CtxOf(nodes[i - 1]) == "Block") && (before?["blockType"]?.ToString() ?? "") == "Antenna";
+			long id = NumOf(nodes[i]["id"], -1L);
+			if (!lone || !tv || id <= current)
+			{
+				continue;
+			}
+			nodes.RemoveAt(i);
+			for (int k = i; k < nodes.Count; k++)
+			{
+				nodes[k]["id"] = NumOf(nodes[k]["id"], 0L) - 1;
+			}
+			foreach (JsonNode? p in paths)
+			{
+				if (p is JsonObject so && (so["name"]?.ToString() ?? "").EndsWith("_SidePath") && NumOf(so["startNode"], -1L) > id)
+				{
+					long start = NumOf(so["startNode"], -1L) - 1;
+					so["startNode"] = start;
+					so["name"] = start + "_SidePath";
+				}
+			}
+			removed++;
+		}
+		if (removed > 0)
+		{
+			Console.WriteLine("[Path] Removed " + removed + " lone TV node(s) (0 / 0) from the player's path.");
+		}
+		return removed;
+	}
+
+	// Side paths in the map itself (the "Impossible" branch and the Versus races). The game builds the first stretch of the path from the map
+	// on a new player's first launch, so they have to be here and not only added to the saved path at the next login (InjectInsaneBranch /
+	// InjectVersus, which stay for paths saved before and skip what is already there).
+	public static int AddSidePaths(JsonObject graph)
+	{
+		if (!(graph["nodes"] is JsonArray nodes) || !(graph["edges"] is JsonArray edges))
+		{
+			return 0;
+		}
+		int count = 0;
+		if (Settings.InsaneBranch)
+		{
+			List<JsonNode> chain = SectionChain(nodes, edges, "unlock_car");
+			for (int i = 2; i < chain.Count; i++)
+			{
+				if ((chain[i]["data"]?["nodeType"]?.ToString() ?? "") == "Level")
+				{
+					List<JsonObject> side = new List<JsonObject>();
+					for (int k = 0; k < 3; k++)
+					{
+						side.Add(new JsonObject { ["nodeType"] = "Level", ["levelMinigameId"] = "", ["levelDifficulty"] = "Impossible", ["levelGameMode"] = "Race", ["levelPlayerUnit"] = "Any" });
+					}
+					AttachSidePath(nodes, edges, chain[i]["id"].GetValue<int>(), side);
+					count++;
+					break;
+				}
+			}
+		}
+		if (Settings.VersusNodes)
+		{
+			foreach (string[] section in VersusSections)
+			{
+				List<JsonNode> chain = SectionChain(nodes, edges, section[0]);
+				int block = chain.FindIndex((JsonNode n) => (n["data"]?["nodeType"]?.ToString() ?? "") == "Block");
+				if (block < 3 ||(chain[1]["data"]?["nodeType"]?.ToString() ?? "") != "Level")
+				{
+					continue;
+				}
+				AttachSidePath(nodes, edges, chain[1]["id"].GetValue<int>(), new List<JsonObject> { new JsonObject { ["nodeType"] = "VersusRace", ["levelMinigameId"] = section[1] } });
+				count++;
+			}
+		}
+		return count;
+	}
+
+	// "SidePath" node hanging off a level, then the side path's nodes one after the other (PsMetagameData.AddUnlocks reads it that way)
+	private static void AttachSidePath(JsonArray nodes, JsonArray edges, int attachId, List<JsonObject> datas)
+	{
+		int previous = NextId(nodes);
+		nodes.Add(new JsonObject { ["id"] = previous, ["name"] = "", ["x"] = 0.0, ["y"] = 0.0, ["data"] = new JsonObject { ["nodeType"] = "SidePath" } });
+		edges.Add(new JsonObject { ["source"] = attachId, ["target"] = previous });
+		foreach (JsonObject data in datas)
+		{
+			int id = NextId(nodes);
+			nodes.Add(new JsonObject { ["id"] = id, ["name"] = "", ["x"] = 0.0, ["y"] = 0.0, ["data"] = data });
+			edges.Add(new JsonObject { ["source"] = previous, ["target"] = id });
+			previous = id;
+		}
 	}
 
 	private static int NextId(JsonArray nodes)
@@ -582,9 +859,12 @@ public static class MapContent
 				count += 3;
 			}
 		}
+		// A new player gets no ready-made path any more: the game builds the first stretch of the path from this map, so the puzzle has to be
+		// in the map itself (second bubble of the first section) and not only added later to the saved path. A section forced with
+		// --puzzle-section keeps priority.
 		if (Settings.PuzzleMission)
 		{
-			List<JsonNode> chain = SectionChain(nodes, edges, Settings.PuzzleSection);
+			List<JsonNode> chain = SectionChain(nodes, edges, Settings.PuzzleSection != "" ? Settings.PuzzleSection : "unlock_car");
 			if (chain.Count >= 3 && (chain[0]["data"]?["nodeType"]?.ToString() ?? "") == "Level" && (chain[1]["data"]?["nodeType"]?.ToString() ?? "") == "Level")
 			{
 				int firstId = chain[0]["id"].GetValue<int>();
