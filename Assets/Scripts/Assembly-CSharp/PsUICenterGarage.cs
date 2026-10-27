@@ -30,6 +30,21 @@ public class PsUICenterGarage : UICanvas
 
 	private bool m_resources;
 
+	private PsUIGenericButton m_upgradeTab;
+
+	private PsUIGenericButton m_hatsTab;
+
+	private GarageHatPanel m_hatPanel;
+
+	// tab switch: the panel that is on screen leaves first, then the other one comes in (they never overlap)
+	private int m_tabAction;
+
+	private float m_tabTimer;
+
+	private const float UpgradeLeaveTime = 0.6f;
+
+	private const float HatLeaveTime = 0.35f;
+
 	public PsUICenterGarage(UIComponent _parent)
 		: base(_parent, false, string.Empty, null, string.Empty)
 	{
@@ -78,6 +93,80 @@ public class PsUICenterGarage : UICanvas
 		m_rightArea.SetAlign(1f, 0f);
 		m_rightArea.SetMargins(0f, 0f, 0f, 0f);
 		m_rightArea.RemoveDrawHandler();
+		UIHorizontalList tabs = new UIHorizontalList(m_rightArea, string.Empty);
+		tabs.SetAlign(0.5f, 0.86f);
+		tabs.SetSpacing(0.02f, RelativeTo.ScreenHeight);
+		tabs.RemoveDrawHandler();
+		m_upgradeTab = new PsUIGenericButton(tabs);
+		m_upgradeTab.SetGreenColors();
+		m_upgradeTab.SetText("UPGRADE", 0.04f, 0.2f);
+		m_hatsTab = new PsUIGenericButton(tabs);
+		m_hatsTab.SetBlueColors();
+		m_hatsTab.SetText("HATS", 0.04f, 0.2f);
+	}
+
+	private void ShowHats()
+	{
+		if (m_hatPanel != null || m_tabAction != 0)
+		{
+			return;
+		}
+		// the upgrade panel slides out, the hats come in once it is gone
+		m_unityUIUpgradeBars.Hide();
+		m_tabAction = 1;
+		m_tabTimer = UpgradeLeaveTime;
+	}
+
+	private void ShowUpgrades()
+	{
+		if (m_hatPanel == null || m_tabAction != 0)
+		{
+			return;
+		}
+		SlideHatPanel(false);
+		m_tabAction = 2;
+		m_tabTimer = HatLeaveTime;
+	}
+
+	private void SlideHatPanel(bool _in)
+	{
+		Vector3 home = m_hatPanel.m_TC.transform.localPosition;
+		Vector3 away = home + Vector3.right * ((float)Screen.width * 0.5f);
+		if (_in)
+		{
+			TweenS.AddTransformTween(m_hatPanel.m_TC, TweenedProperty.Position, TweenStyle.CubicOut, away, home, 0.35f, 0f, true);
+		}
+		else
+		{
+			TweenS.AddTransformTween(m_hatPanel.m_TC, TweenedProperty.Position, TweenStyle.CubicIn, home, away, HatLeaveTime, 0f, true);
+		}
+	}
+
+	private void TickTabs()
+	{
+		if (m_tabAction == 0)
+		{
+			return;
+		}
+		m_tabTimer -= Time.unscaledDeltaTime;
+		if (m_tabTimer > 0f)
+		{
+			return;
+		}
+		if (m_tabAction == 1)
+		{
+			m_hatPanel = new GarageHatPanel(m_rightArea);
+			m_hatPanel.SetAlign(0.5f, 0f);
+			m_rightArea.Update();
+			SlideHatPanel(true);
+		}
+		else
+		{
+			m_hatPanel.Destroy();
+			m_hatPanel = null;
+			m_unityUIUpgradeBars.Show();
+		}
+		m_tabAction = 0;
 	}
 
 	private void ChangeVehicle(int _index)
@@ -102,12 +191,11 @@ public class PsUICenterGarage : UICanvas
 			{
 				m_unityUIUpgradeBars = new PsUnityUIUpgradeBars(m_upgrades, psUpgradeableEditorItem.m_upgradeSteps, m_vehicleTypes[_index]);
 				m_unityUIUpgradeBars.m_uiBundle.m_switchButton.gameObject.SetActive(false);
+				m_unityUIUpgradeBars.Show();
 			}
-			if (!PsMetagameData.GetUnlockableByIdentifier(identifier).m_unlocked)
-			{
-				m_unityUIUpgradeBars.m_uiBundle.m_contentCanvasGroup.alpha = 0f;
-				m_unityUIUpgradeBars.m_uiBundle.m_contentCanvasGroup.interactable = false;
-			}
+			// the original hid the upgrades of a vehicle that was not unlocked yet; the offline game has every vehicle open
+			m_unityUIUpgradeBars.m_uiBundle.m_contentCanvasGroup.alpha = 1f;
+			m_unityUIUpgradeBars.m_uiBundle.m_contentCanvasGroup.interactable = true;
 		}
 	}
 
@@ -201,6 +289,15 @@ public class PsUICenterGarage : UICanvas
 			Texture tierTexture2 = GetTierTexture(m_vehicleTypes[m_currentVehicleIndex].ToString(), PsMetagameManager.m_playerStats.GetUpgradeValue(m_vehicleTypes[m_currentVehicleIndex], "tier", 1));
 			m_modelPrefab.p_gameObject.transform.Find("DirtBike/Chassis").GetComponentInChildren<Renderer>().sharedMaterial.mainTexture = tierTexture2;
 			m_unityUIUpgradeBars.m_tierChanged = false;
+		}
+		TickTabs();
+		if (m_hatsTab != null && m_hatsTab.m_hit)
+		{
+			ShowHats();
+		}
+		else if (m_upgradeTab != null && m_upgradeTab.m_hit)
+		{
+			ShowUpgrades();
 		}
 		if (m_nextButton.m_hit)
 		{

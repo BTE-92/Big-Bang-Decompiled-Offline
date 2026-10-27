@@ -6,6 +6,8 @@ public class ChipmunkTestState : BasicState
 
 	private int ticker;
 
+	private Vector2 m_savedGravity;
+
 	public void createSprite(string name)
 	{
 		float num = Random.Range(4, 10);
@@ -23,6 +25,7 @@ public class ChipmunkTestState : BasicState
 	{
 		m_spriteSheet = FrameworkTestScene.m_spriteSheet;
 		ticker = 0;
+		m_savedGravity = ChipmunkProWrapper.ucpSpaceGetGravity();
 		Entity entity = EntityManager.AddEntity();
 		TransformC transformComponent = TransformS.AddComponent(entity, "walls");
 		ucpPolyShape ucpPolyShape2 = new ucpPolyShape(150f, 10f, Vector2.up * -75f, uint.MaxValue);
@@ -135,5 +138,6 @@ public class ChipmunkTestState : BasicState
 	public override void Exit()
 	{
 		EntityManager.RemoveAllEntities();
+		ChipmunkProWrapper.ucpSpaceSetGravity(m_savedGravity);
 	}
 }

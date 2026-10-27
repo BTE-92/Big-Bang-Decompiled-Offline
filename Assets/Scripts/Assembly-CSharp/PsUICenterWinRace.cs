@@ -10,7 +10,7 @@ public class PsUICenterWinRace : UICanvas
 
 	private PsUIGenericButton m_everyplayButton;
 
-	private PsUIGenericButton m_pvpFriendButton;
+	private UIRectSpriteButton m_pvpFriendButton;
 
 	private UIRectSpriteButton m_thumbsUpButton;
 
@@ -164,6 +164,7 @@ public class PsUICenterWinRace : UICanvas
 		}
 		CreateVideoReplayButton();
 		CreateRetryButton();
+		CreateFriendRaceButton();
 		UIVerticalList uIVerticalList3 = new UIVerticalList(this, string.Empty);
 		uIVerticalList3.SetMargins(0.035f, RelativeTo.ScreenShortest);
 		uIVerticalList3.SetAlign(1f, 0f);
@@ -189,10 +190,11 @@ public class PsUICenterWinRace : UICanvas
 		}
 	}
 
+	// "Challenge a Friend!" button (picture from the UI atlas). It opens the friend list; in the offline game the built-in player BTE is the friend.
 	public virtual void CreateFriendRaceButton()
 	{
-		m_pvpFriendButton = new PsUIGenericButton(this);
-		m_pvpFriendButton.SetText("Challenge\nFriend");
+		m_pvpFriendButton = new UIRectSpriteButton(this, "ChallengeFriend", PsState.m_uiSheet, PsState.m_uiSheet.m_atlas.GetFrame("menu_challenge_friend_button"));
+		m_pvpFriendButton.SetHeight(0.2f, RelativeTo.ScreenHeight);
 		m_pvpFriendButton.SetAlign(0.965f, 0.3f);
 	}
 

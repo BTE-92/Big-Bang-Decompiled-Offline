@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 public class UITestState : BasicState
 {
 	public static int m_healthType = 1;
@@ -37,11 +40,32 @@ public class UITestState : BasicState
 
 	public UIModel m_model;
 
+	// the UI of the game exists before this test: only what the test creates is destroyed, and the shared canvas is put back
+	private int m_uiStartCount;
+
+	private UICanvas m_previousCanvas;
+
+	// the property panel of this test hands its camera over to the shared UI camera of the game (it resizes it and shrinks its viewport),
+	// and the camera it created stays alive: both are put back when the test is left
+	private List<Camera> m_camerasBefore;
+
+	private Rect m_uiCameraRect;
+
+	private float m_uiCameraSize;
+
+	private Vector3 m_uiCameraPosition;
+
 	private SpriteSheet m_symbolSheet;
 
 	public override void Enter(IStatedObject _parent)
 	{
 		m_model = new UIModel(this);
+		m_camerasBefore = new List<Camera>(CameraS.m_cameras);
+		m_uiCameraRect = CameraS.m_uiCamera.rect;
+		m_uiCameraSize = CameraS.m_uiCamera.orthographicSize;
+		m_uiCameraPosition = CameraS.m_uiCamera.transform.position;
+		m_uiStartCount = UIManager.m_uiComponents.Count;
+		m_previousCanvas = UIManager.m_canvas;
 		UIManager.m_canvas = new UICanvas(null, false, "BaseCanvas", null, string.Empty);
 		UIManager.m_canvas.SetMargins(0.01f);
 		UIPanel uIPanel = new UIPanel(UIManager.m_canvas, "PropertyPanel", new UIComponent(null, false, string.Empty, null, null, string.Empty), new UIComponent(null, false, string.Empty, null, null, string.Empty));
@@ -68,9 +92,30 @@ public class UITestState : BasicState
 
 	public override void Exit()
 	{
-		UIManager.DestroyUI();
+		while (UIManager.m_uiComponents.Count > m_uiStartCount)
+		{
+			int index = UIManager.m_uiComponents.Count - 1;
+			UIManager.m_uiComponents[index].Destroy(false);
+			if (UIManager.m_uiComponents.Count > index)
+			{
+				UIManager.m_uiComponents.RemoveAt(index);
+			}
+		}
 		SpriteS.RemoveSpriteSheet(m_symbolSheet);
 		m_symbolSheet = null;
-		UIManager.m_canvas = null;
+		UIManager.m_canvas = m_previousCanvas;
+		m_previousCanvas = null;
+		for (int num = CameraS.m_cameras.Count - 1; num >= 0; num--)
+		{
+			Camera camera = CameraS.m_cameras[num];
+			if (camera != null && !m_camerasBefore.Contains(camera))
+			{
+				CameraS.RemoveCamera(camera);
+			}
+		}
+		m_camerasBefore = null;
+		CameraS.m_uiCamera.rect = m_uiCameraRect;
+		CameraS.m_uiCamera.orthographicSize = m_uiCameraSize;
+		CameraS.m_uiCamera.transform.position = m_uiCameraPosition;
 	}
 }

@@ -21,7 +21,7 @@ public class PsMainMenuState : BasicState, IStatedObject
 
 	private bool m_released;
 
-	private PsUIGenericButton m_hatButton;
+	private UIRectSpriteButton m_garageButton;
 
 	private PsUIGenericButton m_moneyButton;
 
@@ -87,24 +87,37 @@ public class PsMainMenuState : BasicState, IStatedObject
 		m_settingsList.RemoveDrawHandler();
 		m_settingsList.SetSpacing(0.025f, RelativeTo.ScreenHeight);
 		m_settingsList.SetAlign(0f, 1f);
-		UIHorizontalList uIHorizontalList = new UIHorizontalList(m_settingsList, string.Empty);
-		uIHorizontalList.SetHorizontalAlign(0f);
+		// left column: settings button on top, profile shield below it (like the original menu).
+		// The garage button sits right next to that column, on the same line as the settings button.
+		UIHorizontalList menuRow = new UIHorizontalList(m_settingsList, string.Empty);
+		menuRow.SetHorizontalAlign(0f);
+		menuRow.SetSpacing(0.01f, RelativeTo.ScreenHeight);
+		menuRow.RemoveDrawHandler();
+		UIVerticalList leftColumn = new UIVerticalList(menuRow, string.Empty);
+		leftColumn.SetSpacing(0.025f, RelativeTo.ScreenHeight);
+		leftColumn.RemoveDrawHandler();
+		// the settings button's row is only as tall as the button, like in the original menu (the shield stays where it was)
+		UIHorizontalList uIHorizontalList = new UIHorizontalList(leftColumn, string.Empty);
+		uIHorizontalList.SetHorizontalAlign(0.15f);
 		uIHorizontalList.SetSpacing(0.01f, RelativeTo.ScreenHeight);
 		uIHorizontalList.RemoveDrawHandler();
-		m_versusButton = new PsUIProfileShield(uIHorizontalList, true, false);
-		m_versusButton.SetDepthOffset(10f);
-		m_versusButton.SetSize(0.285f, 0.285f, RelativeTo.ScreenHeight);
-		m_settingsButton = new PsUIGenericButton(uIHorizontalList);
-		m_settingsButton.SetIcon("menu_icon_settings_small", 0.052f);
-		m_settingsButton.SetTealColors();
-		m_settingsButton.SetMargins(0.011f);
-		m_settingsButton.SetAlign(0.1f, 1f);
-		m_helpButton = new PsUIGenericButton(uIHorizontalList);
+        m_settingsButton = new PsUIGenericButton(uIHorizontalList);
+        m_settingsButton.SetIcon("menu_icon_settings_small", 0.052f);
+        m_settingsButton.SetTealColors();
+        m_settingsButton.SetMargins(0.011f);
+        m_settingsButton.SetAlign(0.1f, 0.05f);
+        m_helpButton = new PsUIGenericButton(uIHorizontalList);
 		m_helpButton.SetText("?", 0.055f, 0.07f);
 		m_helpButton.SetTealColors();
 		m_helpButton.SetMargins(0.001f);
 		m_helpButton.SetAlign(0.1f, 0.05f);
 		m_helpButton.Destroy();
+		m_versusButton = new PsUIProfileShield(leftColumn, true, true);
+		m_versusButton.SetDepthOffset(10f);
+		m_versusButton.SetSize(0.285f, 0.285f, RelativeTo.ScreenHeight);
+		m_garageButton = new UIRectSpriteButton(menuRow, "garage", PsState.m_uiSheet, PsState.m_uiSheet.m_atlas.GetFrame("menu_garage_button"));
+		m_garageButton.SetHeight(0.175f, RelativeTo.ScreenHeight);
+		m_garageButton.SetAlign(0.1f, 1f);
 		m_createButton = new PsUIGenericButton(m_uiCanvas, 0.25f, 0.25f, 0.02f);
 		m_createButton.SetMargins(0.05f);
 		m_createButton.SetGlareOffset(-0.0175f);
@@ -136,9 +149,6 @@ public class PsMainMenuState : BasicState, IStatedObject
 			uIVerticalList.SetAlign(0f, 0f);
 			uIVerticalList.SetSpacing(0.015f, RelativeTo.ScreenHeight);
 			uIVerticalList.RemoveDrawHandler();
-			m_hatButton = new PsUIGenericButton(uIVerticalList);
-			m_hatButton.SetBlueColors();
-			m_hatButton.SetText("HATS");
 			m_moneyButton = new PsUIGenericButton(uIVerticalList);
 			m_moneyButton.SetGreenColors();
 			m_moneyButton.SetText("MONEY!");
@@ -161,6 +171,12 @@ public class PsMainMenuState : BasicState, IStatedObject
 		m_released = true;
 		m_dragging = false;
 		PsMetagameManager.ShowResources(null, false, true, true, true, true, 0.03f, true);
+		if (FrameworkTestScene.s_rescue)
+		{
+			FrameworkTestScene.s_rescue = false;
+			FrameworkTestScene.Rescue("menu built");
+			FrameworkTestScene.s_rescueFrames = 90;
+		}
 		if (PsState.m_activeGameLoop != null)
 		{
 			PsState.m_activeGameLoop.BackAtMenu();
@@ -206,6 +222,10 @@ public class PsMainMenuState : BasicState, IStatedObject
 
 	public override void Execute()
 	{
+		if (FrameworkTestScene.s_rescueFrames > 0 && --FrameworkTestScene.s_rescueFrames == 0)
+		{
+			FrameworkTestScene.Rescue("1.5 s later");
+		}
 		PsPlanetManager.Update();
 		if (PsPlanetManager.GetCurrentPlanet().m_forcedRoll)
 		{
@@ -240,15 +260,18 @@ public class PsMainMenuState : BasicState, IStatedObject
 			Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(psUIBaseState3);
 			PsMenuScene.CreateBlur();
 		}
+		else if (m_garageButton != null && m_garageButton.m_hit && PsState.m_activeGameLoop == null)
+		{
+			PsPlanetManager.GetCurrentPlanet().FastForward();
+			PsUIBaseState psUIBaseState4 = new PsUIBaseState(typeof(PsUICenterGarage), typeof(PsUITopBackButton));
+			psUIBaseState4.SetAction("Exit", ExitCreate);
+			Main.m_currentGame.m_currentScene.m_stateMachine.ChangeState(psUIBaseState4);
+			PsMenuScene.CreateBlur();
+		}
 		else if (m_helpButton != null && m_helpButton.m_hit && PsState.m_activeGameLoop == null)
 		{
 			PsPlanetManager.GetCurrentPlanet().FastForward();
 			HelpshiftManager.ShowFAQ();
-		}
-		else if (m_hatButton != null && m_hatButton.m_hit)
-		{
-			PsPlanetManager.GetCurrentPlanet().FastForward();
-			new PsUIBasePopup(typeof(HatSelect), null, null, null, false);
 		}
 		else if (true && m_moneyButton != null && m_moneyButton.m_hit)
 		{
@@ -388,6 +411,7 @@ public class PsMainMenuState : BasicState, IStatedObject
 			m_vignetteEntity = null;
 		}
 		m_versusButton = null;
+		m_garageButton = null;
 		m_uiCanvas.Destroy();
 		m_uiCanvas = null;
 		TouchAreaS.RemoveArea(m_rollTAC);

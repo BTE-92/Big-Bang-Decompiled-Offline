@@ -214,6 +214,8 @@ public static class ChallengeApi
 			Db.Exec($"UPDATE challenges SET t{num}=$0, ghost{num}=COALESCE($1, ghost{num}), updatedAt=CURRENT_TIMESTAMP WHERE id=$2", num2, array, row.S("id"));
 		}
 		ApplyOutcome(Get(row.S("id")), c.PlayerId, c.QBool("winRound"), c.QBool("loseRound"));
+		// the built-in player BTE answers as soon as the challenger has set a time
+		BotPlayer.RespondIfChallenged(Get(row.S("id")));
 		await c.Json(new JsonObject());
 	}
 
@@ -394,7 +396,13 @@ public static class ChallengeApi
 		{
 			string text = c.Q("gameId");
 			string text2 = c.Q("challengedId");
-			if (MinigameApi.GetMinigame(text) == null || PlayerApi.GetPlayer(text2) == null || text2 == c.PlayerId)
+			// the levels of the adventure map are stand-ins of official levels: the challenge points at the level that is really served
+			Row? level = MinigameApi.GetOrStandIn(text);
+			if (level != null)
+			{
+				text = level.S("id");
+			}
+			if (level == null || PlayerApi.GetPlayer(text2) == null || text2 == c.PlayerId)
 			{
 				await c.Error();
 			}
@@ -404,6 +412,8 @@ public static class ChallengeApi
 				string text3 = PlayerApi.NewId();
 				Db.Exec("INSERT INTO challenges (id, kind, gameId, p1, challenged, status, currentPlayer, comment)\n                      VALUES ($0,'friendly',$1,$2,$3,'pending',$2,$4)", text3, text, c.PlayerId, text2, c.Q("comment"));
 				Console.WriteLine($"[Challenge] friendly {text3}: {PlayerApi.GetPlayer(c.PlayerId)?.S("name")} -> {PlayerApi.GetPlayer(text2)?.S("name")} on {text}");
+				// BTE accepts at once, so the match screen shows BTE as the opponent instead of "Looking for opponent"
+				BotPlayer.AcceptIfChallenged(text3);
 				await c.Json(ToMeta(Get(text3), c.PlayerId));
 			}
 		});
@@ -448,29 +458,32 @@ public static class ChallengeApi
 				await c.Json(ToMeta(Get(row.S("id")), playerId));
 				return;
 			}
-			Row row3 = Db.One("SELECT * FROM challenges WHERE kind='versus' AND status='open' AND p1=$0 AND p2='' AND t1=0 ORDER BY createdAt LIMIT 1", playerId);
-			if (row3 != null)
+			// nobody else is waiting: the built-in player BTE is the opponent (no more "Looking for opponent")
+			Db.Exec("DELETE FROM challenges WHERE kind='versus' AND status='open' AND p1=$0 AND p2='' AND t1=0", playerId);
+			Row row2 = MinigameApi.GetOrStandIn(c.Q("gameId"));
+			// a match against BTE that has not been played yet is reused (a repeated request does not start another one)
+			Row? waiting = Db.One("SELECT * FROM challenges WHERE kind='versus' AND p1=$0 AND p2=$1 AND status='active' AND t2=0 AND tries2=0 ORDER BY createdAt DESC LIMIT 1", BotPlayer.Id, playerId);
+			if (waiting != null && (row2 == null || waiting.S("gameId") == row2.S("id")))
 			{
-				await c.Json(ToMeta(row3, playerId));
+				await c.Json(ToMeta(waiting, playerId));
+				return;
+			}
+			if (waiting != null)
+			{
+				Db.Exec("DELETE FROM challenges WHERE id=$0", waiting.S("id"));
+			}
+			if (row2 == null)
+			{
+				row2 = Db.One("SELECT * FROM minigames WHERE state='public' AND template=0 AND gameMode='Race' ORDER BY RANDOM() LIMIT 1");
+			}
+			if (row2 == null)
+			{
+				await c.Error();
 			}
 			else
 			{
-				Row row2 = MinigameApi.GetMinigame(c.Q("gameId"));
-				if (row2 == null)
-				{
-					row2 = Db.One("SELECT * FROM minigames WHERE state='public' AND template=0 AND gameMode='Race' ORDER BY RANDOM() LIMIT 1");
-				}
-				if (row2 == null)
-				{
-					await c.Error();
-				}
-				else
-				{
-					string text = PlayerApi.NewId();
-					Db.Exec("INSERT INTO challenges (id, kind, gameId, p1, status, currentPlayer) VALUES ($0,'versus',$1,$2,'open',$2)", text, row2.S("id"), playerId);
-					Console.WriteLine($"[Challenge] versus {text}: {PlayerApi.GetPlayer(playerId)?.S("name")} is searching an opponent on {row2.S("id")}");
-					await c.Json(ToMeta(Get(text), playerId));
-				}
+				string text = BotPlayer.CreateVersusMatch(row2, playerId);
+				await c.Json(ToMeta(Get(text), playerId));
 			}
 		});
 	}

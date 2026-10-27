@@ -8,11 +8,14 @@ public static class HatChoice
 {
     public const string PrefKey = "bbr_hat";
 
-    // index of the choice -> label (English; translated through Loc). 0 = random, 1..9 = the hats (0..8 in SetRandomHat)
+    // index of the choice -> label (English; translated through Loc). 0 = random, 1..12 = the hats (0..11 in SetRandomHat)
     public static readonly string[] Names = new string[]
     {
-        "Random", "Helmet", "Baseball cap", "Barbarian helmet", "Cowboy hat", "Horse mask", "Chicken hat", "Mushroom hat", "Paper bag", "Death mask"
+        "Random", "Baseball cap", "Helmet", "Barbarian helmet", "Cowboy hat", "Horse mask", "Chicken hat", "Mushroom hat", "Paper bag", "Death mask", "Deal with it glasses", "Flight cap", "Knight helmet"
     };
+
+    // number of hats (without the random choice)
+    public const int HatCount = 12;
 
     public const int Random = 0;
 
@@ -249,6 +252,64 @@ public class HatSelect : PsUIHeaderedCanvas
             HatChoice.Set(m_selected);
             (GetRoot() as PsUIBasePopup).Destroy();
             return;
+        }
+        base.Step();
+    }
+}
+
+// The hats of the garage ("HATS" tab): the same tiles as the HatSelect window, shown in the right half of the garage.
+public class GarageHatPanel : UICanvas
+{
+    private List<HatTile> m_tiles = new List<HatTile>();
+    private int m_selected;
+    private const int PerRow = 4;
+
+    public GarageHatPanel(UIComponent _parent)
+        : base(_parent, false, string.Empty, null, string.Empty)
+    {
+        RemoveDrawHandler();
+        SetWidth(1f, RelativeTo.ParentWidth);
+        SetHeight(0.7f, RelativeTo.ScreenHeight);
+        SetVerticalAlign(0f);
+        m_selected = HatChoice.Current;
+        UIVerticalList list = new UIVerticalList(this, string.Empty);
+        list.SetWidth(1f, RelativeTo.ParentWidth);
+        list.SetSpacing(0.02f, RelativeTo.ScreenHeight);
+        list.RemoveDrawHandler();
+        int total = HatChoice.Names.Length;
+        int rows = (total + PerRow - 1) / PerRow;
+        for (int i = 0; i < rows; i++)
+        {
+            UIHorizontalList row = new UIHorizontalList(list, string.Empty);
+            row.SetSpacing(0.02f, RelativeTo.ScreenHeight);
+            row.RemoveDrawHandler();
+            int count = Math.Min(total - i * PerRow, PerRow);
+            for (int j = 0; j < count; j++)
+            {
+                int index = i * PerRow + j;
+                HatTile tile = new HatTile(row, HatChoice.Icon(index), index == m_selected);
+                tile.SetSize(0.15f, 0.15f, RelativeTo.ScreenHeight);
+                m_tiles.Add(tile);
+            }
+        }
+    }
+
+    public override void Step()
+    {
+        for (int i = 0; i < m_tiles.Count; i++)
+        {
+            if (m_tiles[i].m_hit)
+            {
+                m_selected = i;
+                HatChoice.Set(i);
+                SoundS.PlaySingleShot("/UI/ButtonNormal", Vector3.zero);
+                m_tiles[i].Pop();
+                for (int j = 0; j < m_tiles.Count; j++)
+                {
+                    m_tiles[j].m_mark.SetSelected(j == m_selected);
+                }
+                break;
+            }
         }
         base.Step();
     }

@@ -28,6 +28,7 @@ public static class EmbeddedServer
 		MapContent.EnsureBuilderTemplate();
 		MapContent.EnsurePuzzleLevel();
 		MapContent.EnsureSeedLevels();
+		BotPlayer.Ensure();
 		PlayerApi.Register();
 		MinigameApi.Register();
 		LevelIoApi.Register();

@@ -67,6 +67,7 @@ public static class TimedApi
 
 	public static JsonObject TimedEventsJson(string playerId)
 	{
+		BotPlayer.MaybeChallenge(playerId);
 		JsonObject result = TimedEventsBase(playerId);
 		JsonObject? fresh = FreshAndFree(playerId);
 		if (fresh != null)

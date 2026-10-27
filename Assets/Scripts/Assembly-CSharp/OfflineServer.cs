@@ -71,6 +71,7 @@ public static class OfflineServer
 			Db.StartupPragmas = "PRAGMA journal_mode=MEMORY; PRAGMA locking_mode=EXCLUSIVE; PRAGMA foreign_keys=OFF; PRAGMA synchronous=OFF;";
 #endif
 			EmbeddedServer.Initialize(DataRoot, delegate(string line) { Debug.Log(line); });
+			BteSettings.Apply();
 			s_started = true;
 			return true;
 		}
