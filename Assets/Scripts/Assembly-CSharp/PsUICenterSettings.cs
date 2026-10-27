@@ -881,7 +881,7 @@ public class PsUICenterSettings : PsUIHeaderedCanvas
         }
         else if (m_forumButton.m_hit)
         {
-            Application.OpenURL("http://forum.whatonearthgame.com/");
+            Application.OpenURL("https://discord.gg/SkzbJJa7qj");//"http://forum.whatonearthgame.com/");
         }
         else if (m_adminButton != null && m_adminButton.m_hit)
         {
