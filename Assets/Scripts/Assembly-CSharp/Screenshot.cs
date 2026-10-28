@@ -16,7 +16,9 @@ public class Screenshot : MonoBehaviour
 
 	public void Initialize(int _width, int _height)
 	{
-		m_texture = new RenderTexture(_width, _height, 24, ToolBox.GetSupportedRenderTextureFormat(RenderTextureFormat.RGB565));
+		// ARGB32 on every platform: the screenshot is read back (ReadPixels) and uploaded as a level screenshot, and reading an RGB565 target
+		// gives a garbled picture on iPhone / iPad (mixed colours, half of it grey) and a flat grey one on PC.
+		m_texture = new RenderTexture(_width, _height, 24, RenderTextureFormat.ARGB32);
 	}
 
 	private void OnRenderObject()
