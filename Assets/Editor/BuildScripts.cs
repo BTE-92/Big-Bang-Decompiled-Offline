@@ -12,7 +12,15 @@ using UnityEngine;
 // Output goes to <project>/../Builds (override with the BBR_BUILD_DIR environment variable).
 public static class BuildScripts
 {
-	private const string OfflineAndroidId = "com.traplight.bigbangoffline";
+	// Package names / bundle ids of the offline builds: iOS and Android com.bte.bigbang249offline, PC (Standalone) unity.bte.bigbang249offline,
+	// other platforms (WebGL) Unity.bte.bigbang249offline
+	private const string OfflineAndroidId = "com.bte.bigbang249offline";
+
+	private const string OfflineIosId = "com.bte.bigbang249offline";
+
+	private const string OfflineStandaloneId = "unity.bte.bigbang249offline";
+
+	private const string OfflineOtherId = "Unity.bte.bigbang249offline";
 
 	private static string OutDir
 	{
@@ -130,6 +138,7 @@ public static class BuildScripts
 	private static void WindowsBuild(BuildTarget target, string folder)
 	{
 		FixWindowsPlugins();
+		PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Standalone, OfflineStandaloneId);
 		// Unity's "Big Bang Configuration" window at launch (resolution, quality, monitor, controls), with the game's banner
 		PlayerSettings.displayResolutionDialog = ResolutionDialogSetting.Enabled;
 		PlayerSettings.defaultIsFullScreen = true;
@@ -164,6 +173,7 @@ public static class BuildScripts
 		// 32-bit (armv7) and 64-bit (arm64) in the same app: needs IL2CPP (Mono only does armv7). 0 = ARMv7, 1 = ARM64, 2 = Universal
 		PlayerSettings.SetScriptingBackend(BuildTargetGroup.iOS, ScriptingImplementation.IL2CPP);
 		PlayerSettings.SetArchitecture(BuildTargetGroup.iOS, 2);
+		PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.iOS, OfflineIosId);
 		// iPad: the status bar (clock) stayed on screen in the game. It has to be hidden in the player settings AND the app must be
 		// full screen (an iPad app that allows Split View / Slide Over cannot hide the status bar); IosPostProcess also fixes Info.plist.
 		PlayerSettings.statusBarHidden = true;
@@ -183,6 +193,7 @@ public static class BuildScripts
 	// Needs the native physics (chipmunk) and geometry (auto geometry, libtess) libraries for WebGL, see Embedded/README.md.
 	public static void WebGL()
 	{
+		PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.WebGL, OfflineOtherId);
 		PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
 		PlayerSettings.WebGL.memorySize = 512;
 		PlayerSettings.WebGL.dataCaching = true;
