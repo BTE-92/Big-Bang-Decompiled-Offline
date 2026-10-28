@@ -138,7 +138,24 @@ public class PsUIScreenshot : UIComponent
 		base.Destroy();
 	}
 
+	// The drawing library bakes the current scale of the component into the shapes it creates. The card is drawn again while its appear animation is
+	// running (scale 0.4 - 0.6), which made it come out 1.6 - 2.2 times too big once the animation ended (the puzzle was the worst): it is always
+	// drawn at its normal scale, the animation then scales the finished drawing.
 	public override void DrawHandler(UIComponent _c)
+	{
+		Vector3 animatedScale = m_TC.transform.localScale;
+		m_TC.transform.localScale = Vector3.one;
+		try
+		{
+			DrawCard(_c);
+		}
+		finally
+		{
+			m_TC.transform.localScale = animatedScale;
+		}
+	}
+
+	private void DrawCard(UIComponent _c)
 	{
 		PrefabS.RemoveComponentsByEntity(m_TC.p_entity, false);
 		if (m_texture != null)

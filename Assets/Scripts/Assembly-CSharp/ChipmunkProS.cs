@@ -32,11 +32,16 @@ public static class ChipmunkProS
 
 	public static List<ChipmunkBodyC> m_handleCollisionsRemoveBodyQueue = new List<ChipmunkBodyC>();
 
+	// Native constraints that are in the space right now. Removing one a second time (the game does that when a level is restarted fast, after a
+	// ragdoll / body removal already took it out) makes Chipmunk abort() on iPhone and iPad ("Cannot remove a constraint that was not added to the space").
+	private static readonly HashSet<IntPtr> m_liveConstraints = new HashSet<IntPtr>();
+
 	public static void Initialize(int _collisionTypeCount)
 	{
 		m_collisionTypeCount = _collisionTypeCount + 1;
 		m_bodies = new DynamicArray<ChipmunkBodyC>();
 		m_constraints = new DynamicArray<ChipmunkConstraintC>();
+		m_liveConstraints.Clear();
 		ChipmunkProWrapper.ucpInitialize();
 		ChipmunkProWrapper.ucpSpaceSetGravity(Vector2.up * -400f);
 		ChipmunkProWrapper.ucpSpaceSetCollisionBias(0.001f);
@@ -282,6 +287,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -299,6 +305,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor1.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -317,6 +324,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -336,6 +344,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -353,6 +362,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor1.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -371,6 +381,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -388,6 +399,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor1.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -406,6 +418,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -424,6 +437,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -443,6 +457,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -460,6 +475,7 @@ public static class ChipmunkProS
 		chipmunkConstraintC.bodyA = _bodyA;
 		chipmunkConstraintC.bodyB = _bodyB;
 		chipmunkConstraintC.constraint = constraint;
+		m_liveConstraints.Add(constraint);
 		EntityManager.AddComponentToEntity(_anchor1.p_entity, chipmunkConstraintC);
 		return chipmunkConstraintC;
 	}
@@ -491,6 +507,7 @@ public static class ChipmunkProS
 			if (m_removedConstraintResults[i].ucpComponentIndex > -1)
 			{
 				ChipmunkConstraintC chipmunkConstraintC = m_constraints.m_array[m_removedConstraintResults[i].ucpComponentIndex];
+				m_liveConstraints.Remove(chipmunkConstraintC.constraint);
 				chipmunkConstraintC.constraint = IntPtr.Zero;
 				RemoveConstraint(chipmunkConstraintC);
 			}
@@ -516,11 +533,18 @@ public static class ChipmunkProS
 	{
 		if (_c.constraint != IntPtr.Zero)
 		{
-			if (!_c.addedToSpace)
+			if (m_liveConstraints.Remove(_c.constraint))
 			{
-				ChipmunkProWrapper.ucpSpaceAddConstraint(_c.constraint);
+				if (!_c.addedToSpace)
+				{
+					ChipmunkProWrapper.ucpSpaceAddConstraint(_c.constraint);
+				}
+				ChipmunkProWrapper.ucpRemoveConstraint(_c.constraint);
 			}
-			ChipmunkProWrapper.ucpRemoveConstraint(_c.constraint);
+			else
+			{
+				Debug.LogWarning("Constraint was already removed from the space: not removing it twice.");
+			}
 		}
 		EntityManager.RemoveComponentFromEntity(_c);
 		m_constraints.RemoveItem(_c);
