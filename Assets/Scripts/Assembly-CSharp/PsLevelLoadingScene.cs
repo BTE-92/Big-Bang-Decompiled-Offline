@@ -130,21 +130,33 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 
 	public void LevelLoaded()
 	{
-		RenderTexture storedTex = PsPlanetManager.GetCurrentPlanet().m_planetCamera.gameObject.GetComponent<BlurOptimizedWOE>().storedTex;
-		m_texture = new Texture2D(storedTex.width, storedTex.height, TextureFormat.RGB24, false, true);
-		m_texture.wrapMode = TextureWrapMode.Clamp;
-		RenderTexture.active = storedTex;
-		m_texture.ReadPixels(new Rect(0f, 0f, storedTex.width, storedTex.height), 0, 0);
-		m_texture.Apply();
-		RenderTexture.active = null;
-		m_material = Object.Instantiate(ResourceManager.GetMaterial(RESOURCE.LevelLoadingBackgroundMat_Material));
-		m_material.mainTexture = m_texture;
-		m_sheet = SpriteS.AddSpriteSheet(m_camera, m_material, 1f);
-		m_background = new UISprite(null, false, "BluredScreen", m_sheet, new Frame(0f, 0f, m_texture.width, m_texture.height));
-		m_background.SetCamera(m_camera);
-		m_background.SetWidth(1f, RelativeTo.ScreenWidth);
-		m_background.SetHeight(1f, RelativeTo.ScreenHeight);
-		m_background.Update();
+		RenderTexture storedTex = null;
+		PsPlanet loadingPlanet = PsPlanetManager.GetCurrentPlanet();
+		if (loadingPlanet != null && loadingPlanet.m_planetCamera != null)
+		{
+			BlurOptimizedWOE blurComponent = loadingPlanet.m_planetCamera.gameObject.GetComponent<BlurOptimizedWOE>();
+			if (blurComponent != null)
+			{
+				storedTex = blurComponent.storedTex;
+			}
+		}
+		if (storedTex != null)
+		{
+			m_texture = new Texture2D(storedTex.width, storedTex.height, TextureFormat.RGB24, false, true);
+			m_texture.wrapMode = TextureWrapMode.Clamp;
+			RenderTexture.active = storedTex;
+			m_texture.ReadPixels(new Rect(0f, 0f, storedTex.width, storedTex.height), 0, 0);
+			m_texture.Apply();
+			RenderTexture.active = null;
+			m_material = Object.Instantiate(ResourceManager.GetMaterial(RESOURCE.LevelLoadingBackgroundMat_Material));
+			m_material.mainTexture = m_texture;
+			m_sheet = SpriteS.AddSpriteSheet(m_camera, m_material, 1f);
+			m_background = new UISprite(null, false, "BluredScreen", m_sheet, new Frame(0f, 0f, m_texture.width, m_texture.height));
+			m_background.SetCamera(m_camera);
+			m_background.SetWidth(1f, RelativeTo.ScreenWidth);
+			m_background.SetHeight(1f, RelativeTo.ScreenHeight);
+			m_background.Update();
+		}
 		m_introComplete = true;
 	}
 
@@ -194,7 +206,7 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 
 	public void Update()
 	{
-		if (m_fadeOut)
+		if (m_fadeOut && m_material != null)
 		{
 			Color color = m_material.color;
 			color.a = Mathf.Lerp(m_material.color.a, 0f, 0.25f);

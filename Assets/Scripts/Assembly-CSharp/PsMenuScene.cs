@@ -180,9 +180,17 @@ public class PsMenuScene : IScene, IStatedObject
 
 	public static void CreateBlur()
 	{
+		if (m_blur == null)
+		{
+			return;
+		}
 		if (!m_blur.enabled)
 		{
-			PsPlanetManager.GetCurrentPlanet().m_blurCamera.enabled = true;
+			PsPlanet blurPlanet = PsPlanetManager.GetCurrentPlanet();
+			if (blurPlanet != null && blurPlanet.m_blurCamera != null)
+			{
+				blurPlanet.m_blurCamera.enabled = true;
+			}
 			m_blur.blurSize = 0f;
 			m_blur.downsample = 1;
 			m_blur.enabled = true;
@@ -228,7 +236,7 @@ public class PsMenuScene : IScene, IStatedObject
 
 	public static void RemoveBlur()
 	{
-		if (m_blur.enabled)
+		if (m_blur != null && m_blur.enabled)
 		{
 			Debug.Log("REMOVING BLUR");
 			m_blurFadeOut = true;
