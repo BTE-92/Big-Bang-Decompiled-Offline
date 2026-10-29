@@ -130,6 +130,16 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 
 	public void LevelLoaded()
 	{
+		TryCreateBackground();
+		m_introComplete = true;
+	}
+
+	private void TryCreateBackground()
+	{
+		if (m_background != null)
+		{
+			return;
+		}
 		RenderTexture storedTex = null;
 		PsPlanet loadingPlanet = PsPlanetManager.GetCurrentPlanet();
 		if (loadingPlanet != null && loadingPlanet.m_planetCamera != null)
@@ -157,7 +167,6 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 			m_background.SetHeight(1f, RelativeTo.ScreenHeight);
 			m_background.Update();
 		}
-		m_introComplete = true;
 	}
 
 	private void StartGame()
@@ -211,6 +220,10 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 			Color color = m_material.color;
 			color.a = Mathf.Lerp(m_material.color.a, 0f, 0.25f);
 			m_material.color = color;
+		}
+		if (m_background == null && PsMenuScene.m_blur != null && PsMenuScene.m_blur.done)
+		{
+			TryCreateBackground();
 		}
 		m_stateMachine.Update();
 	}
