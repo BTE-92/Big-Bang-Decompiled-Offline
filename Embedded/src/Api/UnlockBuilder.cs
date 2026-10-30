@@ -1204,7 +1204,7 @@ public static class UnlockBuilder
 						["minigameId"] = "",
 						["unlocked"] = false,
 						["blockType"] = "Chest",
-						["requiredStars"] = 0,
+						["requiredStars"] = 3,
 						["unlockedProgression"] = _firstUnlockName,
 						["willUnlockProgression"] = "",
 						// recompense du premier coffre : sans pieces ni gemmes, le jeu n'affiche pas l'animation d'ouverture
