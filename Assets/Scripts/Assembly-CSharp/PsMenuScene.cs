@@ -102,6 +102,14 @@ public class PsMenuScene : IScene, IStatedObject
 	public void Update()
 	{
 		m_stateMachine.Update();
+		if (!(m_stateMachine.GetCurrentState() is PsMainMenuState))
+		{
+			PsPlanet currentPlanet = PsPlanetManager.GetCurrentPlanet();
+			if (currentPlanet != null && currentPlanet.m_floaterManager != null)
+			{
+				currentPlanet.m_floaterManager.Update();
+			}
+		}
 		UpdateBlur();
 	}
 

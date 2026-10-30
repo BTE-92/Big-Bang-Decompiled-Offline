@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityStandardAssets.ImageEffects;
 
 public class PsLevelLoadingScene : ILoadingScene, IStatedObject
@@ -29,7 +30,7 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 
 	private Material m_material;
 
-	private UISprite m_background;
+	private GameObject m_background;
 
 	private SpriteSheet m_sheet;
 
@@ -38,6 +39,8 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 	private PsUIBaseState m_state;
 
 	private bool m_fadeOut;
+
+	private bool m_backgroundFinal;
 
 	public StateMachine StateMachine
 	{
@@ -123,6 +126,7 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 		SpriteS.SetColor(sprite, new Color(0f, 0f, 0f, 0f));
 		TweenS.AddTransformTween(m_TC, TweenedProperty.Alpha, TweenStyle.Linear, Vector3.zero, new Vector3(0.5f, 0.5f, 0.5f), 0.2f, 0f, true);
 		m_stateMachine.ChangeState(m_state);
+		TryCreateBackground();
 		m_initComplete = true;
 		m_introComplete = PsState.m_activeGameLoop.m_minigameBytes != null;
 		StartIntro();
@@ -134,38 +138,53 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 		m_introComplete = true;
 	}
 
-	private void TryCreateBackground()
+	private RenderTexture GetStoredBlurTexture()
 	{
-		if (m_background != null)
-		{
-			return;
-		}
-		RenderTexture storedTex = null;
 		PsPlanet loadingPlanet = PsPlanetManager.GetCurrentPlanet();
 		if (loadingPlanet != null && loadingPlanet.m_planetCamera != null)
 		{
 			BlurOptimizedWOE blurComponent = loadingPlanet.m_planetCamera.gameObject.GetComponent<BlurOptimizedWOE>();
 			if (blurComponent != null)
 			{
-				storedTex = blurComponent.storedTex;
+				return blurComponent.storedTex;
 			}
 		}
+		return null;
+	}
+
+	private void FillBackgroundTexture(RenderTexture _storedTex)
+	{
+		RenderTexture.active = _storedTex;
+		m_texture.ReadPixels(new Rect(0f, 0f, _storedTex.width, _storedTex.height), 0, 0);
+		m_texture.Apply();
+		RenderTexture.active = null;
+	}
+
+	private void TryCreateBackground()
+	{
+		if (m_background != null)
+		{
+			return;
+		}
+		RenderTexture storedTex = GetStoredBlurTexture();
 		if (storedTex != null)
 		{
 			m_texture = new Texture2D(storedTex.width, storedTex.height, TextureFormat.RGB24, false, true);
 			m_texture.wrapMode = TextureWrapMode.Clamp;
-			RenderTexture.active = storedTex;
-			m_texture.ReadPixels(new Rect(0f, 0f, storedTex.width, storedTex.height), 0, 0);
-			m_texture.Apply();
-			RenderTexture.active = null;
+			FillBackgroundTexture(storedTex);
 			m_material = Object.Instantiate(ResourceManager.GetMaterial(RESOURCE.LevelLoadingBackgroundMat_Material));
 			m_material.mainTexture = m_texture;
-			m_sheet = SpriteS.AddSpriteSheet(m_camera, m_material, 1f);
-			m_background = new UISprite(null, false, "BluredScreen", m_sheet, new Frame(0f, 0f, m_texture.width, m_texture.height));
-			m_background.SetCamera(m_camera);
-			m_background.SetWidth(1f, RelativeTo.ScreenWidth);
-			m_background.SetHeight(1f, RelativeTo.ScreenHeight);
-			m_background.Update();
+			m_background = GameObject.CreatePrimitive(PrimitiveType.Quad);
+			m_background.name = "BluredScreen";
+			m_background.layer = m_camera.gameObject.layer;
+			Object.Destroy(m_background.GetComponent<Collider>());
+			m_background.transform.position = new Vector3(0f, 0f, 0f);
+			m_background.transform.localScale = new Vector3(Screen.width, Screen.height, 1f);
+			Renderer backgroundRenderer = m_background.GetComponent<Renderer>();
+			backgroundRenderer.sharedMaterial = m_material;
+			backgroundRenderer.receiveShadows = false;
+			backgroundRenderer.shadowCastingMode = ShadowCastingMode.Off;
+			m_backgroundFinal = PsMenuScene.m_blur != null && PsMenuScene.m_blur.done;
 		}
 	}
 
@@ -221,9 +240,18 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 			color.a = Mathf.Lerp(m_material.color.a, 0f, 0.25f);
 			m_material.color = color;
 		}
-		if (m_background == null && PsMenuScene.m_blur != null && PsMenuScene.m_blur.done)
+		if (m_background == null)
 		{
 			TryCreateBackground();
+		}
+		if (m_background != null && !m_backgroundFinal && PsMenuScene.m_blur != null && PsMenuScene.m_blur.done)
+		{
+			RenderTexture finalTex = GetStoredBlurTexture();
+			if (finalTex != null && finalTex.width == m_texture.width && finalTex.height == m_texture.height)
+			{
+				FillBackgroundTexture(finalTex);
+			}
+			m_backgroundFinal = true;
 		}
 		m_stateMachine.Update();
 	}
@@ -265,7 +293,7 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 		}
 		if (m_background != null)
 		{
-			m_background.Destroy();
+			Object.Destroy(m_background);
 			m_background = null;
 		}
 		EntityManager.RemoveEntity(m_entity);
