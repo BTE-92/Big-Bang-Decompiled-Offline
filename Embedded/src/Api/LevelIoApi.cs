@@ -12,7 +12,11 @@ using BBR249Server.Net;
 namespace BBR249Server.Api;
 
 // Export / import d'un niveau publie sous forme de fichier .zip (le client enregistre / lit le fichier sur le telephone).
-// Contenu du zip : <id>/metadata (JSON), <id>/levelData (octets du niveau), <id>/screenshot, <id>/ghost (facultatifs).
+// Contenu du zip (meme organisation que BBRo) : <id>/metadata (JSON), <id>/level (octets du niveau), <id>/screenshot (facultatif), et le fantome du
+// createur s'il existe. Un fantome est un bloc "JSON + octets du fantome", avec un fichier .header qui donne les deux tailles ("268,8240") :
+//   - course (Race) : <id>/Ghosts/ghost<nombre> et <id>/Ghosts/ghost<nombre>.header (le nombre est un horodatage)
+//   - autres modes   : <id>/ghost et <id>/Ghosts/ghost.header
+// L'import accepte aussi l'ancien nom <id>/levelData et l'ancien fantome brut (<id>/ghost sans .header).
 public static class LevelIoApi
 {
 	// A level with its screenshot and ghost is well under a megabyte. The limits below keep a wrong or hostile file from using up memory:
@@ -80,6 +84,82 @@ public static class LevelIoApi
 		return null;
 	}
 
+	// The ghost of the creator, written the way BBRo does: one file holding a small JSON description followed by the ghost bytes, and a
+	// .header file with the two sizes. A race level keeps both in the Ghosts folder, any other level keeps the ghost at the root.
+	private static void AddGhost(ZipArchive zip, string id, Row row)
+	{
+		byte[]? ghost = row.B("creatorGhost");
+		if (ghost == null || ghost.Length == 0)
+		{
+			return;
+		}
+		JsonObject info = new JsonObject
+		{
+			["name"] = row.S("creatorName"),
+			["playerId"] = row.S("creatorId"),
+			["time"] = row.L("bestTime"),
+			["ghostId"] = Guid.NewGuid().ToString("N"),
+			["version"] = 3,
+			["countryCode"] = "US",
+			["trophies"] = 123,
+			["trophyLoss"] = 0,
+			["trophyWin"] = 0,
+			["ghostWin"] = 0,
+			["ghostLoss"] = 0,
+			["teamId"] = "",
+			["teamName"] = ""
+		};
+		byte[] infoBytes = Encoding.UTF8.GetBytes(info.ToJsonString());
+		byte[] blob = new byte[infoBytes.Length + ghost.Length];
+		Buffer.BlockCopy(infoBytes, 0, blob, 0, infoBytes.Length);
+		Buffer.BlockCopy(ghost, 0, blob, infoBytes.Length, ghost.Length);
+		byte[] header = Encoding.UTF8.GetBytes(infoBytes.Length + "," + ghost.Length);
+		if (row.S("gameMode", "Race") == "Race")
+		{
+			string name = "ghost" + DateTime.UtcNow.Ticks;
+			AddEntry(zip, id + "/Ghosts/" + name, blob);
+			AddEntry(zip, id + "/Ghosts/" + name + ".header", header);
+		}
+		else
+		{
+			AddEntry(zip, id + "/ghost", blob);
+			AddEntry(zip, id + "/Ghosts/ghost.header", header);
+		}
+	}
+
+	// The ghost bytes of an imported level. With a .header file the ghost file is "JSON + ghost bytes" and only the ghost bytes are kept;
+	// without one (a level exported by an older version of this game) the file already holds the ghost bytes only.
+	private static byte[]? ReadGhost(ZipArchive zip)
+	{
+		string? headerName = null;
+		foreach (ZipArchiveEntry entry in zip.Entries)
+		{
+			if (entry.Name.StartsWith("ghost", StringComparison.Ordinal) && entry.Name.EndsWith(".header", StringComparison.Ordinal))
+			{
+				headerName = entry.Name;
+				break;
+			}
+		}
+		if (headerName == null)
+		{
+			return ReadEntry(zip, "ghost", MaxImageBytes);
+		}
+		byte[]? header = ReadEntry(zip, headerName, 64);
+		byte[]? blob = ReadEntry(zip, headerName.Substring(0, headerName.Length - ".header".Length), MaxImageBytes);
+		if (header == null || blob == null)
+		{
+			return null;
+		}
+		string[] parts = Encoding.UTF8.GetString(header).Trim().Split(',');
+		if (parts.Length != 2 || !int.TryParse(parts[0], out int infoLength) || !int.TryParse(parts[1], out int ghostLength) || infoLength < 0 || ghostLength <= 0 || (long)infoLength + ghostLength != blob.Length)
+		{
+			return null;
+		}
+		byte[] ghost = new byte[ghostLength];
+		Buffer.BlockCopy(blob, infoLength, ghost, 0, ghostLength);
+		return ghost;
+	}
+
 	public static void Register()
 	{
 		Router.Map("/v1/minigame/export", async delegate(Ctx c)
@@ -116,9 +196,9 @@ public static class LevelIoApi
 			using (ZipArchive zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
 			{
 				AddEntry(zip, id + "/metadata", Encoding.UTF8.GetBytes(meta.ToJsonString()));
-				AddEntry(zip, id + "/levelData", levelData);
+				AddEntry(zip, id + "/level", levelData);
 				AddEntry(zip, id + "/screenshot", row.B("screenshot"));
-				AddEntry(zip, id + "/ghost", row.B("creatorGhost"));
+				AddGhost(zip, id, row);
 			}
 			Console.WriteLine($"[Export] {row.S("name")} ({id}) by {c.PlayerId}: {ms.Length} bytes");
 			await c.Bytes(ms.ToArray());
@@ -148,9 +228,9 @@ public static class LevelIoApi
 					throw new InvalidDataException("too many entries");
 				}
 				metaBytes = ReadEntry(zip, "metadata", MaxMetaBytes);
-				levelData = ReadEntry(zip, "levelData", MaxLevelBytes);
+				levelData = ReadEntry(zip, "level", MaxLevelBytes) ?? ReadEntry(zip, "levelData", MaxLevelBytes);
 				screenshot = ReadEntry(zip, "screenshot", MaxImageBytes);
-				ghost = ReadEntry(zip, "ghost", MaxImageBytes);
+				ghost = ReadGhost(zip);
 			}
 			catch (Exception ex)
 			{
@@ -172,6 +252,24 @@ public static class LevelIoApi
 			{
 				await c.JsonText("{\"ok\":false,\"reason\":\"invalid\"}");
 				return;
+			}
+			if (meta["itemsUsed"] is JsonArray usedItems)
+			{
+				List<string> unknown = new List<string>();
+				foreach (JsonNode? usedItem in usedItems)
+				{
+					string itemName = usedItem?.ToString() ?? "";
+					if (itemName != "" && !KnownItems.IsKnown(itemName))
+					{
+						unknown.Add(itemName);
+					}
+				}
+				if (unknown.Count > 0)
+				{
+					Console.WriteLine("[Import] refused: the level uses objects this version does not have: " + string.Join(", ", unknown));
+					await c.JsonText("{\"ok\":false,\"reason\":\"incompatible\"}");
+					return;
+				}
 			}
 			string id = meta["id"]?.ToString() ?? "";
 			if (!Regex.IsMatch(id, "^[A-Za-z0-9_-]{6,64}$"))
