@@ -133,6 +133,12 @@ public static class ChallengeApi
 		List<Row> list = Db.Query("SELECT * FROM challenges WHERE kind=$0 AND (\n                (p1=$1 AND claimed1=0)\n             OR (p2=$1 AND claimed2=0)\n             OR (challenged=$1 AND p2='' AND claimed2=0 AND (t1>0 OR status='declined'))\n            ) ORDER BY createdAt DESC LIMIT 50", kind, playerId);
 		foreach (Row item in list)
 		{
+			// a challenge whose level was deleted (or has no data) cannot be played: the game would get "not found" and restart to the title screen
+			byte[]? data = MinigameApi.GetOrStandIn(item.S("gameId"))?.B("levelData");
+			if (data == null || data.Length == 0)
+			{
+				continue;
+			}
 			jsonArray.Add(ToMeta(item, playerId));
 		}
 		return jsonArray;

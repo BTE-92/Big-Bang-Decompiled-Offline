@@ -410,6 +410,7 @@ public static class MinigameApi
 			{
 				Db.Exec("DELETE FROM minigames WHERE id=$0", text);
 				Db.Exec("DELETE FROM scores WHERE gameId=$0", text);
+				Db.Exec("DELETE FROM challenges WHERE gameId=$0", text);
 				Db.Exec("DELETE FROM ratings WHERE gameId=$0", text);
 				Db.Exec("DELETE FROM comments WHERE gameId=$0", text);
 			}
