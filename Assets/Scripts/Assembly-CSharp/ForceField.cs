@@ -75,11 +75,11 @@ public class ForceField : Unit
 		}
 		m_graphElement.m_position = (m_node1.m_position + m_node2.m_position) / 2f;
 		m_node1.m_minDistanceFromParent = 50f;
-		m_node1.m_maxDistanceFromParent = 1750f;
+		m_node1.m_maxDistanceFromParent = 10000f;
 		m_node2.m_minDistanceFromParent = 50f;
-		m_node2.m_maxDistanceFromParent = 1750f;
+		m_node2.m_maxDistanceFromParent = 10000f;
 		m_trigger.m_minDistanceFromParent = 0f;
-		m_trigger.m_maxDistanceFromParent = 1750f;
+		m_trigger.m_maxDistanceFromParent = 50000f;
 		m_node1.m_isRemovable = false;
 		m_node2.m_isRemovable = false;
 		m_trigger.m_isRemovable = true;

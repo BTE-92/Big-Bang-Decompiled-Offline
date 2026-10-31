@@ -63,7 +63,7 @@ public static class ServerManager
 		m_playerAuthenticated = true;
 		PsState.m_inLoginFlow = false;
 		PsMetagameManager.InitNewEditorItems();
-		if (PsState.m_activeGameLoop != null && PsState.m_activeGameLoop.m_gameMode.m_exitingMinigame && Main.m_currentGame.m_currentScene.m_name == "MenuScene" && Main.m_currentGame.m_currentScene.GetCurrentState() is PsMainMenuState)
+		if (PsState.m_activeGameLoop != null && PsState.m_activeGameLoop.m_gameMode != null && PsState.m_activeGameLoop.m_gameMode.m_exitingMinigame && Main.m_currentGame.m_currentScene.m_name == "MenuScene" && Main.m_currentGame.m_currentScene.GetCurrentState() is PsMainMenuState)
 		{
 			PsState.m_activeGameLoop.BackAtMenu();
 		}

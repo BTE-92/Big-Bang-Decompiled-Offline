@@ -154,7 +154,7 @@ public class PsUITopPlayRace : UICanvas, IPlayMenu
 			else if (num > m_medalTimes[i] && !m_starList[i].exploded)
 			{
 				m_starList[i].SetInflationAmount(1f);
-				if (i > 0 && num > m_medalTimes[i - 1] - num2)
+				if (i > 0 && num > m_medalTimes[i - 1] - num2 && m_popTimer != null)
 				{
 					m_popTimer.SetText(Mathf.CeilToInt(m_medalTimes[i - 1] - num).ToString());
 					Vector3 position2 = m_starList[i - 1].transform.position;
@@ -162,7 +162,7 @@ public class PsUITopPlayRace : UICanvas, IPlayMenu
 					float num4 = 0.1f;
 					m_popTimer.m_TC.transform.position = new Vector3(position2.x, position2.y - m_popTimer.m_actualHeight / 6f, m_popTimer.m_TC.transform.position.z);
 				}
-				else
+				else if (m_popTimer != null)
 				{
 					m_popTimer.Destroy();
 					m_popTimer = null;

@@ -85,6 +85,8 @@ public class AutoGeometryLayer
 
 	public byte[] m_bytes;
 
+	public byte[] m_protectedBytes;
+
 	public Texture2D m_maskTexture;
 
 	public AGPropStorage m_groundPropStorage;
@@ -429,6 +431,10 @@ public class AutoGeometryLayer
 			b2 = (byte)(num2 * num3 * 255f);
 			break;
 		}
+		}
+		if (m_protectedBytes != null && _drawMode == AGDrawMode.SUB && b2 < m_protectedBytes[_targetByteOffset])
+		{
+			b2 = m_protectedBytes[_targetByteOffset];
 		}
 		if (m_bytes[_targetByteOffset] != b2)
 		{

@@ -31,7 +31,7 @@ public static class MapContent
 
 	// niveau puzzle "The Enigma" (fourni avec le serveur, sans les objets de la solution) ; les seuls objets permis au joueur :
 	public const string PuzzleId = "7e47a1e0b3d14e7a9c11d0b17e5a0002";
-	private static readonly string[] PuzzleItems = { "MaterialSand", "MaterialDanger", "MaterialMetal", "MaterialMud", "MaterialIce", "MaterialLava" };
+	private static readonly string[] PuzzleItems = { "MaterialSand" };
 
 	// Cree (une fois) le niveau modele dans la base : une ligne "template" (jamais proposee comme niveau public),
 	// copiee pour le joueur par /v1/template/duplicate.

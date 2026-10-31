@@ -146,6 +146,17 @@ public class PsGameLoopEditorPuzzle : PsGameLoop
 			if (LevelManager.m_currentLevel != null)
 			{
 				PsState.m_activeMinigame.m_groundNode = LevelManager.m_currentLevel.m_currentLayer.GetElement("LevelGround") as LevelGroundNode;
+				if (PsState.m_activeMinigame.m_groundNode != null)
+				{
+					AutoGeometryLayer[] groundLayers = PsState.m_activeMinigame.m_groundNode.m_AGLayer;
+					for (int g = 0; g < groundLayers.Length; g++)
+					{
+						if (groundLayers[g] != null && groundLayers[g].m_bytes != null)
+						{
+							groundLayers[g].m_protectedBytes = (byte[])groundLayers[g].m_bytes.Clone();
+						}
+					}
+				}
 			}
 			else
 			{
@@ -220,12 +231,7 @@ public class PsGameLoopEditorPuzzle : PsGameLoop
 			}
 			else
 			{
-				if (childElements[num4] == PsState.m_activeMinigame.m_playerNode || childElements[num4] == PsState.m_activeMinigame.m_goalNode || list.Contains(childElements[num4]))
-				{
-					childElements[num4].m_isSelectable = false;
-					childElements[num4].m_isMoveable = false;
-					childElements[num4].m_isRotateable = false;
-				}
+				LockElement(childElements[num4]);
 				childElements[num4].m_isRemovable = false;
 				childElements[num4].m_isCopyable = false;
 				if (childElements[num4].m_name == "Teleport")
@@ -247,6 +253,22 @@ public class PsGameLoopEditorPuzzle : PsGameLoop
 		if (flag)
 		{
 			AutoGeometryManager.UpdateMaxValueLookupTable(AutoGeometryManager.m_layers[PsState.m_drawLayer], LookupUpdateMode.LEVEL_LOADED, true);
+		}
+	}
+
+	// Nothing of a puzzle level can be selected, moved or turned: the player only draws ground.
+	private static void LockElement(GraphElement _element)
+	{
+		_element.m_isSelectable = false;
+		_element.m_isMoveable = false;
+		_element.m_isRotateable = false;
+		GraphNode graphNode = _element as GraphNode;
+		if (graphNode != null)
+		{
+			for (int i = 0; i < graphNode.m_childElements.Count; i++)
+			{
+				LockElement(graphNode.m_childElements[i]);
+			}
 		}
 	}
 

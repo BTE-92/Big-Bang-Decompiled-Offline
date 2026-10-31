@@ -47,9 +47,15 @@ public class PsUICenterWinEditor : UICanvas
 		uIVerticalList.SetVerticalAlign(0f);
 		uIVerticalList.SetMargins(0f, 0f, 0f, 0.05f);
 		bool flag = PsState.m_activeGameLoop.m_scoreCurrent == 3;
+		int totalStars = 3;
+		if (PsState.m_activeGameLoop.m_gameMode is PsGameModeStarCollect)
+		{
+			totalStars = Math.Max(3, LevelManager.m_currentLevel.m_currentLayer.GetElements("CollectibleStar").Length);
+			flag = PsState.m_activeGameLoop.m_scoreCurrent >= totalStars;
+		}
 		if (!flag)
 		{
-			UIText uIText = new UIText(uIVerticalList, false, string.Empty, "Collect all three stars to Go Live", "HurmeBold_Font", 0.04f, RelativeTo.ScreenHeight);
+			UIText uIText = new UIText(uIVerticalList, false, string.Empty, (totalStars == 3) ? "Collect all three stars to Go Live" : ("Collect all " + totalStars + " stars to Go Live"), "HurmeBold_Font", 0.04f, RelativeTo.ScreenHeight);
 		}
 		else
 		{

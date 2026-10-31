@@ -402,7 +402,14 @@ public class AlienCharacter : Unit
 			{
 				_force += new Vector2(m_mainTC.transform.up.x, m_mainTC.transform.up.y) * 400f;
 			}
-			new PsHat(transform.GetChild(0).GetChild(0), _force, _angVel);
+			Transform hatRoot = transform.GetChild(0);
+			new PsHat(hatRoot.GetChild(0), _force, _angVel);
+			// the paper bag carries a second copy of its model on the root itself, which would stay on the head
+			Renderer[] hatRootRenderers = hatRoot.GetComponents<Renderer>();
+			for (int i = 0; i < hatRootRenderers.Length; i++)
+			{
+				hatRootRenderers[i].enabled = false;
+			}
 			m_hasHelmet = false;
 		}
 	}
