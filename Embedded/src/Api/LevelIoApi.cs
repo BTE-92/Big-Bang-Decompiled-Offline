@@ -333,8 +333,13 @@ public static class LevelIoApi
 			{
 				Set("creatorUpgrades", creatorUpgrades.ToJsonString());
 			}
-			Set("state", "public");
-			Set("publishTime", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+			// a file whose metadata says "state":"saved" is imported as an unfinished draft the player can still edit; any other file is imported as a live level
+			bool asDraft = meta["state"]?.ToString() == "saved";
+			Set("state", asDraft ? "saved" : "public");
+			if (!asDraft)
+			{
+				Set("publishTime", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+			}
 			Set("updatedAt", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
 			Set("levelData", levelData);
 			if (screenshot != null && screenshot.Length > 1)
