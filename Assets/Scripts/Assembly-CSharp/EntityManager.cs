@@ -698,13 +698,20 @@ public static class EntityManager
 					{
 						if (chipmunkConstraintC.addedToSpace)
 						{
-							ChipmunkProWrapper.ucpSpaceRemoveConstraint(chipmunkConstraintC.constraint);
+							// never touch a constraint that is gone or not in the space: Chipmunk abort()s the game
+							if (ChipmunkProS.IsConstraintLive(chipmunkConstraintC.constraint) && ChipmunkProWrapper.ucpSpaceContainsConstraint(chipmunkConstraintC.constraint))
+							{
+								ChipmunkProWrapper.ucpSpaceRemoveConstraint(chipmunkConstraintC.constraint);
+							}
 							chipmunkConstraintC.addedToSpace = false;
 						}
 					}
 					else if (!chipmunkConstraintC.addedToSpace)
 					{
-						ChipmunkProWrapper.ucpSpaceAddConstraint(chipmunkConstraintC.constraint);
+						if (ChipmunkProS.IsConstraintLive(chipmunkConstraintC.constraint) && !ChipmunkProWrapper.ucpSpaceContainsConstraint(chipmunkConstraintC.constraint))
+						{
+							ChipmunkProWrapper.ucpSpaceAddConstraint(chipmunkConstraintC.constraint);
+						}
 						chipmunkConstraintC.addedToSpace = true;
 					}
 				}

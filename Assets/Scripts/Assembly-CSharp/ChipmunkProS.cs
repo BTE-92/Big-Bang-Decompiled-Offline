@@ -529,17 +529,34 @@ public static class ChipmunkProS
 		}
 	}
 
+	// true while the native constraint exists and is still registered (it is gone once a body removal took it out)
+	public static bool IsConstraintLive(IntPtr _constraint)
+	{
+		return _constraint != IntPtr.Zero && m_liveConstraints.Contains(_constraint);
+	}
+
 	public static void RemoveConstraint(ChipmunkConstraintC _c)
 	{
 		if (_c.constraint != IntPtr.Zero)
 		{
 			if (m_liveConstraints.Remove(_c.constraint))
 			{
-				if (!_c.addedToSpace)
+				// ask Chipmunk itself whether the constraint is in the space: the flag of the component and the registry can be out of date, and
+				// removing a constraint that is not in the space (or adding one that already is) makes Chipmunk abort() the whole game
+				bool inSpace = ChipmunkProWrapper.ucpSpaceContainsConstraint(_c.constraint);
+				if (!inSpace && !_c.addedToSpace)
 				{
 					ChipmunkProWrapper.ucpSpaceAddConstraint(_c.constraint);
+					inSpace = true;
 				}
-				ChipmunkProWrapper.ucpRemoveConstraint(_c.constraint);
+				if (inSpace)
+				{
+					ChipmunkProWrapper.ucpRemoveConstraint(_c.constraint);
+				}
+				else
+				{
+					Debug.LogWarning("Constraint is not in the space any more: not removing it.");
+				}
 			}
 			else
 			{

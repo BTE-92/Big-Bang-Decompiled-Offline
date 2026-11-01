@@ -69,6 +69,11 @@ public static class LevelTransfer
     private class ExportEntry
     {
         public PsUIGenericButton Button;
+        public PsUIGenericButton EditButton;
+        public PsUIGenericButton PlayButton;
+        public UIComponent Bar;
+        public UIComponent Banner;
+        public bool Fitted;
         public string Id;
         public string Name;
     }
@@ -114,8 +119,18 @@ public static class LevelTransfer
             b.SetText("Export level", 0.03f);
             b.SetHorizontalAlign(0f);
             b.SetDepthOffset(-20f);
+            // "Edit" between "Export level" and "Play": the level goes back to the unfinished levels so it can be edited and published again
+            PsUIGenericButton edit = new PsUIGenericButton(parent);
+            edit.SetOrangeColors();
+            edit.SetText("Edit", 0.03f);
+            edit.SetHorizontalAlign(0.6f);
+            edit.SetDepthOffset(-20f);
             ExportEntry e = new ExportEntry();
             e.Button = b;
+            e.EditButton = edit;
+            e.PlayButton = banner.m_button;
+            e.Bar = parent;
+            e.Banner = banner;
             e.Id = banner.m_loop.m_minigameId;
             e.Name = banner.m_loop.GetName();
             s_exports.Add(e);
@@ -136,6 +151,12 @@ public static class LevelTransfer
             if (!LaunchPicker()) new PsUIBasePopup(typeof(ImportSelect), null, null, null, false);
             return;
         }
+        bool refit = false;
+        for (int i = 0; i < s_exports.Count; i++)
+        {
+            if (!s_exports[i].Fitted && FitButtons(s_exports[i])) refit = true;
+        }
+        if (refit && s_center != null) s_center.GetRoot().Update();
         for (int i = 0; i < s_exports.Count; i++)
         {
             if (s_exports[i].Button != null && s_exports[i].Button.m_hit)
@@ -143,6 +164,48 @@ public static class LevelTransfer
                 StartExport(s_exports[i].Id, s_exports[i].Name);
                 return;
             }
+            if (s_exports[i].EditButton != null && s_exports[i].EditButton.m_hit)
+            {
+                WOEURL url = new WOEURL("/v1/minigame/draft");
+                url.AddParameter("id", s_exports[i].Id);
+                Request.Get(url, "LEVEL_DRAFT", DraftOk, DraftFailed);
+                return;
+            }
+        }
+    }
+
+    // "Export level", "Edit" and "Play" are as wide as their text, which changes with the language: the blue bar is made as long as needed
+    // (never shorter than before) and the three buttons are spread so that the spaces between them are equal and never smaller than GapRatio.
+    private const float GapRatio = 0.025f;
+    private const float MinBarWidth = 0.625f;
+
+    private static bool FitButtons(ExportEntry e)
+    {
+        try
+        {
+            if (e.Button == null || e.EditButton == null || e.PlayButton == null || e.Bar == null) { e.Fitted = true; return false; }
+            float wExport = e.Button.m_actualWidth;
+            float wEdit = e.EditButton.m_actualWidth;
+            float wPlay = e.PlayButton.m_actualWidth;
+            if (wExport < 1f || wEdit < 1f || wPlay < 1f) return false;
+            e.Fitted = true;
+            float h = Screen.height;
+            float margins = e.Bar.m_actualMargins.l + e.Bar.m_actualMargins.r;
+            float needed = margins + wExport + wEdit + wPlay + 2f * GapRatio * h;
+            float width = Mathf.Max(MinBarWidth * h, needed);
+            e.Bar.SetWidth(width / h, RelativeTo.ScreenHeight);
+            float inner = width - margins;
+            float free = inner - (wExport + wEdit + wPlay);
+            float editLeft = wExport + free * 0.5f;
+            float room = inner - wEdit;
+            if (room > 1f) e.EditButton.SetHorizontalAlign(Mathf.Clamp01(editLeft / room));
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("LevelTransfer.FitButtons failed: " + ex.Message);
+            e.Fitted = true;
+            return false;
         }
     }
 
@@ -565,6 +628,25 @@ public static class LevelTransfer
         }
         WOEURL url = new WOEURL("/v1/minigame/import");
         Request.Post(url, "LEVEL_IMPORT", data, ImportOk, ImportFailed);
+    }
+
+    private static void DraftFailed(HttpC c)
+    {
+        LevelMsg.Show("Edit Failed", "Could not move the level to your unfinished levels.");
+    }
+
+    private static void DraftOk(HttpC c)
+    {
+        string txt = c.www.text ?? string.Empty;
+        if (txt.IndexOf("\"ok\":true") >= 0)
+        {
+            LevelMsg.Show("Level moved", "The level is now one of your unfinished levels. Edit it, then publish it again.");
+            RefreshLevelBuilder();
+        }
+        else
+        {
+            DraftFailed(c);
+        }
     }
 
     private static void ImportFailed(HttpC c)

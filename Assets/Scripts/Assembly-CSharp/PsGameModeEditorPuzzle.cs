@@ -52,7 +52,8 @@ public class PsGameModeEditorPuzzle : PsGameModeStarCollect
 	public override bool isMaterialAvailable(int _index)
 	{
 		PsUnlockable psUnlockable = PsMetagameData.m_gameMaterials[0].m_items[_index];
-		return psUnlockable.m_unlocked && (PsState.m_activeGameLoop as PsGameLoopEditorPuzzle).m_limitedItems.Contains(psUnlockable.m_identifier);
+		// the puzzle gives the materials it lists even to a player who has not unlocked them yet
+		return (PsState.m_activeGameLoop as PsGameLoopEditorPuzzle).m_limitedItems.Contains(psUnlockable.m_identifier);
 	}
 
 	protected override void CreateWinUI()

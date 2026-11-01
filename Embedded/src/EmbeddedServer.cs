@@ -27,6 +27,7 @@ public static class EmbeddedServer
 		Db.Init();
 		MapContent.EnsureBuilderTemplate();
 		MapContent.EnsurePuzzleLevel();
+		MapContent.EnsureNode3Level();
 		MapContent.EnsureSeedLevels();
 		BotPlayer.Ensure();
 		PlayerApi.Register();

@@ -102,6 +102,290 @@ public static class MapContent
 		}
 	}
 
+	// Level 3 of the adventure map. The map is the same for every player: its second official level (after the puzzle, which takes number 2)
+	// is replaced by this level, packed in node3_level.zip (the export format of the game). Node3OfficialId is the id of that official level
+	// in the map; the server serves Node3Id whenever the game asks for it (see MinigameApi.GetOrStandIn).
+	public const string Node3OfficialId = "5537881a3100001b007510f7";
+
+	public const string Node3Id = "7e47a1e0b3d14e7a9c11d0b17e5a0003";
+
+	private static byte[]? ZipEntry(System.IO.Compression.ZipArchive zip, string name)
+	{
+		foreach (System.IO.Compression.ZipArchiveEntry entry in zip.Entries)
+		{
+			if (entry.FullName == name || entry.FullName.EndsWith("/" + name, StringComparison.Ordinal))
+			{
+				using Stream s = entry.Open();
+				using MemoryStream ms = new MemoryStream();
+				s.CopyTo(ms);
+				return ms.ToArray();
+			}
+		}
+		return null;
+	}
+
+	// Level 3 of the map is a puzzle: the level is fixed, the player can only draw with the materials listed here (and can not erase the level).
+	public static readonly string[] Node3Items = { "MaterialLava" };
+
+	public const string Node3DialogueId = "puzzle_lava_intro";
+
+	private const string Node3DialogueText = "Another puzzle ! Lava is the only ground you can draw here. Use it to collect all the stars and reach the goal.";
+
+	private const string Node3DialogueButton = "Let's do it !";
+
+	// The Enigma is always the second bubble of the map (right after the first level), for every player: a player who was already past that
+	// part of the map when the puzzle was added gets it inserted there too, and the numbers of everything after it move by one (node ids,
+	// the node the player is on, the side paths that hang off the main path, level numbers). One that an older version of the server put
+	// somewhere else in the path is taken out first.
+	private static void ShiftPathIds(JsonArray paths, JsonObject main, long fromId, long delta)
+	{
+		if (!(main["nodes"] is JsonArray nodes))
+		{
+			return;
+		}
+		foreach (JsonNode? n in nodes)
+		{
+			if (n is JsonObject no && NumOf(no["id"], -1L) >= fromId)
+			{
+				no["id"] = NumOf(no["id"], 0L) + delta;
+			}
+		}
+		if (NumOf(main["currentNode"], 1L) >= fromId)
+		{
+			main["currentNode"] = NumOf(main["currentNode"], 1L) + delta;
+		}
+		foreach (JsonNode? sp in paths)
+		{
+			if (sp is JsonObject so && (so["name"]?.ToString() ?? "").EndsWith("_SidePath") && NumOf(so["startNode"], -1L) >= fromId)
+			{
+				long start = NumOf(so["startNode"], -1L) + delta;
+				so["startNode"] = start;
+				so["name"] = start + "_SidePath";
+			}
+		}
+	}
+
+	public static void EnforceFixedNodes(JsonArray paths)
+	{
+		try
+		{
+			if (!Settings.PuzzleMission)
+			{
+				return;
+			}
+			JsonObject? main = null;
+			foreach (JsonNode? p in paths)
+			{
+				if (p is JsonObject po && po["name"]?.ToString() == "MainPath")
+				{
+					main = po;
+				}
+			}
+			if (main == null || !(main["nodes"] is JsonArray nodes) || nodes.Count < 4)
+			{
+				return;
+			}
+			// the nodes must be in the order of their ids
+			List<JsonNode> sorted = nodes.Where((JsonNode? n) => n != null).Select((JsonNode? n) => n!).OrderBy((JsonNode n) => NumOf(n["id"], 0L)).ToList();
+			nodes.Clear();
+			foreach (JsonNode n in sorted)
+			{
+				nodes.Add(n.DeepClone());
+			}
+			int first = -1;
+			for (int i = 0; i < nodes.Count; i++)
+			{
+				if (CtxOf(nodes[i]) == "Level")
+				{
+					first = i;
+					break;
+				}
+			}
+			if (first < 0)
+			{
+				return;
+			}
+			bool IsEnigma(JsonNode? n) => CtxOf(n) == "EditorPuzzle" && (n?["data"]?["minigameId"]?.ToString() ?? "") == PuzzleId;
+			// 1. an Enigma that is not right after the first level (an older server put it in a later section for players who were past the first)
+			for (int i = nodes.Count - 1; i >= 0; i--)
+			{
+				if (IsEnigma(nodes[i]) && i != first + 1)
+				{
+					long removedId = NumOf(nodes[i]!["id"], -1L);
+					nodes.RemoveAt(i);
+					for (int k = i; k < nodes.Count; k++)
+					{
+						if (CtxOf(nodes[k]) == "Level" && NumOf(nodes[k]!["levelNumber"], -1L) > 1)
+						{
+							nodes[k]!["levelNumber"] = NumOf(nodes[k]!["levelNumber"], 0L) - 1;
+						}
+					}
+					ShiftPathIds(paths, main, removedId + 1, -1);
+					Console.WriteLine("[Path] Moved the Enigma puzzle (it was node " + removedId + ").");
+				}
+			}
+			// 2. none right after the first level: insert it
+			if (first + 1 < nodes.Count && IsEnigma(nodes[first + 1]))
+			{
+				return;
+			}
+			long firstId = NumOf(nodes[first]!["id"], -1L);
+			long newId = firstId + 1;
+			long current = NumOf(main["currentNode"], 1L);
+			for (int k = first + 1; k < nodes.Count; k++)
+			{
+				if (CtxOf(nodes[k]) == "Level" && NumOf(nodes[k]!["levelNumber"], -1L) > 0)
+				{
+					nodes[k]!["levelNumber"] = NumOf(nodes[k]!["levelNumber"], 0L) + 1;
+				}
+			}
+			ShiftPathIds(paths, main, newId, 1);
+			nodes.Insert(first + 1, new JsonObject
+			{
+				["id"] = newId,
+				["levelNumber"] = Math.Max(NumOf(nodes[first]!["levelNumber"], 0L), 0L) + 1,
+				["score"] = 0,
+				["rented"] = false,
+				["data"] = new JsonObject
+				{
+					["context"] = "EditorPuzzle",
+					["minigameId"] = PuzzleId,
+					["unlocked"] = current > newId,
+					["puzzleLimitedItems"] = new JsonArray(PuzzleItems.Select((string it) => (JsonNode)JsonValue.Create(it)).ToArray()),
+					["dialogueIdentifiers"] = new JsonArray("puzzle_enigma_intro"),
+					["dialogueTriggers"] = new JsonArray("LoopStart")
+				}
+			});
+			Console.WriteLine("[Path] Enigma puzzle inserted as node " + newId + " of the player's path.");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("[Path] EnforceFixedNodes failed: " + ex.Message);
+		}
+	}
+
+	// Levels of the adventure map that this version replaces. The map is the same for every player, but the path each player has is saved
+	// on the player's side and the game rewrites the id of a node with the id of the level it loaded, so an old path would keep the old levels
+	// forever. Every time the path is served, the nodes below are put back, whatever the player's progress is and whether the player has the
+	// puzzle that is added after level 1 or not: a player who updates the game gets the new level at once, without reinstalling or resetting.
+	// To replace another level or puzzle of the map later, add a line here (and the level in a resource like node3_level.zip).
+	// BaseIndex counts the levels of the original map from the start (1, 2, 3 ...), without the puzzle of node 2 nor the builder missions.
+	private sealed class MapOverride
+	{
+		public int BaseIndex;
+		public string LevelId = "";
+		public string[]? Items;
+		public string DialogueId = "";
+	}
+
+	private static readonly MapOverride[] MapOverrides =
+	{
+		// level 3 of the map (second level of the original map): the lava puzzle
+		new MapOverride { BaseIndex = 2, LevelId = Node3Id, Items = Node3Items, DialogueId = Node3DialogueId }
+	};
+
+	public static void ApplyMapOverrides(JsonObject mainPath)
+	{
+		try
+		{
+			if (!(mainPath["nodes"] is JsonArray nodes))
+			{
+				return;
+			}
+			long current = long.TryParse(mainPath["currentNode"]?.ToString(), out long cv) ? cv : 1L;
+			int index = 0;
+			foreach (JsonNode? node in nodes)
+			{
+				string context = node?["data"]?["context"]?.ToString() ?? "";
+				string levelId = node?["data"]?["minigameId"]?.ToString() ?? "";
+				bool isMapLevel = context == "Level" || (context == "EditorPuzzle" && MapOverrides.Any((MapOverride o) => o.LevelId == levelId));
+				if (!isMapLevel || !(node is JsonObject obj))
+				{
+					continue;
+				}
+				index++;
+				MapOverride? rule = MapOverrides.FirstOrDefault((MapOverride o) => o.BaseIndex == index);
+				if (rule == null)
+				{
+					continue;
+				}
+				long id = long.TryParse(obj["id"]?.ToString(), out long nid) ? nid : -1L;
+				bool unlocked = (obj["data"]?["unlocked"]?.ToJsonString() ?? "false") == "true" || (id > 0 && id < current);
+				if (rule.Items == null)
+				{
+					if (obj["data"] is JsonObject levelData)
+					{
+						levelData["minigameId"] = rule.LevelId;
+					}
+					continue;
+				}
+				JsonObject puzzle = new JsonObject
+				{
+					["context"] = "EditorPuzzle",
+					["minigameId"] = rule.LevelId,
+					["unlocked"] = unlocked,
+					["puzzleLimitedItems"] = new JsonArray(rule.Items.Select((string it) => (JsonNode)JsonValue.Create(it)).ToArray())
+				};
+				if (rule.DialogueId != "")
+				{
+					puzzle["dialogueIdentifiers"] = new JsonArray(rule.DialogueId);
+					puzzle["dialogueTriggers"] = new JsonArray("LoopStart");
+				}
+				obj["data"] = puzzle;
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("[Path] ApplyMapOverrides failed: " + ex.Message);
+		}
+	}
+
+	public static void EnsureNode3Level()
+	{
+		try
+		{
+			using Stream? res = EmbeddedResources.Open("node3_level.zip");
+			if (res == null)
+			{
+				return;
+			}
+			using MemoryStream raw = new MemoryStream();
+			res.CopyTo(raw);
+			using System.IO.Compression.ZipArchive zip = new System.IO.Compression.ZipArchive(new MemoryStream(raw.ToArray()), System.IO.Compression.ZipArchiveMode.Read);
+			byte[]? metaBytes = ZipEntry(zip, "metadata");
+			byte[]? levelData = ZipEntry(zip, "level");
+			if (metaBytes == null || levelData == null || levelData.Length < 2)
+			{
+				return;
+			}
+			JsonObject meta = (JsonNode.Parse(System.Text.Encoding.UTF8.GetString(metaBytes)) as JsonObject) ?? new JsonObject();
+			byte[]? shot = ZipEntry(zip, "screenshot");
+			byte[]? ghost = ZipEntry(zip, "ghost");
+			string name = meta["name"]?.ToString() ?? "Level 3";
+			string description = meta["description"]?.ToString() ?? "";
+			string playerUnit = meta["playerUnit"]?.ToString() ?? "OffroadCar";
+			string gameMode = meta["gameMode"]?.ToString() ?? "StarCollect";
+			string items = (meta["itemsUsed"] as JsonArray)?.ToJsonString() ?? "[]";
+			string upgrades = (meta["creatorUpgrades"] as JsonObject)?.ToJsonString() ?? "{}";
+			string creator = meta["creatorName"]?.ToString() ?? "BTE";
+			long complexity = long.TryParse(meta["complexity"]?.ToString(), out long cx) ? cx : 0L;
+			long requirement = long.TryParse(meta["levelRequirement"]?.ToString(), out long rq) ? rq : 0L;
+			if (Db.One("SELECT id FROM minigames WHERE id=$0", Node3Id) != null)
+			{
+				Db.Exec("UPDATE minigames SET name=$0, description=$1, gameMode=$2, playerUnit=$3, itemsUsed=$4, creatorUpgrades=$5, complexity=$6, levelRequirement=$7, creatorName=$8, levelData=$9, screenshot=$10, creatorGhost=$11 WHERE id=$12", name, description, gameMode, playerUnit, items, upgrades, complexity, requirement, creator, levelData, shot, ghost, Node3Id);
+				return;
+			}
+			// state "hidden" and no creator: the level is only reachable from the map, it is not listed with the players' levels
+			Db.Exec("INSERT INTO minigames (id, name, description, creatorId, creatorName, state, gameMode, playerUnit, difficulty, clientVersion, gameQuality, levelRequirement, complexity, itemsUsed, creatorUpgrades, template, levelData, screenshot, creatorGhost, publishTime) VALUES ($0,$1,$2,'',$3,'hidden',$4,$5,'New',249,1.0,$6,$7,$8,$9,0,$10,$11,$12,'2026-10-08T00:00:00.000Z')",
+				Node3Id, name, description, creator, gameMode, playerUnit, requirement, complexity, items, upgrades, levelData, shot, ghost);
+			Console.WriteLine("[Setup] Created the level of node 3: " + name);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("[Setup] Could not add the level of node 3: " + ex.Message);
+		}
+	}
+
 	// Cree (une fois) le niveau du puzzle : ligne "template" cachee de la liste des modeles (researchIdentifier "puzzle_..."),
 	// lue directement par le noeud puzzle de la carte.
 	public static void EnsurePuzzleLevel()
@@ -896,8 +1180,8 @@ public static class MapContent
 						["dialogueTrigger"] = "LoopStart",
 						["dialogueCharacter"] = "Mechanic",
 						["dialogueCharacterPosition"] = "Left",
-						["dialogueText"] = "A puzzle! There are two gaps in the way. Fill them in with the ground you can draw, collect the stars and reach the goal to move on.",
-						["dialogueProceed"] = "Let's solve it!",
+						["dialogueText"] = "A puzzle ! There are two gaps in the way. Fill them in with the ground you can draw, collect the stars and reach the goal to move on.",
+						["dialogueProceed"] = "Let's solve it !",
 						["dialogueCancel"] = "",
 						["dialogueIdentifier"] = "puzzle_enigma_intro"
 					}
@@ -913,6 +1197,34 @@ public static class MapContent
 				edges.Add(new JsonObject { ["source"] = puzzleNodeId, ["target"] = secondId });
 				edges.Add(new JsonObject { ["source"] = dialogueId, ["target"] = puzzleNodeId });
 				count += 3;
+				// level 3 of the map (the second level of the section) is a second puzzle, with lava as the only ground
+				chain[1]["data"] = new JsonObject
+				{
+					["nodeType"] = "EditorPuzzle",
+					["levelMinigameId"] = Node3Id,
+					["puzzleLimitedItems"] = new JsonArray(Node3Items.Select((string i) => (JsonNode)JsonValue.Create(i)).ToArray())
+				};
+				int lavaDialogueId = NextId(nodes);
+				nodes.Add(new JsonObject
+				{
+					["id"] = lavaDialogueId,
+					["name"] = "",
+					["x"] = 0.0,
+					["y"] = 0.0,
+					["data"] = new JsonObject
+					{
+						["nodeType"] = "Dialogue",
+						["dialogueTrigger"] = "LoopStart",
+						["dialogueCharacter"] = "Mechanic",
+						["dialogueCharacterPosition"] = "Left",
+						["dialogueText"] = Node3DialogueText,
+						["dialogueProceed"] = Node3DialogueButton,
+						["dialogueCancel"] = "",
+						["dialogueIdentifier"] = Node3DialogueId
+					}
+				});
+				edges.Add(new JsonObject { ["source"] = lavaDialogueId, ["target"] = secondId });
+				count += 1;
 			}
 		}
 		// Le noeud puzzle est ajoute au chemin enregistre du joueur (InjectPuzzle) : son dialogue d'introduction doit exister dans le graphe
@@ -931,8 +1243,8 @@ public static class MapContent
 					["dialogueTrigger"] = "LoopStart",
 					["dialogueCharacter"] = "Mechanic",
 					["dialogueCharacterPosition"] = "Left",
-					["dialogueText"] = "A puzzle! There are two gaps in the way. Fill them in with the ground you can draw, collect the stars and reach the goal to move on.",
-					["dialogueProceed"] = "Let's solve it!",
+					["dialogueText"] = "A puzzle ! There are two gaps in the way. Fill them in with the ground you can draw, collect the stars and reach the goal to move on.",
+					["dialogueProceed"] = "Let's solve it !",
 					["dialogueCancel"] = "",
 					["dialogueIdentifier"] = "puzzle_enigma_intro"
 				}

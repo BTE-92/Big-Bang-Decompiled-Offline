@@ -150,6 +150,7 @@ public static class PlayerApi
 		UnlockBuilder.FixStoredSignalNodes(result["nodes"] as JsonArray, AsLong(result["currentNode"], 1L));
 		MapContent.RemoveDuplicateTv(result);
 		MapContent.InjectPuzzle(result);
+		MapContent.ApplyMapOverrides(result);
 		return result;
 	}
 
@@ -342,6 +343,7 @@ public static class PlayerApi
 			{
 				return jsonArray;
 			}
+			MapContent.EnforceFixedNodes(jsonArray);
 			JsonArray jsonArray3 = new JsonArray { MainPathWithProgress(jsonArray) };
 			{
 				foreach (JsonNode item in jsonArray)

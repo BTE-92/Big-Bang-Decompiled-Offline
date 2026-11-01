@@ -28,6 +28,15 @@ public static class MinigameApi
 	// choisi de facon stable a partir de l'identifiant demande.
 	public static Row? GetOrStandIn(string id)
 	{
+		// the third level of the adventure map (the second official level, after the puzzle) is a level chosen by the game's author
+		if (id == MapContent.Node3OfficialId)
+		{
+			Row? fixedLevel = GetMinigame(MapContent.Node3Id);
+			if (fixedLevel != null)
+			{
+				return fixedLevel;
+			}
+		}
 		Row? row = GetMinigame(id);
 		if (row != null || id.Length != 24 || !System.Text.RegularExpressions.Regex.IsMatch(id, "^[0-9a-f]{24}$"))
 		{
@@ -401,6 +410,18 @@ public static class MinigameApi
 				Db.Exec("UPDATE minigames SET screenshot=$0 WHERE id=$1", c.Body, c.Q("gameId"));
 			}
 			await c.Json(new JsonObject());
+		});
+		// "Edit" on a finished level: it goes back to the player's unfinished levels (draft), where it can be edited and published again
+		Router.Map("/v1/minigame/draft", async delegate(Ctx c)
+		{
+			Row? level = GetMinigame(c.Q("id"));
+			if (level == null || level.S("creatorId") != c.PlayerId || c.PlayerId == "")
+			{
+				await c.JsonText("{\"ok\":false}");
+				return;
+			}
+			Db.Exec("UPDATE minigames SET state='saved', publishTime='', updatedAt=$0 WHERE id=$1", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), level.S("id"));
+			await c.JsonText("{\"ok\":true}");
 		});
 		Router.Map("/v1/minigame/delete", async delegate(Ctx c)
 		{
