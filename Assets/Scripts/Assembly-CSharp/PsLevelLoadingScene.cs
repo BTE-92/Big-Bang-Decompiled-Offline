@@ -42,6 +42,12 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 
 	private bool m_backgroundFinal;
 
+	private bool m_backgroundIsFallback;
+
+	private float m_blurWaitStart = -1f;
+
+	private bool m_blurTimedOut;
+
 	public StateMachine StateMachine
 	{
 		get
@@ -95,6 +101,10 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 	public void StartOutro()
 	{
 		m_outroStarted = true;
+		if (m_background == null)
+		{
+			CreateFallbackBackground();
+		}
 		CameraS.BringToFront(m_camera);
 		m_state.BringToFront();
 	}
@@ -172,20 +182,41 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 			m_texture = new Texture2D(storedTex.width, storedTex.height, TextureFormat.RGB24, false, true);
 			m_texture.wrapMode = TextureWrapMode.Clamp;
 			FillBackgroundTexture(storedTex);
-			m_material = Object.Instantiate(ResourceManager.GetMaterial(RESOURCE.LevelLoadingBackgroundMat_Material));
-			m_material.mainTexture = m_texture;
-			m_background = GameObject.CreatePrimitive(PrimitiveType.Quad);
-			m_background.name = "BluredScreen";
-			m_background.layer = m_camera.gameObject.layer;
-			Object.Destroy(m_background.GetComponent<Collider>());
-			m_background.transform.position = new Vector3(0f, 0f, 0f);
-			m_background.transform.localScale = new Vector3(Screen.width, Screen.height, 1f);
-			Renderer backgroundRenderer = m_background.GetComponent<Renderer>();
-			backgroundRenderer.sharedMaterial = m_material;
-			backgroundRenderer.receiveShadows = false;
-			backgroundRenderer.shadowCastingMode = ShadowCastingMode.Off;
+			CreateBackgroundQuad();
 			m_backgroundFinal = PsMenuScene.m_blur != null && PsMenuScene.m_blur.done;
 		}
+	}
+
+	private void CreateBackgroundQuad()
+	{
+		m_material = Object.Instantiate(ResourceManager.GetMaterial(RESOURCE.LevelLoadingBackgroundMat_Material));
+		m_material.mainTexture = m_texture;
+		m_background = GameObject.CreatePrimitive(PrimitiveType.Quad);
+		m_background.name = "BluredScreen";
+		m_background.layer = m_camera.gameObject.layer;
+		Object.Destroy(m_background.GetComponent<Collider>());
+		m_background.transform.position = new Vector3(0f, 0f, 0f);
+		m_background.transform.localScale = new Vector3(Screen.width, Screen.height, 1f);
+		Renderer backgroundRenderer = m_background.GetComponent<Renderer>();
+		backgroundRenderer.sharedMaterial = m_material;
+		backgroundRenderer.receiveShadows = false;
+		backgroundRenderer.shadowCastingMode = ShadowCastingMode.Off;
+	}
+
+	// No blurred picture of the menu yet (the blur has not been rendered once, as on the first level the first time the game runs): the menu is about
+	// to be removed and the level to be built, which must not show before the player presses play. A plain dark cover is drawn in the meantime; it
+	// is replaced by the blurred menu as soon as that exists.
+	private void CreateFallbackBackground()
+	{
+		m_texture = new Texture2D(2, 2, TextureFormat.RGB24, false, true);
+		m_texture.wrapMode = TextureWrapMode.Clamp;
+		Color cover = new Color(0.07f, 0.12f, 0.2f);
+		m_texture.SetPixels(new Color[4] { cover, cover, cover, cover });
+		m_texture.Apply();
+		CreateBackgroundQuad();
+		m_backgroundIsFallback = true;
+		m_backgroundFinal = false;
+		Debug.LogError("[LoadingBG] no blurred menu yet: dark cover used");
 	}
 
 	private void StartGame()
@@ -244,7 +275,22 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 		{
 			TryCreateBackground();
 		}
-		if (m_background != null && !m_backgroundFinal && PsMenuScene.m_blur != null && PsMenuScene.m_blur.done)
+		if (m_background == null && m_blurTimedOut)
+		{
+			CreateFallbackBackground();
+		}
+		if (m_background != null && m_backgroundIsFallback && !m_outroStarted)
+		{
+			RenderTexture blurred = GetStoredBlurTexture();
+			if (blurred != null && PsMenuScene.m_blur != null && PsMenuScene.m_blur.done)
+			{
+				m_texture.Resize(blurred.width, blurred.height, TextureFormat.RGB24, false);
+				FillBackgroundTexture(blurred);
+				m_backgroundIsFallback = false;
+				m_backgroundFinal = true;
+			}
+		}
+		if (m_background != null && !m_backgroundFinal && !m_backgroundIsFallback && PsMenuScene.m_blur != null && PsMenuScene.m_blur.done)
 		{
 			RenderTexture finalTex = GetStoredBlurTexture();
 			if (finalTex != null && finalTex.width == m_texture.width && finalTex.height == m_texture.height)
@@ -258,7 +304,32 @@ public class PsLevelLoadingScene : ILoadingScene, IStatedObject
 
 	public bool IntroComplete()
 	{
-		return m_introComplete;
+		return m_introComplete && BackgroundReady();
+	}
+
+	// The menu is removed and the level built when the intro is complete. Before that the blurred picture of the menu has to be ready, whether it
+	// is the first level the game opens or not: the first time the blur has not been rendered once yet, and the level showed through. The wait is
+	// a few frames; it gives up after two seconds (the dark cover is used then).
+	private bool BackgroundReady()
+	{
+		if (!(m_fromScene is PsMenuScene) || PsMenuScene.m_blur == null)
+		{
+			return true;
+		}
+		if (m_background != null && m_backgroundFinal && !m_backgroundIsFallback)
+		{
+			return true;
+		}
+		if (m_blurWaitStart < 0f)
+		{
+			m_blurWaitStart = Time.realtimeSinceStartup;
+		}
+		if (Time.realtimeSinceStartup - m_blurWaitStart > 2f)
+		{
+			m_blurTimedOut = true;
+			return true;
+		}
+		return false;
 	}
 
 	public bool OutroComplete()

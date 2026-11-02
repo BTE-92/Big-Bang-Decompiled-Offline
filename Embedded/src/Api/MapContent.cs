@@ -1014,7 +1014,9 @@ public static class MapContent
 			List<JsonNode> chain = SectionChain(nodes, edges, "unlock_car");
 			for (int i = 2; i < chain.Count; i++)
 			{
-				if ((chain[i]["data"]?["nodeType"]?.ToString() ?? "") == "Level")
+				// the branch hangs off the first level after the puzzle; level 3 of the map is a puzzle now (Node3Id), which counts as that level
+				string branchType = chain[i]["data"]?["nodeType"]?.ToString() ?? "";
+				if (branchType == "Level" || (branchType == "EditorPuzzle" && (chain[i]["data"]?["levelMinigameId"]?.ToString() ?? "") == Node3Id))
 				{
 					List<JsonObject> side = new List<JsonObject>();
 					for (int k = 0; k < 3; k++)

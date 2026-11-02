@@ -58,6 +58,7 @@ public class PsGameLoopEditorPuzzle : PsGameLoop
 			new PsMenuDialogueFlow(this, PsNodeEventTrigger.LoopStart, 0f, delegate
 			{
 				SetAsActiveLoop();
+				PsMenuScene.CreateBlur();
 				if (m_nodeId < m_path.m_currentNodeId)
 				{
 					LoadMinigame();
