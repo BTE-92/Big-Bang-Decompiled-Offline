@@ -454,7 +454,7 @@ public static class LevelTransfer
             s_webData = null;
             if (st == "ok") StartImportBytes(picked);
             else if (st == "toolarge") LevelMsg.Show("Import Failed", TooBigMsg);
-            else if (st == "error") LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+            else if (st == "error") LevelMsg.Show("Import Failed", "Make sure you are importing a valid level !");
             return;
         }
         try
@@ -480,7 +480,7 @@ public static class LevelTransfer
             }
             else if (status == "error")
             {
-                LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+                LevelMsg.Show("Import Failed", "Make sure you are importing a valid level !");
             }
         }
         catch (Exception e)
@@ -611,7 +611,7 @@ public static class LevelTransfer
     {
         if (data == null || data.Length < 22)
         {
-            LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+            LevelMsg.Show("Import Failed", "Make sure you are importing a valid level !");
             return;
         }
         if (data.Length > MaxImportBytes)
@@ -651,7 +651,7 @@ public static class LevelTransfer
 
     private static void ImportFailed(HttpC c)
     {
-        LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+        LevelMsg.Show("Import Failed", "Make sure you are importing a valid level !");
     }
 
     private static void ImportOk(HttpC c)
@@ -659,7 +659,7 @@ public static class LevelTransfer
         string txt = c.www.text ?? string.Empty;
         if (txt.IndexOf("\"ok\":true") >= 0)
         {
-            LevelMsg.Show("Level imported!", "The level was added to your Finished Levels.");
+            LevelMsg.Show("Level imported !", "The level was added to your Finished Levels.");
             RefreshLevelBuilder();
         }
         else if (txt.IndexOf("already") >= 0)
@@ -668,7 +668,7 @@ public static class LevelTransfer
         }
         else
         {
-            LevelMsg.Show("Import Failed", "Make sure you are importing a valid level!");
+            LevelMsg.Show("Import Failed", "Make sure you are importing a valid level !");
         }
     }
 
@@ -714,14 +714,15 @@ public class LevelMsg : PsUIHeaderedCanvas
         row.SetMargins(0.025f, 0.025f, 0f, 0f);
         row.SetHorizontalAlign(0.5f);
         m_headerText = new UIText(row, false, string.Empty, " ", "KGSecondChances_Font", 0.055f, RelativeTo.ScreenHeight, "#95e5ff");
-        m_box = new UITextbox(this, false, string.Empty, " ", "HurmeRegular_Font", 0.03f, RelativeTo.ScreenShortest, false, Align.Center, Align.Middle);
+        m_box = new UITextbox(this, false, string.Empty, " ", "KGSecondChances_Font", 0.04f, RelativeTo.ScreenShortest, false, Align.Center, Align.Middle);
         UIHorizontalList buttons = new UIHorizontalList(this, "msgButtons");
         buttons.SetHeight(0.1f, RelativeTo.ScreenHeight);
         buttons.RemoveDrawHandler();
         buttons.SetVerticalAlign(0f);
         buttons.SetMargins(0f, 0f, 0.075f, -0.075f);
         m_okButton = new PsUIGenericButton(buttons);
-        m_okButton.SetText("Ok");
+        m_okButton.SetText("Ok", 0.04f);
+        m_okButton.SetHeight(0.075f, RelativeTo.ScreenHeight);
         m_okButton.SetGreenColors();
     }
 
@@ -735,6 +736,17 @@ public class LevelMsg : PsUIHeaderedCanvas
             m.m_box.SetText(text);
         }
         popup.Update();
+        if (m != null)
+        {
+            // the width of the box is known now: the text is cut into lines of about the same length
+            string balanced = TextBalance.Lines(m.m_box, text);
+            if (balanced != text)
+            {
+                Loc.Keep(balanced);
+                m.m_box.SetText(balanced);
+                popup.Update();
+            }
+        }
     }
 
     public override void Step()
@@ -744,6 +756,102 @@ public class LevelMsg : PsUIHeaderedCanvas
             (GetRoot() as PsUIBasePopup).Destroy();
         }
         base.Step();
+    }
+}
+
+// coupe un texte en lignes de largeur a peu pres egale (au lieu d'une ligne pleine suivie d'un mot seul)
+public static class TextBalance
+{
+    public static string Lines(UITextbox tb, string raw)
+    {
+        try
+        {
+            if (tb == null || tb.m_tmc == null || string.IsNullOrEmpty(raw)) return raw;
+            float scale = (float)TextMeshS.m_defaultCharacterSize / tb.m_tmc.m_textMesh.characterSize;
+            float width = (tb.m_actualWidth - tb.m_actualMargins.l - tb.m_actualMargins.r) * scale * 0.95f;
+            if (width <= 4f) return raw;
+            int size = Mathf.FloorToInt(tb.m_fontSize * tb.m_fontSizeRelative * scale);
+            if (size < 6) return raw;
+            Font font = tb.m_tmc.m_textMesh.font;
+            float spacing = tb.m_tmc.m_textMesh.lineSpacing;
+            string[] paragraphs = Loc.T(raw).Split('\n');
+            for (int p = 0; p < paragraphs.Length; p++)
+            {
+                paragraphs[p] = Paragraph(font, size, spacing, paragraphs[p].Trim(), width);
+            }
+            return string.Join("\n", paragraphs);
+        }
+        catch (Exception)
+        {
+            return raw;
+        }
+    }
+
+    private static float Measure(Font font, int size, float spacing, string s)
+    {
+        return TextMeshS.GetTextSize(font, size, spacing, s).x;
+    }
+
+    private static string Paragraph(Font font, int size, float spacing, string text, float width)
+    {
+        string[] words = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        int n = words.Length;
+        if (n < 2) return text;
+        float whole = Measure(font, size, spacing, text);
+        int lines = Mathf.CeilToInt(whole / width);
+        if (lines < 2) return text;
+        // w[i, j] = width of the words i..j-1 on one line
+        float[,] w = new float[n + 1, n + 1];
+        for (int i = 0; i < n; i++)
+        {
+            string s = string.Empty;
+            for (int j = i + 1; j <= n; j++)
+            {
+                s = (j == i + 1) ? words[i] : s + " " + words[j - 1];
+                w[i, j] = Measure(font, size, spacing, s);
+            }
+        }
+        for (; lines <= n; lines++)
+        {
+            // best[k, j] = smallest widest line when the first j words are on k lines
+            float[,] best = new float[lines + 1, n + 1];
+            int[,] cut = new int[lines + 1, n + 1];
+            for (int k = 0; k <= lines; k++)
+            {
+                for (int j = 0; j <= n; j++)
+                {
+                    best[k, j] = float.MaxValue;
+                }
+            }
+            best[0, 0] = 0f;
+            for (int k = 1; k <= lines; k++)
+            {
+                for (int j = k; j <= n; j++)
+                {
+                    for (int i = k - 1; i < j; i++)
+                    {
+                        if (best[k - 1, i] == float.MaxValue) continue;
+                        float v = Mathf.Max(best[k - 1, i], w[i, j]);
+                        if (v < best[k, j])
+                        {
+                            best[k, j] = v;
+                            cut[k, j] = i;
+                        }
+                    }
+                }
+            }
+            if (best[lines, n] > width) continue;
+            List<string> result = new List<string>();
+            int end = n;
+            for (int k = lines; k >= 1; k--)
+            {
+                int start = cut[k, end];
+                result.Insert(0, string.Join(" ", words, start, end - start));
+                end = start;
+            }
+            return string.Join("\n", result.ToArray());
+        }
+        return text;
     }
 }
 
@@ -793,15 +901,15 @@ public class ImportSelect : PsUIHeaderedCanvas
         list.SetSpacing(0.02f, RelativeTo.ScreenHeight);
         list.SetMargins(0f, 0f, 0.03f, 0f);
         list.RemoveDrawHandler();
-        new UIText(list, false, string.Empty, "Select the level file to import", "HurmeRegular_Font", 0.03f, RelativeTo.ScreenHeight);
+        new UIText(list, false, string.Empty, "Select the level file to import", "KGSecondChances_Font", 0.04f, RelativeTo.ScreenHeight);
         if (!allowed)
         {
-            new UIText(list, false, string.Empty, opened ? LevelTransfer.SettingsMsg : "Allow access to your files, then tap Import level again.", "HurmeRegular_Font", 0.03f, RelativeTo.ScreenHeight);
+            new UIText(list, false, string.Empty, opened ? LevelTransfer.SettingsMsg : "Allow access to your files, then tap Import level again.", "KGSecondChances_Font", 0.04f, RelativeTo.ScreenHeight);
             return;
         }
         if (zips.Count == 0)
         {
-            new UIText(list, false, string.Empty, "No level files found.\nPut the .zip file you received in your Download folder.", "HurmeRegular_Font", 0.03f, RelativeTo.ScreenHeight);
+            new UIText(list, false, string.Empty, "No level files found.\nPut the .zip file you received in your Download folder.", "KGSecondChances_Font", 0.04f, RelativeTo.ScreenHeight);
             return;
         }
         int max = Math.Min(zips.Count, 5);
@@ -809,7 +917,7 @@ public class ImportSelect : PsUIHeaderedCanvas
         {
             PsUIGenericButton b = new PsUIGenericButton(list);
             b.SetBlueColors();
-            b.SetText(Display(zips[i]), 0.03f, 0.55f);
+            b.SetText(Display(zips[i]), 0.04f, 0.55f);
             b.SetHeight(0.075f, RelativeTo.ScreenHeight);
             m_buttons.Add(b);
             m_paths.Add(zips[i]);

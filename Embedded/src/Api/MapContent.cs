@@ -1126,8 +1126,8 @@ public static class MapContent
 						["dialogueTrigger"] = "LoopStart",
 						["dialogueCharacter"] = "Mechanic",
 						["dialogueCharacterPosition"] = "Left",
-						["dialogueText"] = "Time to build! Make a level with the items you have, then publish it to move on.",
-						["dialogueProceed"] = "Let's build!",
+						["dialogueText"] = "Time to build ! Make a level with the items you have, then publish it to move on.",
+						["dialogueProceed"] = "Let's build !",
 						["dialogueCancel"] = "",
 						["dialogueIdentifier"] = "builder_mission_intro"
 					}
