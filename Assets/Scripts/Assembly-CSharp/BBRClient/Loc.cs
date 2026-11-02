@@ -191,6 +191,28 @@ public static class Loc
         return sb.ToString();
     }
 
+    // separe les balises du debut et de la fin du texte
+    private static void EdgeTags(string s, out string head, out string mid, out string tail)
+    {
+        int a = 0;
+        while (a < s.Length && s[a] == '<')
+        {
+            int gt = s.IndexOf('>', a);
+            if (gt < 0) break;
+            a = gt + 1;
+        }
+        int b = s.Length;
+        while (b > a && s[b - 1] == '>')
+        {
+            int lt = s.LastIndexOf('<', b - 1);
+            if (lt < a) break;
+            b = lt;
+        }
+        head = s.Substring(0, a);
+        mid = s.Substring(a, b - a);
+        tail = s.Substring(b);
+    }
+
     private static string WildMatch(string s)
     {
         string best = null;
@@ -277,7 +299,14 @@ public static class Loc
             {
                 r = ExactOrUpper(plain);
                 if (r == null) r = WildMatch(plain);
-                if (r != null) return r;
+                if (r != null)
+                {
+                    // balises seulement aux extremites : on les remet autour de la traduction (sinon couleur perdue, ombre blanche, balises orphelines)
+                    string head, mid, tail;
+                    EdgeTags(s, out head, out mid, out tail);
+                    if (mid.IndexOf('<') < 0) return head + r + tail;
+                    return r;
+                }
             }
         }
 
