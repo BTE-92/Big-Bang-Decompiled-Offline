@@ -110,6 +110,10 @@ public class PsFloatingPlanetNode : PsPlanetNode
 			Frame frame = m_planetNodeSpriteSheet.m_atlas.GetFrame("menu_timer_background");
 			bgSpriteC = SpriteS.AddComponent(m_domeNumberTC, frame, m_planetNodeSpriteSheet);
 			SpriteS.SetColor(bgSpriteC, new Color(1f, 1f, 1f, 0.6f));
+			// a longer (translated) name makes the grey rectangle wider, so it can overlap the diamonds or the other pictures of the node; at the same depth they kept
+			// swapping places. The rectangle is always behind them, and the name stays in front of it.
+			SpriteS.SetSortValue(bgSpriteC, 1f);
+			TransformS.Move(m_domeNumberTC, Vector3.forward * 0.3f);
 			m_numberText = TextMeshS.AddComponent(m_domeNumberTC, Vector3.forward * -0.5f, "HurmeSemiBold_Font", 5f, 2f, 30f, Align.Center, Align.Middle, m_loop.m_planet.m_planetCamera, m_loop.m_levelNumber.ToString());
 			string bannerString = (m_loop as PsTimedEventLoop).GetBannerString();
 			TextMeshS.SetText(m_numberText, bannerString, false);
