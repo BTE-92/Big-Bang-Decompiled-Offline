@@ -89,8 +89,13 @@ public static class MinigameApi
 			["name"] = m.S("name"),
 			["creatorId"] = m.S("creatorId", "??")
 		};
-		string text2 = PlayerApi.GetPlayer(m.S("creatorId"))?.S("name");
-		obj["creatorName"] = ((text2 != null && text2.Length > 0) ? text2 : m.S("creatorName", "??"));
+		// the stored name is kept up to date on rename (changeName), and keeps the original author's name on imported levels
+		string text2 = m.S("creatorName", "");
+		if (text2.Length == 0)
+		{
+			text2 = PlayerApi.GetPlayer(m.S("creatorId"))?.S("name") ?? "??";
+		}
+		obj["creatorName"] = text2;
 		obj["description"] = m.S("description");
 		obj["timesPlayed"] = m.L("timesPlayed", 0L);
 		obj["timesLiked"] = m.L("timesLiked", 0L);

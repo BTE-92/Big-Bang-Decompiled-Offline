@@ -755,9 +755,11 @@ public static class PlayerApi
 			string text = (c.BodyJson() as JsonObject)?["name"]?.ToString() ?? "";
 			if (text != "" && c.PlayerId != "")
 			{
+				string oldName = PlayerApi.GetPlayer(c.PlayerId)?.S("name") ?? "";
 				Db.Exec("UPDATE players SET name=$0 WHERE id=$1", text, c.PlayerId);
 				// le nom est aussi recopie sur les niveaux et les scores du joueur : on les met a jour pour que tout le monde voie le nouveau nom
-				Db.Exec("UPDATE minigames SET creatorName=$0 WHERE creatorId=$1", text, c.PlayerId);
+				// imported levels keep their original author's name: only levels carrying the old name follow a rename
+				Db.Exec("UPDATE minigames SET creatorName=$0 WHERE creatorId=$1 AND (creatorName=$2 OR creatorName='')", text, c.PlayerId, oldName);
 				Db.Exec("UPDATE scores SET name=$0 WHERE playerId=$1", text, c.PlayerId);
 				Db.Exec("UPDATE comments SET name=$0 WHERE playerId=$1", text, c.PlayerId);
 				Console.WriteLine($"[Player] renamed to {text} ({c.PlayerId})");
