@@ -30,12 +30,15 @@ public class PsUICenterCreate : UICanvas
 		: base(_parent, false, "ScrollableContent", null, string.Empty)
 	{
 		GetRoot().SetDrawHandler(PsUIDrawHandlers.DebriefBackground);
-		SetWidth(0.75f, RelativeTo.ScreenWidth);
+		// 75% of the screen width is enough on wide phones, but on a squarer screen (iPad 4:3) it clipped the level banners:
+		// the page gets up to 1.3 screen heights of width there (the spacing and margins keep the page one screen wide)
+		float pageWidth = Mathf.Clamp(1.3f * (float)Screen.height / (float)Screen.width, 0.75f, 0.98f);
+		SetWidth(pageWidth, RelativeTo.ScreenWidth);
 		SetHeight(1f, RelativeTo.ParentHeight);
 		SetVerticalAlign(0f);
 		UIHorizontalList uIHorizontalList = _parent as UIHorizontalList;
-		uIHorizontalList.SetSpacing(0.25f, RelativeTo.ScreenWidth);
-		uIHorizontalList.SetMargins(0.125f, 0.125f, 0f, 0f, RelativeTo.ScreenWidth);
+		uIHorizontalList.SetSpacing(1f - pageWidth, RelativeTo.ScreenWidth);
+		uIHorizontalList.SetMargins((1f - pageWidth) * 0.5f, (1f - pageWidth) * 0.5f, 0f, 0f, RelativeTo.ScreenWidth);
 		float num = 0.15f;
 		RemoveDrawHandler();
 		m_scrollArea = new UIScrollableCanvas(this, string.Empty);

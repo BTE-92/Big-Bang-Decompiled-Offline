@@ -97,6 +97,24 @@ public class UIEditorDrawMenu : UIHorizontalList
 		{
 			m_drawWindow.Destroy();
 		}
+		// the wheel is rebuilt here (lefty switch, rotation...): the red "new item" badges of the previous wheel are separate entities
+		// and were left on screen for good, so a stale red "!" stayed even after every item had been seen
+		if (m_notifications != null)
+		{
+			for (int n = 0; n < m_notifications.Length; n++)
+			{
+				if (m_notifications[n] != null)
+				{
+					EntityManager.RemoveEntity(m_notifications[n], true, true);
+					m_notifications[n] = null;
+				}
+			}
+		}
+		if (m_masterNotification != null)
+		{
+			EntityManager.RemoveEntity(m_masterNotification, true, true);
+			m_masterNotification = null;
+		}
 		bool flag = true;
 		m_drawWindow = new UIEditorDrawButtonsWindow(null, "DrawWindow");
 		if (flag)

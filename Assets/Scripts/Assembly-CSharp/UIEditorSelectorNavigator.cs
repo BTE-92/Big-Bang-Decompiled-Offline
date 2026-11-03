@@ -15,6 +15,8 @@ public class UIEditorSelectorNavigator : UIHorizontalList
 
 	private string[] m_categories;
 
+	private float m_categoryButtonWidth = 0.2f;
+
 	private EditorSelectorContext m_context;
 
 	private UIFittedText m_notificationAmount;
@@ -89,6 +91,11 @@ public class UIEditorSelectorNavigator : UIHorizontalList
 		uIHorizontalList.SetMargins(-0.025f, 0f, 0.035f, 0f);
 		uIHorizontalList.SetSpacing(0.01f, RelativeTo.ParentHeight);
 		uIHorizontalList.RemoveDrawHandler();
+		// the category buttons are 0.2 screen heights wide each: on a squarer screen (iPad 4:3) the row would run past the right edge,
+		// so they get narrower to fit the room left next to the back column (a no-op on wide screens)
+		float aspect = (float)Screen.width / (float)Screen.height;
+		float room = aspect - (0.2f * aspect + 0.05f + 0.1f) - 0.02f;
+		m_categoryButtonWidth = Mathf.Min(0.2f, room / (float)m_categories.Length);
 		m_categoryButtons = new UICanvas[m_categories.Length];
 		for (int j = 0; j < m_categoryButtons.Length; j++)
 		{
@@ -120,7 +127,7 @@ public class UIEditorSelectorNavigator : UIHorizontalList
 	public UICanvas AddCategoryButton(UIComponent _parent, string _title, bool _highlight, Color _color)
 	{
 		UICanvas uICanvas = new UICanvas(_parent, true, string.Empty, null, string.Empty);
-		uICanvas.SetWidth(0.2f, RelativeTo.ScreenHeight);
+		uICanvas.SetWidth(m_categoryButtonWidth, RelativeTo.ScreenHeight);
 		uICanvas.SetHeight(0.12f, RelativeTo.ScreenHeight);
 		uICanvas.RemoveDrawHandler();
 		if (_highlight)

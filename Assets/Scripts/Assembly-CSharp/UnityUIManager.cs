@@ -147,7 +147,9 @@ public static class UnityUIManager
 		CanvasScaler canvasScaler = gameObject.AddComponent<CanvasScaler>();
 		canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 		canvasScaler.referenceResolution = new Vector2(1334f, 750f);
-		canvasScaler.matchWidthOrHeight = 1f;
+		// Expand: wide screens still fit the height (same as before), but a squarer screen (iPad 4:3) now fits the width
+		// instead of letting the panels (upgrades, hats...) run past the right edge
+		canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 		GraphicRaycaster graphicRaycaster = gameObject.AddComponent<GraphicRaycaster>();
 		return canvas;
 	}
